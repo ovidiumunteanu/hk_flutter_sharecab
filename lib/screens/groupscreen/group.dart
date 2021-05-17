@@ -34,6 +34,12 @@ class _GroupPageState extends State<GroupPage>
   String departure_date = '';
   String departure_time = '';
   String grpOwner = '';
+  String rule  = '';
+  String sex = '';
+  int waiting_time = 0;
+  bool wait_all_member = false;
+  bool require_permission = false;
+
   int presentNum = 0;
   int maxPoolers = 0;
   bool loading = true;
@@ -130,20 +136,29 @@ class _GroupPageState extends State<GroupPage>
                 builder: (context, groupsnapshot) {
                   if (groupsnapshot.connectionState == ConnectionState.active) {
                     if (buttonEnabled == true) {
-                      destination = groupsnapshot.data['destination'];
-                      dest_location =
-                          groupsnapshot.data['destination_location'];
-                      departure_location =
-                          groupsnapshot.data['departure_location'];
-                      departure_date =
-                          "${DateFormat('yyyy.MM.dd').format(groupsnapshot.data['departure_time'].toDate())}";
-                      departure_time =
-                          "${DateFormat('kk:mm a').format(groupsnapshot.data['departure_time'].toDate())}";
+                      if (groupsnapshot.data != null) {
+                        destination = groupsnapshot.data['destination'];
+                        dest_location =
+                            groupsnapshot.data['destination_location'];
+                        departure_location =
+                            groupsnapshot.data['departure_location'];
+                        departure_date =
+                            "${DateFormat('yyyy.MM.dd').format(groupsnapshot.data['departure_time'].toDate())}";
+                        departure_time =
+                            "${DateFormat('kk:mm a').format(groupsnapshot.data['departure_time'].toDate())}";
 
-                      grpOwner = groupsnapshot.data['owner'];
-                      presentNum = groupsnapshot.data['users'].length;
-                      maxPoolers = groupsnapshot.data['maxPoolers'];
-                      loading = false;
+                        rule =  groupsnapshot.data['rule']; 
+                        sex =  groupsnapshot.data['sex']; 
+                        wait_all_member = groupsnapshot.data['wait_all_member'];
+                        waiting_time = groupsnapshot.data['waiting_time'];
+                        require_permission = groupsnapshot.data['require_permission']; 
+
+                        grpOwner = groupsnapshot.data['owner'];
+                        presentNum = groupsnapshot.data['users'].length;
+                        maxPoolers = groupsnapshot.data['maxPoolers'];
+                        loading = false;
+                      }
+                      
                     }
 
                     return loading
@@ -519,28 +534,24 @@ class _GroupPageState extends State<GroupPage>
                                               departure_time),
                                           buildRowInfo(
                                               'Rule : ',
-                                              groupsnapshot.data['rule'] +
+                                              rule +
                                                   ', ' +
-                                                  groupsnapshot.data['sex']),
+                                                  sex ),
                                           buildRowInfo('No. of members : ',
                                               maxPoolers.toString()),
                                           buildRowInfo(
-                                              'Waiting time limited: ',
-                                              groupsnapshot.data['waiting_time']
-                                                      .toString() +
-                                                  ' minutes'),
+                                              'Waiting time limited: ', 
+                                              waiting_time.toString() +
+                                                  ' minutes' ),
                                           buildRowInfo(
-                                              'Required wait for all members arrive before going? : ',
-                                              groupsnapshot.data[
-                                                          'wait_all_member'] ==
+                                              'Required wait for all members arrive before going? : ', 
+                                              wait_all_member ==
                                                       true
                                                   ? 'Yes'
                                                   : 'No'),
                                           buildRowInfo(
                                               'Required permission to join trip? : ',
-                                              groupsnapshot.data[
-                                                          'require_permission'] ==
-                                                      true
+                                              require_permission ==  true
                                                   ? 'Yes'
                                                   : 'No'),
                                         ],

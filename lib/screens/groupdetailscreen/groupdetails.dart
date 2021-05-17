@@ -203,14 +203,14 @@ class _GroupDetailsState extends State<GroupDetails>
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
+                                        mainAxisSize : MainAxisSize.max,
                                     children: <Widget>[
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text('Departure Location'),
                                       ),
-                                      Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(departure_location),
+                                      Flexible(
+                                        child : Text(departure_location)
                                       ),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
