@@ -1,4 +1,4 @@
-package com.devclub.shareacab
+package com.hk.sharetripapp
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity

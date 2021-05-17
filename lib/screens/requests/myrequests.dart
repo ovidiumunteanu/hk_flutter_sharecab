@@ -20,6 +20,42 @@ class _MyRequestsState extends State<MyRequests> with AutomaticKeepAliveClientMi
     return qn.documents;
   }
 
+
+  Widget buildRowInfo(String key, String value) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: <Widget>[
+        Padding(
+          padding: const EdgeInsets.only(top: 10.0, left: 12),
+          child: Text(
+            key,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.start,
+          ),
+        ),
+        Flexible(
+          fit: FlexFit.tight,
+          flex: 1,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10.0, right: 12),
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                // fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.start,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -50,8 +86,8 @@ class _MyRequestsState extends State<MyRequests> with AutomaticKeepAliveClientMi
                             itemCount: snapshot.data == null ? 0 : snapshot.data.length,
                             itemBuilder: (ctx, index) {
                               final destination = snapshot.data[index].data['destination'];
-                              final start = snapshot.data[index].data['start'].toDate();
-                              final end = snapshot.data[index].data['end'].toDate();
+                              final start = DateTime.now();
+                              final end = DateTime.now(); //snapshot.data[index].data['end'].toDate();
                               final docId = snapshot.data[index].documentID;
                               final privacy = snapshot.data[index].data['privacy'];
                               final numberOfMembers = snapshot.data[index].data['numberOfMembers'];
@@ -71,99 +107,17 @@ class _MyRequestsState extends State<MyRequests> with AutomaticKeepAliveClientMi
                                             elevation: 5,
                                             margin: EdgeInsets.symmetric(vertical: 6, horizontal: 5),
                                             child: Container(
+                                              padding: EdgeInsets.all(12),
                                               child: SingleChildScrollView(
                                                 child: Column(
                                                   children: <Widget>[
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                      children: <Widget>[
-                                                        Flexible(
-                                                          fit: FlexFit.tight,
-                                                          flex: 1,
-                                                          child: Container(
-                                                              margin: EdgeInsets.only(
-                                                                left: 20,
-                                                                top: 20,
-                                                              ),
-                                                              child: snapshot.data[index].data['destination'] == 'New Delhi Railway Station' || snapshot.data[index].data['destination'] == 'Hazrat Nizamuddin Railway Station'
-                                                                  ? Icon(
-                                                                      Icons.train,
-                                                                      color: Theme.of(context).accentColor,
-                                                                      size: 30,
-                                                                    )
-                                                                  : snapshot.data[index].data['destination'] == 'Indira Gandhi International Airport'
-                                                                      ? Icon(
-                                                                          Icons.airplanemode_active,
-                                                                          color: Theme.of(context).accentColor,
-                                                                          size: 30,
-                                                                        )
-                                                                      : Icon(
-                                                                          Icons.directions_bus,
-                                                                          color: Theme.of(context).accentColor,
-                                                                          size: 30,
-                                                                        )),
-                                                        ),
-                                                        Flexible(
-                                                          fit: FlexFit.tight,
-                                                          flex: 4,
-                                                          child: Padding(
-                                                            padding: const EdgeInsets.only(top: 10.0),
-                                                            child: Text(
-                                                              '${snapshot.data[index].data['destination']}',
-                                                              style: TextStyle(
-                                                                fontSize: 17,
-                                                                fontWeight: FontWeight.bold,
-                                                              ),
-                                                              textAlign: TextAlign.center,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                        bottom: 5,
-                                                        top: 10,
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: <Widget>[
-                                                          Text(
-                                                            'Started : ${DateFormat('dd.MM.yyyy - kk:mm a').format(snapshot.data[index].data['start'].toDate())}',
-                                                            style: TextStyle(
-                                                              fontSize: 15,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                        bottom: 5,
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        children: <Widget>[
-                                                          Text(
-                                                            'Ended : ${DateFormat('dd.MM.yyyy - kk:mm a').format(snapshot.data[index].data['end'].toDate())}',
-                                                            style: TextStyle(
-                                                              fontSize: 15,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                    Padding(
-                                                      padding: const EdgeInsets.all(8.0),
-                                                      child: Row(
-                                                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                                        children: <Widget>[
-                                                          Column(
-                                                            children: <Widget>[Text('Number of poolers: ${snapshot.data[index].data['numberOfMembers'].toString()}')],
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
+                                                    buildRowInfo('Destination : ', '${snapshot.data[index].data['destination']}'),
+                                                    buildRowInfo('Destination Location : ', '${snapshot.data[index].data['destination_location']}'),
+                                                    buildRowInfo('Departure Date : ', '${DateFormat('yyyy.MM.dd').format(snapshot.data[index].data['departure_time'].toDate())}'),
+                                                    buildRowInfo('Departure Time : ', '${DateFormat('kk:mm a').format(snapshot.data[index].data['departure_time'].toDate())}'),
+                                                    buildRowInfo('Departure Location : ', '${snapshot.data[index].data['departure_location']}'),
+                                                    buildRowInfo('Rule : ', '${snapshot.data[index].data['rule']} , ${snapshot.data[index].data['sex']}'),
+                                                    buildRowInfo('Number of people who joined : ', '${snapshot.data[index].data['maxPoolers']}'),
                                                   ],
                                                 ),
                                               ),

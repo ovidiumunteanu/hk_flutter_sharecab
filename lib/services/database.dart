@@ -84,22 +84,23 @@ class DatabaseService {
     var user = await _auth.currentUser();
 
     // CODE FOR CONVERTING DATE TIME TO TIMESTAMP
-
-    var temp = requestDetails.startTime;
-    var starting = DateTime(requestDetails.startDate.year, requestDetails.startDate.month, requestDetails.startDate.day, temp.hour, temp.minute);
-    var temp2 = requestDetails.endTime;
-    var ending = DateTime(requestDetails.endDate.year, requestDetails.endDate.month, requestDetails.endDate.day, temp2.hour, temp2.minute);
-
+    var temp = requestDetails.departureTime;
+    var departure_time = DateTime(requestDetails.departureDate.year, requestDetails.departureDate.month, requestDetails.departureDate.day, temp.hour, temp.minute);
+    
     final docRef = await groupdetails.add({
       'owner': user.uid.toString(),
       'users': FieldValue.arrayUnion([user.uid]),
       'destination': requestDetails.destination.toString(),
-      'start': starting,
-      'end': ending,
-      'privacy': requestDetails.privacy.toString(),
-      'maxpoolers': requestDetails.maxPoolers,
-      'numberOfMembers': 1,
-      'threshold': null,
+      'destination_location': requestDetails.destination_location.toString(),
+      'departure_location': requestDetails.departure_location.toString(),
+      'departure_time': departure_time,
+      'rule': requestDetails.rule,
+      'sex': requestDetails.sex,
+      'waiting_time': requestDetails.waiting_time,
+      'wait_all_member': requestDetails.wait_all_member,
+      'require_permission': requestDetails.require_permission,
+      'maxPoolers': requestDetails.maxPoolers,
+      'end' : false,
       'created': Timestamp.now(),
     });
 
@@ -113,30 +114,37 @@ class DatabaseService {
     var request = groupdetails.document(docRef.documentID).collection('users');
     await Firestore.instance.collection('userdetails').document(user.uid).get().then((value) async {
       if (value.exists) {
-        await request.document(user.uid).setData({'name': value.data['name'], 'hostel': value.data['hostel'], 'sex': value.data['sex'], 'mobilenum': value.data['mobileNumber'], 'totalrides': value.data['totalRides'], 'cancelledrides': value.data['cancelledRides'], 'actualrating': value.data['actualRating'], 'numberofratings': value.data['numberOfRatings']});
+        await request.document(user.uid).setData({'uid' : user.uid, 'name': value.data['name'], 'hostel': value.data['hostel'], 'sex': value.data['sex'], 'mobilenum': value.data['mobileNumber'], 'totalrides': value.data['totalRides'], 'cancelledrides': value.data['cancelledRides'], 'actualrating': value.data['actualRating'], 'numberofratings': value.data['numberOfRatings']});
       }
     });
   }
 
-  // to update group details (W=1, R=0)
-  Future<void> updateGroup(String groupUID, DateTime SD, TimeOfDay ST, DateTime ED, TimeOfDay ET, bool privacy, int maxPoolers) async {
-    var starting = DateTime(SD.year, SD.month, SD.day, ST.hour, ST.minute);
-    var ending = DateTime(ED.year, ED.month, ED.day, ET.hour, ET.minute);
-
-    await groupdetails.document(groupUID).setData({
-      'start': starting,
-      'end': ending,
-      'privacy': privacy.toString(),
-      'maxpoolers': maxPoolers,
+  Future<void> updateGroup(RequestDetails requestDetails) async {
+    
+    // CODE FOR CONVERTING DATE TIME TO TIMESTAMP
+    var temp = requestDetails.departureTime;
+    var departure_time = DateTime(requestDetails.departureDate.year, requestDetails.departureDate.month, requestDetails.departureDate.day, temp.hour, temp.minute);
+    
+    await groupdetails.document(requestDetails.id).setData({
+      'destination': requestDetails.destination.toString(),
+      'destination_location': requestDetails.destination_location.toString(),
+      'departure_location': requestDetails.departure_location.toString(),
+      'departure_time': departure_time,
+      'rule': requestDetails.rule,
+      'sex': requestDetails.sex,
+      'waiting_time': requestDetails.waiting_time,
+      'wait_all_member': requestDetails.wait_all_member,
+      'require_permission': requestDetails.require_permission,
+      'maxPoolers': requestDetails.maxPoolers,
     }, merge: true);
+
   }
 
   // exit a group (W=4/5, R =3/4)
   Future<void> exitGroup() async {
     var user = await _auth.currentUser();
     var currentGrp;
-    var presentNum;
-    var startTimeStamp;
+    int presentNum;
     var totalRides;
     var cancelledRides;
     var owner;
@@ -146,21 +154,20 @@ class DatabaseService {
       cancelledRides = value.data['cancelledRides'];
     });
     await groupdetails.document(currentGrp).get().then((value) {
-      presentNum = value.data['numberOfMembers'];
-      startTimeStamp = value.data['start'];
+      presentNum = value.data['users'].length;
       owner = value.data['owner'];
     });
-    // if user leaves early, then :
-    if (startTimeStamp.compareTo(Timestamp.now()) > 0) {
-      await userDetails.document(user.uid).updateData({
-        'currentGroup': null,
-        'cancelledRides': cancelledRides + 1,
-      });
+    
+    await userDetails.document(user.uid).updateData({
+      'currentGroup': null,
+    });
+
+    if (presentNum > 1 ) {
       await groupdetails.document(currentGrp).updateData({
         'users': FieldValue.arrayRemove([user.uid]),
-        'numberOfMembers': presentNum - 1,
       });
-      if (owner == user.uid && presentNum > 1) {
+      await groupdetails.document(currentGrp).collection('users').document(user.uid).delete();
+      if (owner == user.uid ) {
         var newowner;
         await groupdetails.document(currentGrp).get().then((value) {
           newowner = value.data['users'][0];
@@ -169,21 +176,10 @@ class DatabaseService {
           'owner': newowner,
         });
       }
-      await groupdetails.document(currentGrp).collection('users').document(user.uid).delete();
       //deleting user from chat group
       await ChatService().exitChatRoom(currentGrp);
     }
-    // if user leaves after ride completion:
     else {
-      await userDetails.document(user.uid).updateData({
-        'currentGroup': null,
-        'totalRides': totalRides + 1,
-        'previous_groups': FieldValue.arrayUnion([currentGrp]),
-      });
-    }
-
-    // delete group if last member and startTime is greater than present time.
-    if (presentNum == 1 && startTimeStamp.compareTo(Timestamp.now()) > 0) {
       await groupdetails.document(currentGrp).delete();
     }
   }
@@ -191,22 +187,19 @@ class DatabaseService {
   // join a group from dashboard (W=4,R=2)
   Future<void> joinGroup(String listuid) async {
     var user = await _auth.currentUser();
-    var presentNum;
+ 
     await userDetails.document(user.uid).updateData({
       'currentGroup': listuid,
     });
-    await groupdetails.document(listuid).get().then((value) {
-      presentNum = value.data['numberOfMembers'];
-    });
     await groupdetails.document(listuid).updateData({
       'users': FieldValue.arrayUnion([user.uid.toString()]),
-      'numberOfMembers': presentNum + 1,
     });
 
     var request = groupdetails.document(listuid).collection('users');
     await Firestore.instance.collection('userdetails').document(user.uid).get().then((value) async {
       if (value.exists) {
         await request.document(user.uid).setData({
+          'uid' : user.uid,
           'name': value.data['name'],
           'hostel': value.data['hostel'],
           'sex': value.data['sex'],
@@ -222,6 +215,15 @@ class DatabaseService {
     await ChatService().joinGroup(listuid);
   }
 
+  Future<void> setArrived(String listuid) async {
+    var user = await _auth.currentUser();
+ 
+    var request = groupdetails.document(listuid).collection('users');
+    await request.document(user.uid).setData({
+          'isArrived' : true
+    }, merge: true);
+  }
+
   // set device token (W=1,R=0)
   Future<void> setToken(String token) async {
     final user = await _auth.currentUser();
@@ -231,16 +233,12 @@ class DatabaseService {
   // Function for kicking a user (ADMIN ONLY) (W=4,R=1)
   Future<void> kickUser(String currentGrp, String uid) async {
     await groupdetails.document(currentGrp).collection('users').document(uid).delete();
-    var presentNum;
-    await groupdetails.document(currentGrp).get().then((value) {
-      presentNum = value.data['numberOfMembers'];
-    });
+
     await userDetails.document(uid).updateData({
       'currentGroup': null,
     });
     await groupdetails.document(currentGrp).updateData({
       'users': FieldValue.arrayRemove([uid]),
-      'numberOfMembers': presentNum - 1,
     });
     await ChatService().kickedChatRoom(currentGrp, uid);
   }

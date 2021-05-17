@@ -1,42 +1,33 @@
 {
   "project_info": {
-    "project_number": "601602499777",
-    "firebase_url": "https://shareacab-df9e9.firebaseio.com",
-    "project_id": "shareacab-df9e9",
-    "storage_bucket": "shareacab-df9e9.appspot.com"
+    "project_number": "601144392265",
+    "project_id": "share-project-2fdb3",
+    "storage_bucket": "share-project-2fdb3.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:601602499777:android:ed43aee964570d9ea9a040",
+        "mobilesdk_app_id": "1:601144392265:android:c5983e79e5e77e2916dd98",
         "android_client_info": {
-          "package_name": "com.devclub.shareacab"
+          "package_name": "com.hk.sharetripapp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "601602499777-bfm8012m2t72hv9s5ds49rvpaake02cm.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.devclub.shareacab",
-            "certificate_hash": "937dc5d255542dc6d4e574f56b1c54e395359bbc"
-          }
-        },
-        {
-          "client_id": "601602499777-0rnt0a40dt4q986j1jiqill4j9i1afve.apps.googleusercontent.com",
+          "client_id": "601144392265-odvljfr9d94k7n6u3r4ntv9acej2fr72.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCK0fGYjIa79OGe7oDe1yXXu_tDykaArzo"
+          "current_key": "AIzaSyCtTRjcc3NsVsJ5RfathOd2QZ1sR4pf7KA"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "601602499777-0rnt0a40dt4q986j1jiqill4j9i1afve.apps.googleusercontent.com",
+              "client_id": "601144392265-odvljfr9d94k7n6u3r4ntv9acej2fr72.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

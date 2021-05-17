@@ -15,20 +15,43 @@ class CreateTrip extends StatefulWidget {
 class _CreateTripState extends State<CreateTrip> {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  List<String> destinations = ['New Delhi Railway Station', 'Indira Gandhi International Airport', 'Anand Vihar ISBT', 'Hazrat Nizamuddin Railway Station'];
-  List<int> maxpoolers = [1, 2, 3, 4, 5, 6];
-  String _destination;
-  int _maxPoolers;
   final _finalDestinationController = TextEditingController();
-  DateTime _selectedStartDate;
-  TimeOfDay _selectedStartTime;
-  DateTime _selectedEndDate;
-  TimeOfDay _selectedEndTime;
-  bool privacy = false;
   final RequestService _request = RequestService();
 
+  List<String> destinations = [
+    'New Delhi Railway Station',
+    'Indira Gandhi International Airport',
+    'Anand Vihar ISBT',
+    'Hazrat Nizamuddin Railway Station'
+  ];
+  List<int> maxpoolers = [1, 2, 3, 4, 5, 6, 7];
+  String _destination;
+  String _destination_location;
+  String _departure_location;
+  DateTime _selectedDepartureDate;
+  TimeOfDay _selectedDepartureTime;
+  String _rule = '4 Person Taxi';
+  String _sex = 'Any';
+  int _maxMembers = 1;
+  int _waiting_time = 0;
+  bool _wait_all_member = false;
+  bool _require_permission = false;
+
   void _addNewRequest() async {
-    final newRq = RequestDetails(name: 'Name', id: DateTime.now().toString(), destination: _destination, finalDestination: '', startDate: _selectedStartDate, startTime: _selectedStartTime, endDate: _selectedEndDate, endTime: _selectedEndTime, privacy: privacy, maxPoolers: _maxPoolers);
+    final newRq = RequestDetails(
+        id: DateTime.now().toString(),
+        name: 'Name',
+        destination: _destination,
+        destination_location: _destination_location,
+        departure_location: _departure_location,
+        departureDate: _selectedDepartureDate,
+        departureTime: _selectedDepartureTime,
+        rule: _rule,
+        sex: _sex,
+        waiting_time: _waiting_time,
+        wait_all_member: _wait_all_member,
+        require_permission: _require_permission,
+        maxPoolers: _maxMembers);
     try {
       await _request.createTrip(newRq);
       // LOOK FOR A WAY TO SHOW A RESPONSE THAT THE TRIP HAS BEEN CREATED
@@ -48,68 +71,47 @@ class _CreateTripState extends State<CreateTrip> {
 
   void _submitData() {
     _formKey.currentState.validate();
-    final enteredDestination = _destination;
-    var enteredFinalDestination = _finalDestinationController.text;
-    enteredFinalDestination = '';
 
-    if (enteredFinalDestination == null || _maxPoolers == null || enteredDestination == null) {
+    if (_destination == null ||
+        _destination_location == null ||
+        _departure_location == null) {
       _scaffoldKey.currentState.hideCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
         backgroundColor: Theme.of(context).primaryColor,
-        content: Text('One or more fields is missing', style: TextStyle(color: Theme.of(context).accentColor)),
+        content: Text('One or more fields is missing',
+            style: TextStyle(color: Theme.of(context).accentColor)),
       ));
       return; //return stops function execution and thus nothing is called or returned
-    } else if (_selectedStartDate == null || _selectedStartTime == null || _selectedEndDate == null || _selectedEndTime == null) {
+    } else if (_selectedDepartureDate == null ||
+        _selectedDepartureTime == null) {
       _scaffoldKey.currentState.hideCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
         backgroundColor: Theme.of(context).primaryColor,
-        content: Text('Date or Time is missing', style: TextStyle(color: Theme.of(context).accentColor)),
+        content: Text('Date or Time is missing',
+            style: TextStyle(color: Theme.of(context).accentColor)),
       ));
       return;
     } else {
-      var starting = DateTime(_selectedStartDate.year, _selectedStartDate.month, _selectedStartDate.day, _selectedStartTime.hour, _selectedStartTime.minute);
-      var ending = DateTime(_selectedEndDate.year, _selectedEndDate.month, _selectedEndDate.day, _selectedEndTime.hour, _selectedEndTime.minute);
-      if (starting.compareTo(ending) < 0) {
-        setState(() {
-          _formKey.currentState.save();
-          _addNewRequest();
-        });
-        Navigator.of(context).pop();
-      } else {
-        _scaffoldKey.currentState.hideCurrentSnackBar();
-        _scaffoldKey.currentState.showSnackBar(SnackBar(
-          backgroundColor: Theme.of(context).primaryColor,
-          duration: Duration(seconds: 2),
-          content: Text(
-            'INVALID : Start Time > End Time',
-            style: TextStyle(color: Theme.of(context).accentColor),
-          ),
-        ));
-      }
+      _formKey.currentState.save();
+      _addNewRequest();
+      Navigator.of(context).pop();
     }
   }
 
   void _startDatePicker() {
-    showDatePicker(context: context, initialDate: DateTime.now(), firstDate: DateTime.now().subtract(Duration(days: 1)), lastDate: DateTime.now().add(Duration(days: 30))).then((pickedDate) {
+    showDatePicker(
+            context: context,
+            initialDate: DateTime.now(),
+            firstDate: DateTime.now().subtract(Duration(days: 1)),
+            lastDate: DateTime.now().add(Duration(days: 30)))
+        .then((pickedDate) {
       if (pickedDate == null) {
         return;
       }
       setState(() {
-        _selectedStartDate = pickedDate;
-        FocusScope.of(context).requestFocus(FocusNode());
-      });
-    });
-  }
-
-  void _endDatePicker() {
-    showDatePicker(context: context, initialDate: _selectedStartDate, firstDate: DateTime.parse(_selectedStartDate.toString()), lastDate: DateTime.now().add(Duration(days: 30))).then((pickedDate) {
-      if (pickedDate == null) {
-        return;
-      }
-      setState(() {
-        _selectedEndDate = pickedDate;
+        _selectedDepartureDate = pickedDate;
         FocusScope.of(context).requestFocus(FocusNode());
       });
     });
@@ -118,28 +120,13 @@ class _CreateTripState extends State<CreateTrip> {
   void _startTimePicker() {
     showTimePicker(
       context: context,
-      initialTime: _selectedStartTime ?? TimeOfDay.now(),
+      initialTime: _selectedDepartureTime ?? TimeOfDay.now(),
     ).then((pickedTime) {
       if (pickedTime == null) {
         return;
       }
       setState(() {
-        _selectedStartTime = pickedTime;
-        FocusScope.of(context).requestFocus(FocusNode());
-      });
-    });
-  }
-
-  void _endTimePicker() {
-    showTimePicker(
-      context: context,
-      initialTime: _selectedEndTime ?? _selectedStartTime,
-    ).then((pickedTime) {
-      if (pickedTime == null) {
-        return;
-      }
-      setState(() {
-        _selectedEndTime = pickedTime;
+        _selectedDepartureTime = pickedTime;
         FocusScope.of(context).requestFocus(FocusNode());
       });
     });
@@ -154,11 +141,13 @@ class _CreateTripState extends State<CreateTrip> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: <Widget>[
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 25,
-              color: getVisibleTextColorOnScaffold(context),
+          Flexible(
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 25,
+                color: getVisibleTextColorOnScaffold(context),
+              ),
             ),
           ),
         ],
@@ -166,13 +155,16 @@ class _CreateTripState extends State<CreateTrip> {
     );
   }
 
-  Widget buildContainer(String point, DateTime date, TimeOfDay time, Function DatePicker, Function TimePicker) {
+  Widget buildContainer(String point, DateTime date, TimeOfDay time,
+      Function DatePicker, Function TimePicker) {
     return Container(
       margin: EdgeInsets.only(top: 20, left: 30, right: 30),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: <Widget>[
-          Text(date == null ? '$point Date' : '${DateFormat.yMd().format(date)}'),
+          Text(date == null
+              ? '$point Date'
+              : '${DateFormat.yMd().format(date)}'),
           IconButton(
             icon: Icon(
               Icons.calendar_today,
@@ -180,7 +172,9 @@ class _CreateTripState extends State<CreateTrip> {
             ),
             onPressed: () => DatePicker(),
           ),
-          Text(time == null ? '$point Time' : '${time.toString().substring(10, 15)}'),
+          Text(time == null
+              ? '$point Time'
+              : '${time.toString().substring(10, 15)}'),
           IconButton(
             icon: Icon(
               Icons.schedule,
@@ -221,7 +215,7 @@ class _CreateTripState extends State<CreateTrip> {
                 key: _formKey,
                 child: Column(
                   children: <Widget>[
-                    buildLabel('Destination'),
+                    buildLabel('Where are we going?'),
                     Row(
                       children: <Widget>[
                         Container(
@@ -235,7 +229,8 @@ class _CreateTripState extends State<CreateTrip> {
                               Icons.keyboard_arrow_down,
                               size: 30,
                             ),
-                            items: destinations.map((String dropDownStringItem) {
+                            items:
+                                destinations.map((String dropDownStringItem) {
                               return DropdownMenuItem<String>(
                                 value: dropDownStringItem,
                                 child: Text(
@@ -258,21 +253,143 @@ class _CreateTripState extends State<CreateTrip> {
                               }
                               return null;
                             },
-                            hint: Text('Select The Destination'),
+                            hint: Text('Destination'),
                           ),
                         ),
                       ],
                     ),
-                    buildLabel('Starting'),
-                    buildContainer('Start', _selectedStartDate, _selectedStartTime, _startDatePicker, _startTimePicker),
-                    buildLabel('Ending'),
-                    buildContainer('End', _selectedEndDate, _selectedEndTime, _endDatePicker, _endTimePicker),
+                    Container(
+                      margin: EdgeInsets.only(
+                        top: 20,
+                      ),
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: 'Destination Location',
+                        ),
+                        validator: (val) => val.length == 0
+                            ? 'Enter a destination location.'
+                            : null,
+                        onChanged: (val) {
+                          setState(() => _destination_location = val);
+                        },
+                      ),
+                    ),
+                    buildLabel('Where are we meeting?'),
+                    Container(
+                      margin: EdgeInsets.only(
+                        top: 20,
+                      ),
+                      width: MediaQuery.of(context).size.width * 0.8,
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                          hintText: 'Departure Location',
+                        ),
+                        validator: (val) => val.length == 0
+                            ? 'Enter a departure location.'
+                            : null,
+                        onChanged: (val) {
+                          setState(() => _departure_location = val);
+                        },
+                      ),
+                    ),
+                    buildContainer(
+                        'Departure',
+                        _selectedDepartureDate,
+                        _selectedDepartureTime,
+                        _startDatePicker,
+                        _startTimePicker),
+                    buildLabel('Setup your rules'),
+                    Container(
+                      margin: EdgeInsets.only(
+                        top: 20,
+                        left: 20,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Wrap(
+                          children: ['4 Person Taxi', '5 Person Taxi', 'Uber']
+                              .map((String rule_item) {
+                            return Container(
+                              margin: EdgeInsets.only(
+                                top: 6,
+                                left: 8,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Checkbox(
+                                      checkColor:
+                                          getVisibleColorOnAccentColor(context),
+                                      activeColor:
+                                          Theme.of(context).accentColor,
+                                      value: _rule == rule_item,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          _rule = rule_item;
+                                        });
+                                      }),
+                                  Text(rule_item,
+                                      style: TextStyle(
+                                        color: getVisibleTextColorOnScaffold(
+                                            context),
+                                      )),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(
+                        top: 20,
+                        left: 20,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Wrap(
+                          children: ['All Male', 'All Female', 'Any']
+                              .map((String sex_item) {
+                            return Container(
+                              margin: EdgeInsets.only(
+                                top: 6,
+                                left: 8,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Checkbox(
+                                      checkColor:
+                                          getVisibleColorOnAccentColor(context),
+                                      activeColor:
+                                          Theme.of(context).accentColor,
+                                      value: _sex == sex_item,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          _sex = sex_item;
+                                        });
+                                      }),
+                                  Text(sex_item,
+                                      style: TextStyle(
+                                        color: getVisibleTextColorOnScaffold(
+                                            context),
+                                      )),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.only(top: 30.0, left: 40.0),
-                          child: Text('Max No. of poolers: ',
+                          child: Text('No. of members: ',
                               style: TextStyle(
                                 fontSize: 20.0,
                                 color: getVisibleTextColorOnScaffold(context),
@@ -297,10 +414,10 @@ class _CreateTripState extends State<CreateTrip> {
                                 ),
                               );
                             }).toList(),
-                            value: _maxPoolers,
+                            value: _maxMembers,
                             onChanged: (val) {
                               setState(() {
-                                _maxPoolers = val;
+                                _maxMembers = val;
                               });
                             },
                             validator: (value) {
@@ -309,6 +426,108 @@ class _CreateTripState extends State<CreateTrip> {
                               }
                               return null;
                             },
+                          ),
+                        ),
+                      ],
+                    ),
+                    buildLabel('Waiting time limited'),
+                    Container(
+                      margin: EdgeInsets.only(
+                        top: 20,
+                        left: 20,
+                      ),
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: Wrap(children: 
+                        [0, 5, 10, 15].map((int time_value) {
+                          return
+                            Container(
+                              margin: EdgeInsets.only(
+                                top: 6,
+                                left: 6,
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: <Widget>[
+                                  Checkbox(
+                                      checkColor:
+                                          getVisibleColorOnAccentColor(context),
+                                      activeColor:
+                                          Theme.of(context).accentColor,
+                                      value: time_value == _waiting_time,
+                                      onChanged: (bool value) {
+                                        setState(() {
+                                          _waiting_time = time_value;
+                                        });
+                                      }),
+                                  Text('$time_value minutes',
+                                      style: TextStyle(
+                                        color: getVisibleTextColorOnScaffold(
+                                            context),
+                                      )),
+                                ],
+                              ),
+                            );
+                        }).toList()
+                        ),
+                      ),
+                    ),
+                    buildLabel(
+                        'Required wait for all member arrive before going?'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        Container(
+                          margin: EdgeInsets.only(
+                            top: 20,
+                            left: 30,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Checkbox(
+                                  checkColor:
+                                      getVisibleColorOnAccentColor(context),
+                                  activeColor: Theme.of(context).accentColor,
+                                  value: _wait_all_member == true,
+                                  onChanged: (bool value) {
+                                    setState(() {
+                                      _wait_all_member = value == true;
+                                    });
+                                  }),
+                              Text('Yes',
+                                  style: TextStyle(
+                                    color:
+                                        getVisibleTextColorOnScaffold(context),
+                                  )),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(
+                            top: 20,
+                            left: 30,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Checkbox(
+                                  checkColor:
+                                      getVisibleColorOnAccentColor(context),
+                                  activeColor: Theme.of(context).accentColor,
+                                  value: _wait_all_member == false,
+                                  onChanged: (bool value) {
+                                    setState(() {
+                                      _wait_all_member = value == false;
+                                    });
+                                  }),
+                              Text('No',
+                                  style: TextStyle(
+                                    color:
+                                        getVisibleTextColorOnScaffold(context),
+                                  )),
+                            ],
                           ),
                         ),
                       ],
@@ -324,10 +543,10 @@ class _CreateTripState extends State<CreateTrip> {
                           Checkbox(
                               checkColor: getVisibleColorOnAccentColor(context),
                               activeColor: Theme.of(context).accentColor,
-                              value: privacy,
+                              value: _require_permission,
                               onChanged: (bool value) {
                                 setState(() {
-                                  privacy = value;
+                                  _require_permission = value;
                                 });
                               }),
                           Text('Require Permission To Join Trip',
@@ -348,11 +567,13 @@ class _CreateTripState extends State<CreateTrip> {
                       child: RaisedButton(
                         textColor: getVisibleColorOnAccentColor(context),
                         onPressed: () {
-                          SystemChannels.textInput.invokeMethod('Text Input hide');
+                          SystemChannels.textInput
+                              .invokeMethod('Text Input hide');
                           _submitData();
                         },
                         color: Theme.of(context).accentColor,
-                        child: Text('Create Trip', style: TextStyle(fontSize: 18)),
+                        child:
+                            Text('Create Trip', style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ],

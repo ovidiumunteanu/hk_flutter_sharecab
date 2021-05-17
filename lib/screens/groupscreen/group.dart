@@ -21,31 +21,41 @@ class GroupPage extends StatefulWidget {
   _GroupPageState createState() => _GroupPageState();
 }
 
-class _GroupPageState extends State<GroupPage> with AutomaticKeepAliveClientMixin<GroupPage> {
+class _GroupPageState extends State<GroupPage>
+    with AutomaticKeepAliveClientMixin<GroupPage> {
   final RequestService _request = RequestService();
   final NotifServices _notifServices = NotifServices();
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   String groupUID = '';
   String destination = '';
-  String startTime = '';
-  String endTime = '';
-  String startDate = '';
-  String endDate = '';
+  String dest_location = '';
+  String departure_location = '';
+  String departure_date = '';
+  String departure_time = '';
   String grpOwner = '';
-  String presentNum = '';
+  int presentNum = 0;
   int maxPoolers = 0;
   bool loading = true;
-
-  String start = '';
-  String end = '';
 
   int i = 0, numberOfMessages = 696;
   double userRating;
 
   Future getMembers(String docid) async {
-    var qp = await Firestore.instance.collection('group').document(docid).collection('users').getDocuments();
+    var qp = await Firestore.instance
+        .collection('group')
+        .document(docid)
+        .collection('users')
+        .getDocuments();
     return qp.documents;
+  }
+
+  void _complete(String docid) async {
+    await Firestore.instance
+        .collection('group')
+        .document(docid)
+        .updateData({'end': true});
+    Navigator.of(context).pop();
   }
 
   bool buttonEnabled = true;
@@ -53,12 +63,57 @@ class _GroupPageState extends State<GroupPage> with AutomaticKeepAliveClientMixi
   bool timestampFlag = false;
   final FirebaseAuth auth = FirebaseAuth.instance;
 
+  Widget buildRowInfo(String key, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 10.0, left: 12),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10.0, right: 12),
+              child: Text(
+                key,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ),
+          Flexible(
+            fit: FlexFit.tight,
+            flex: 1,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10.0, right: 12),
+              child: Text(
+                value,
+                style: TextStyle(
+                  fontSize: 16,
+                  // fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final currentuser = Provider.of<FirebaseUser>(context);
     return StreamBuilder(
-        stream: Firestore.instance.collection('userdetails').document(currentuser.uid).snapshots(),
+        stream: Firestore.instance
+            .collection('userdetails')
+            .document(currentuser.uid)
+            .snapshots(),
         builder: (context, usersnapshot) {
           if (usersnapshot.connectionState == ConnectionState.active) {
             if (buttonEnabled == true) {
@@ -68,22 +123,29 @@ class _GroupPageState extends State<GroupPage> with AutomaticKeepAliveClientMixi
               Navigator.pop(context);
             }
             return StreamBuilder(
-                stream: Firestore.instance.collection('group').document(groupUID).snapshots(),
+                stream: Firestore.instance
+                    .collection('group')
+                    .document(groupUID)
+                    .snapshots(),
                 builder: (context, groupsnapshot) {
                   if (groupsnapshot.connectionState == ConnectionState.active) {
                     if (buttonEnabled == true) {
                       destination = groupsnapshot.data['destination'];
-                      start = DateFormat('dd.MM.yyyy - kk:mm a').format(groupsnapshot.data['start'].toDate());
-                      end = DateFormat('dd.MM.yyyy - kk:mm a').format(groupsnapshot.data['end'].toDate());
+                      dest_location =
+                          groupsnapshot.data['destination_location'];
+                      departure_location =
+                          groupsnapshot.data['departure_location'];
+                      departure_date =
+                          "${DateFormat('yyyy.MM.dd').format(groupsnapshot.data['departure_time'].toDate())}";
+                      departure_time =
+                          "${DateFormat('kk:mm a').format(groupsnapshot.data['departure_time'].toDate())}";
+
                       grpOwner = groupsnapshot.data['owner'];
-                      presentNum = groupsnapshot.data['numberOfMembers'].toString();
-                      endTimeStamp = groupsnapshot.data['end'];
-                      maxPoolers = groupsnapshot.data['maxpoolers'];
+                      presentNum = groupsnapshot.data['users'].length;
+                      maxPoolers = groupsnapshot.data['maxPoolers'];
                       loading = false;
-                      if (endTimeStamp.compareTo(Timestamp.now()) < 0) {
-                        timestampFlag = true;
-                      }
                     }
+
                     return loading
                         ? Loading()
                         : Scaffold(
@@ -93,51 +155,105 @@ class _GroupPageState extends State<GroupPage> with AutomaticKeepAliveClientMixi
                                 buttonEnabled
                                     ? timestampFlag
                                         ? FlatButton.icon(
-                                            textColor: getVisibleColorOnPrimaryColor(context),
-                                            icon: Icon(FontAwesomeIcons.signOutAlt),
+                                            textColor:
+                                                getVisibleColorOnPrimaryColor(
+                                                    context),
+                                            icon: Icon(
+                                                FontAwesomeIcons.signOutAlt),
                                             onPressed: () async {
                                               try {
                                                 await showDialog(
                                                     context: context,
-                                                    builder: (BuildContext ctx) {
+                                                    builder:
+                                                        (BuildContext ctx) {
                                                       return AlertDialog(
                                                         title: Text('End Trip'),
-                                                        content: Text('Are you sure you want to end this trip?'),
-                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                                                        content: Text(
+                                                            'Are you sure you want to end this trip?'),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0)),
                                                         actions: <Widget>[
                                                           FlatButton(
-                                                            child: Text('End', style: TextStyle(color: Theme.of(context).accentColor)),
-                                                            onPressed: () async {
+                                                            child: Text('End',
+                                                                style: TextStyle(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .accentColor)),
+                                                            onPressed:
+                                                                () async {
                                                               ProgressDialog pr;
-                                                              pr = ProgressDialog(context, type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+                                                              pr = ProgressDialog(
+                                                                  context,
+                                                                  type: ProgressDialogType
+                                                                      .Normal,
+                                                                  isDismissible:
+                                                                      false,
+                                                                  showLogs:
+                                                                      false);
                                                               pr.style(
-                                                                message: 'Ending Trip...',
-                                                                backgroundColor: Theme.of(context).backgroundColor,
-                                                                messageTextStyle: TextStyle(
-                                                                  color: getVisibleTextColorOnScaffold(context),
+                                                                message:
+                                                                    'Ending Trip...',
+                                                                backgroundColor:
+                                                                    Theme.of(
+                                                                            context)
+                                                                        .backgroundColor,
+                                                                messageTextStyle:
+                                                                    TextStyle(
+                                                                  color: getVisibleTextColorOnScaffold(
+                                                                      context),
                                                                 ),
                                                               );
                                                               await pr.show();
-                                                              await Future.delayed(Duration(seconds: 1));
+                                                              await Future.delayed(
+                                                                  Duration(
+                                                                      seconds:
+                                                                          1));
                                                               try {
-                                                                buttonEnabled = false;
-                                                                await _request.exitGroup();
-                                                                Navigator.pop(context);
+                                                                buttonEnabled =
+                                                                    false;
+                                                                await _request
+                                                                    .exitGroup();
+                                                                Navigator.pop(
+                                                                    context);
                                                                 await pr.hide();
                                                               } catch (e) {
                                                                 await pr.hide();
-                                                                print(e.toString());
-                                                                String errStr = e.message ?? e.toString();
-                                                                final snackBar = SnackBar(content: Text(errStr), duration: Duration(seconds: 3));
-                                                                scaffoldKey.currentState.showSnackBar(snackBar);
+                                                                print(e
+                                                                    .toString());
+                                                                var errStr =
+                                                                    e.message ==
+                                                                            null
+                                                                        ? ""
+                                                                        : e.toString();
+                                                                final snackBar = SnackBar(
+                                                                    content: Text(
+                                                                        errStr),
+                                                                    duration: Duration(
+                                                                        seconds:
+                                                                            3));
+                                                                scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        snackBar);
                                                               }
-                                                              Navigator.pop(context);
+                                                              Navigator.pop(
+                                                                  context);
                                                             },
                                                           ),
                                                           FlatButton(
-                                                            child: Text('Cancel', style: TextStyle(color: Theme.of(context).accentColor)),
+                                                            child: Text(
+                                                                'Cancel',
+                                                                style: TextStyle(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .accentColor)),
                                                             onPressed: () {
-                                                              Navigator.of(context).pop();
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
                                                             },
                                                           ),
                                                         ],
@@ -150,52 +266,111 @@ class _GroupPageState extends State<GroupPage> with AutomaticKeepAliveClientMixi
                                             label: Text('End Trip'),
                                           )
                                         : FlatButton.icon(
-                                            textColor: getVisibleColorOnPrimaryColor(context),
-                                            icon: Icon(FontAwesomeIcons.signOutAlt),
+                                            textColor:
+                                                getVisibleColorOnPrimaryColor(
+                                                    context),
+                                            icon: Icon(
+                                                FontAwesomeIcons.signOutAlt),
                                             onPressed: () async {
                                               try {
                                                 await showDialog(
                                                     context: context,
-                                                    builder: (BuildContext ctx) {
+                                                    builder:
+                                                        (BuildContext ctx) {
                                                       return AlertDialog(
-                                                        title: Text('Leave Group'),
-                                                        content: Text('Are you sure you want to leave this group?'),
-                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+                                                        title:
+                                                            Text('Leave Group'),
+                                                        content: Text(
+                                                            'Are you sure you want to leave this group?'),
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        20.0)),
                                                         actions: <Widget>[
                                                           FlatButton(
-                                                            child: Text('Leave', style: TextStyle(color: Theme.of(context).accentColor)),
-                                                            onPressed: () async {
+                                                            child: Text('Leave',
+                                                                style: TextStyle(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .accentColor)),
+                                                            onPressed:
+                                                                () async {
                                                               ProgressDialog pr;
-                                                              pr = ProgressDialog(context, type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+                                                              pr = ProgressDialog(
+                                                                  context,
+                                                                  type: ProgressDialogType
+                                                                      .Normal,
+                                                                  isDismissible:
+                                                                      false,
+                                                                  showLogs:
+                                                                      false);
                                                               pr.style(
-                                                                message: 'Leaving Group...',
-                                                                backgroundColor: Theme.of(context).backgroundColor,
-                                                                messageTextStyle: TextStyle(
-                                                                  color: getVisibleTextColorOnScaffold(context),
+                                                                message:
+                                                                    'Leaving Group...',
+                                                                backgroundColor:
+                                                                    Theme.of(
+                                                                            context)
+                                                                        .backgroundColor,
+                                                                messageTextStyle:
+                                                                    TextStyle(
+                                                                  color: getVisibleTextColorOnScaffold(
+                                                                      context),
                                                                 ),
                                                               );
                                                               await pr.show();
-                                                              await Future.delayed(Duration(seconds: 1));
+                                                              await Future.delayed(
+                                                                  Duration(
+                                                                      seconds:
+                                                                          1));
                                                               try {
-                                                                buttonEnabled = false;
-                                                                await _notifServices.leftGroup(usersnapshot.data['name'], groupUID);
-                                                                await _request.exitGroup();
-                                                                Navigator.pop(context);
+                                                                buttonEnabled =
+                                                                    false;
+                                                                await _notifServices.leftGroup(
+                                                                    usersnapshot
+                                                                            .data[
+                                                                        'name'],
+                                                                    groupUID);
+                                                                await _request
+                                                                    .exitGroup();
+                                                                Navigator.pop(
+                                                                    context);
                                                                 await pr.hide();
                                                               } catch (e) {
                                                                 await pr.hide();
-                                                                print(e.toString());
-                                                                String errStr = e.message ?? e.toString();
-                                                                final snackBar = SnackBar(content: Text(errStr), duration: Duration(seconds: 3));
-                                                                scaffoldKey.currentState.showSnackBar(snackBar);
+                                                                print(e
+                                                                    .toString());
+                                                                String errStr =
+                                                                    e.message ==
+                                                                            null
+                                                                        ? ""
+                                                                        : e.toString();
+                                                                final snackBar = SnackBar(
+                                                                    content: Text(
+                                                                        errStr),
+                                                                    duration: Duration(
+                                                                        seconds:
+                                                                            3));
+                                                                scaffoldKey
+                                                                    .currentState
+                                                                    .showSnackBar(
+                                                                        snackBar);
                                                               }
-                                                              Navigator.pop(context);
+                                                              Navigator.pop(
+                                                                  context);
                                                             },
                                                           ),
                                                           FlatButton(
-                                                            child: Text('Cancel', style: TextStyle(color: Theme.of(context).accentColor)),
+                                                            child: Text(
+                                                                'Cancel',
+                                                                style: TextStyle(
+                                                                    color: Theme.of(
+                                                                            context)
+                                                                        .accentColor)),
                                                             onPressed: () {
-                                                              Navigator.of(context).pop();
+                                                              Navigator.of(
+                                                                      context)
+                                                                  .pop();
                                                             },
                                                           ),
                                                         ],
@@ -209,337 +384,218 @@ class _GroupPageState extends State<GroupPage> with AutomaticKeepAliveClientMixi
                                           )
                                     : timestampFlag
                                         ? FlatButton.icon(
-                                            textColor: getVisibleColorOnPrimaryColor(context),
-                                            icon: Icon(FontAwesomeIcons.signOutAlt),
+                                            textColor:
+                                                getVisibleColorOnPrimaryColor(
+                                                    context),
+                                            icon: Icon(
+                                                FontAwesomeIcons.signOutAlt),
                                             onPressed: null,
                                             label: Text('End Trip'),
                                           )
                                         : FlatButton.icon(
-                                            textColor: getVisibleColorOnPrimaryColor(context),
-                                            icon: Icon(FontAwesomeIcons.signOutAlt),
+                                            textColor:
+                                                getVisibleColorOnPrimaryColor(
+                                                    context),
+                                            icon: Icon(
+                                                FontAwesomeIcons.signOutAlt),
                                             onPressed: null,
                                             label: Text('Leave Group'),
                                           )
                               ],
                             ),
-                            body: Container(
-                              height: 1000,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: <Widget>[
-                                        Flexible(
-                                          fit: FlexFit.tight,
-                                          flex: 1,
-                                          child: Container(
-                                              margin: EdgeInsets.only(
-                                                left: 20,
-                                                top: 20,
-                                              ),
-                                              child: destination == 'New Delhi Railway Station' || destination == 'Hazrat Nizamuddin Railway Station'
-                                                  ? Icon(
-                                                      Icons.train,
-                                                      color: getVisibleIconColorOnScaffold(context),
-                                                      size: 30,
-                                                    )
-                                                  : destination == 'Indira Gandhi International Airport'
-                                                      ? Icon(
-                                                          Icons.airplanemode_active,
-                                                          color: getVisibleIconColorOnScaffold(context),
-                                                          size: 30,
-                                                        )
-                                                      : Icon(
-                                                          Icons.directions_bus,
-                                                          color: getVisibleIconColorOnScaffold(context),
-                                                          size: 30,
-                                                        )),
-                                        ),
-                                        Flexible(
-                                          fit: FlexFit.tight,
-                                          flex: 4,
-                                          child: Padding(
-                                            padding: const EdgeInsets.only(top: 10.0),
-                                            child: Text(
-                                              destination,
-                                              style: TextStyle(
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                              textAlign: TextAlign.center,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    grpOwner == currentuser.uid
-                                        ? Padding(
+                            body: Column(
+                              children: [
+                                Expanded(
+                                  child: Container(
+                                    child: SingleChildScrollView(
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          Padding(
                                             padding: EdgeInsets.only(
-                                              top: 10,
-                                            ),
+                                                top: 30, bottom: 12),
                                             child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.end,
-                                              children: <Widget>[
-                                                Text('Press here to edit the details: '),
-                                                FlatButton.icon(
-                                                    onPressed: () {
-                                                      Navigator.push(context, MaterialPageRoute(builder: (context) => EditGroup(groupUID: groupUID)));
-                                                    },
-                                                    icon: Icon(
-                                                      FontAwesomeIcons.pen,
-                                                      size: 16.0,
-                                                      color: getVisibleTextColorOnScaffold(context),
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              mainAxisSize: MainAxisSize.max,
+                                              children: [
+                                                Flexible(
+                                                  flex: 1,
+                                                  child: Text(
+                                                    destination,
+                                                    style: TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
-                                                    label: Text(
-                                                      'Edit',
-                                                      style: TextStyle(
-                                                        color: getVisibleTextColorOnScaffold(context),
-                                                      ),
-                                                    )),
-                                              ],
-                                            ),
-                                          )
-                                        : Padding(
-                                            padding: EdgeInsets.only(
-                                              top: 10,
-                                            ),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: <Widget>[
-                                                Text(
-                                                  '*Contact group admin to edit details.',
-                                                  style: TextStyle(color: Theme.of(context).accentColor),
+                                                    textAlign: TextAlign.center,
+                                                  ),
                                                 ),
                                               ],
                                             ),
                                           ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        bottom: 5,
-                                        top: 10,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(
-                                            'Start : $start',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                            ),
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.max,
+                                            children: [
+                                              Flexible(
+                                                flex: 1,
+                                                child: Text(
+                                                  dest_location,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        bottom: 5,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(
-                                            'End: $end',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        bottom: 5,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(
-                                            'Number of members in group: ${presentNum}',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        bottom: 5,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          Text(
-                                            'Max number of poolers: ${maxPoolers}',
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    Container(
-                                      child: StreamBuilder(
-                                        stream: Firestore.instance.collection('group').document(groupUID).collection('users').snapshots(),
-                                        builder: (_, snapshots) {
-                                          if (!snapshots.hasData) {
-                                            return Center(
-                                              child: CircularProgressIndicator(),
-                                            );
-                                          }
-                                          return ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: snapshots.data == null ? 0 : snapshots.data.documents.length,
-                                            itemBuilder: (ctx, index) {
-                                              var cancelledRides = snapshots.data.documents[index].data['cancelledrides'];
-                                              var totalRides = snapshots.data.documents[index].data['totalrides'];
-                                              userRating = 5 - (0.2 * cancelledRides) + (0.35 * totalRides);
-                                              if (userRating < 0) {
-                                                userRating = 0;
-                                              }
-                                              if (userRating > 5) {
-                                                userRating = 5;
-                                              }
-                                              return Card(
-                                                color: Theme.of(context).scaffoldBackgroundColor,
-                                                child: ListTile(
-                                                  title: Text(snapshots.data.documents[index].data['name']),
-                                                  subtitle: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                          grpOwner == currentuser.uid
+                                              ? Padding(
+                                                  padding: EdgeInsets.only(
+                                                    top: 10,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.end,
                                                     children: <Widget>[
-                                                      Text('Hostel: ${snapshots.data.documents[index].data['hostel']}'),
-                                                      GestureDetector(
-                                                          onTap: () async {
-                                                            try {
-                                                              if (Platform.isIOS) {
-                                                                await Clipboard.setData(ClipboardData(text: '${snapshots.data.documents[index].data['mobilenum']}')).then((result) {
-                                                                  final snackBar = SnackBar(
-                                                                    backgroundColor: Theme.of(context).primaryColor,
-                                                                    content: Text(
-                                                                      'Copied to Clipboard',
-                                                                      style: TextStyle(color: Theme.of(context).accentColor),
-                                                                    ),
-                                                                    duration: Duration(seconds: 1),
-                                                                  );
-                                                                  Scaffold.of(context).hideCurrentSnackBar();
-                                                                  Scaffold.of(context).showSnackBar(snackBar);
-                                                                });
-                                                              } else {
-                                                                await launch('tel://${snapshots.data.documents[index].data['mobilenum']}');
-                                                              }
-                                                            } catch (e) {
-                                                              await Clipboard.setData(ClipboardData(text: '${snapshots.data.documents[index].data['mobilenum']}')).then((result) {
-                                                                final snackBar = SnackBar(
-                                                                  backgroundColor: Theme.of(context).primaryColor,
-                                                                  content: Text(
-                                                                    'Copied to Clipboard',
-                                                                    style: TextStyle(color: Theme.of(context).accentColor),
-                                                                  ),
-                                                                  duration: Duration(seconds: 1),
-                                                                );
-                                                                Scaffold.of(context).hideCurrentSnackBar();
-                                                                Scaffold.of(context).showSnackBar(snackBar);
-                                                              });
-                                                            }
+                                                      Text(
+                                                          'Press here to edit the details: '),
+                                                      FlatButton.icon(
+                                                          onPressed: () {
+                                                            Navigator.push(
+                                                                context,
+                                                                MaterialPageRoute(
+                                                                    builder: (context) =>
+                                                                        EditGroup(
+                                                                            groupUID:
+                                                                                groupUID)));
                                                           },
-                                                          child: Text('Mobile Number: ${snapshots.data.documents[index].data['mobilenum']}')),
-                                                      Row(
-                                                        children: <Widget>[
-                                                          Text('User Rating:'),
-                                                          Row(
-                                                            children: <Widget>[],
+                                                          icon: Icon(
+                                                            FontAwesomeIcons
+                                                                .pen,
+                                                            size: 16.0,
+                                                            color:
+                                                                getVisibleTextColorOnScaffold(
+                                                                    context),
                                                           ),
-                                                          showRating(userRating),
-                                                        ],
-                                                      )
+                                                          label: Text(
+                                                            'Edit',
+                                                            style: TextStyle(
+                                                              color:
+                                                                  getVisibleTextColorOnScaffold(
+                                                                      context),
+                                                            ),
+                                                          )),
                                                     ],
                                                   ),
-                                                  trailing: grpOwner == snapshots.data.documents[index].documentID
-                                                      ? FaIcon(
-                                                          FontAwesomeIcons.crown,
-                                                          color: getVisibleIconColorOnScaffold(context),
-                                                        )
-                                                      : grpOwner == currentuser.uid && !timestampFlag
-                                                          ? IconButton(
-                                                              icon: Icon(Icons.exit_to_app),
-                                                              color: getVisibleIconColorOnScaffold(context),
-                                                              tooltip: 'Kick User',
-                                                              onPressed: () async {
-                                                                await showDialog(
-                                                                    context: context,
-                                                                    builder: (BuildContext ctx) {
-                                                                      return AlertDialog(
-                                                                        title: Text('Kick User'),
-                                                                        content: Text('Are you sure you want to kick this user?'),
-                                                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
-                                                                        actions: <Widget>[
-                                                                          FlatButton(
-                                                                            child: Text('Kick', style: TextStyle(color: Theme.of(context).accentColor)),
-                                                                            onPressed: () async {
-                                                                              Navigator.pop(context);
-                                                                              ProgressDialog pr;
-                                                                              pr = ProgressDialog(context, type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
-                                                                              pr.style(
-                                                                                message: 'Kicking the user...',
-                                                                                backgroundColor: Theme.of(context).backgroundColor,
-                                                                                messageTextStyle: TextStyle(
-                                                                                  color: getVisibleTextColorOnScaffold(context),
-                                                                                ),
-                                                                              );
-                                                                              await pr.show();
-                                                                              try {
-                                                                                await _request.kickUser(groupUID, snapshots.data.documents[index].documentID);
-                                                                                await pr.hide();
-                                                                              } catch (e) {
-                                                                                await pr.hide();
-                                                                                print(e.toString());
-                                                                              }
-                                                                            },
-                                                                          ),
-                                                                          FlatButton(
-                                                                            child: Text('Cancel', style: TextStyle(color: Theme.of(context).accentColor)),
-                                                                            onPressed: () {
-                                                                              Navigator.of(context).pop();
-                                                                            },
-                                                                          ),
-                                                                        ],
-                                                                      );
-                                                                    });
-                                                              },
-                                                            )
-                                                          : null,
-                                                  isThreeLine: true,
-                                                  onTap: () {},
+                                                )
+                                              : Padding(
+                                                  padding: EdgeInsets.only(
+                                                    top: 10,
+                                                  ),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    children: <Widget>[
+                                                      Text(
+                                                        '*Contact group admin to edit details.',
+                                                        style: TextStyle(
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .accentColor),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              );
-                                            },
-                                          );
-                                        },
+                                          buildRowInfo('Departure Location : ',
+                                              departure_location),
+                                          buildRowInfo('Departure Date : ',
+                                              departure_date),
+                                          buildRowInfo('Departure Time : ',
+                                              departure_time),
+                                          buildRowInfo(
+                                              'Rule : ',
+                                              groupsnapshot.data['rule'] +
+                                                  ', ' +
+                                                  groupsnapshot.data['sex']),
+                                          buildRowInfo('No. of members : ',
+                                              maxPoolers.toString()),
+                                          buildRowInfo(
+                                              'Waiting time limited: ',
+                                              groupsnapshot.data['waiting_time']
+                                                      .toString() +
+                                                  ' minutes'),
+                                          buildRowInfo(
+                                              'Required wait for all members arrive before going? : ',
+                                              groupsnapshot.data[
+                                                          'wait_all_member'] ==
+                                                      true
+                                                  ? 'Yes'
+                                                  : 'No'),
+                                          buildRowInfo(
+                                              'Required permission to join trip? : ',
+                                              groupsnapshot.data[
+                                                          'require_permission'] ==
+                                                      true
+                                                  ? 'Yes'
+                                                  : 'No'),
+                                        ],
                                       ),
+                                    ),
+                                  ),
+                                ),
+                                grpOwner == currentuser.uid
+                                    ? Container(
+                                        height: 50,
+                                        width: double.infinity,
+                                        margin: EdgeInsets.only(
+                                          top: 40,
+                                        ),
+                                        child: RaisedButton(
+                                          textColor:
+                                              getVisibleColorOnAccentColor(
+                                                  context),
+                                          onPressed: () {
+                                            _complete(groupUID);
+                                          },
+                                          color: Theme.of(context).accentColor,
+                                          child: Text('Completed',
+                                              style: TextStyle(fontSize: 18)),
+                                        ),
+                                      )
+                                    : Container(),
+                              ],
+                            ),
+                            floatingActionButton: Padding(
+                              padding: const EdgeInsets.only(bottom: 50.0),
+                              child: FloatingActionButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ChatScreen(groupUID)));
+                                },
+                                child: Stack(
+                                  alignment: Alignment(-10, -10),
+                                  children: <Widget>[
+                                    Tooltip(
+                                      message: 'Messages',
+                                      verticalOffset: 30,
+                                      child: Icon(Icons.chat),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
-                            floatingActionButton: FloatingActionButton(
-                              onPressed: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(groupUID)));
-                              },
-                              child: Stack(
-                                alignment: Alignment(-10, -10),
-                                children: <Widget>[
-                                  Tooltip(
-                                    message: 'Messages',
-                                    verticalOffset: 30,
-                                    child: Icon(Icons.chat),
-                                  ),
-                                ],
-                              ),
-                            ),
                           );
                   } else {
-                    return Container(child: Center(child: CircularProgressIndicator()));
+                    return Container(
+                        child: Center(child: CircularProgressIndicator()));
                   }
                 });
           } else {

@@ -7,10 +7,6 @@ class RequestService {
     await DatabaseService().createTrip(requestDetails);
   }
 
-  Future<void> updateGroup(String groupUID, DateTime SD, TimeOfDay ST, DateTime ED, TimeOfDay ET, bool privacy, int maxPoolers) async {
-    await DatabaseService().updateGroup(groupUID, SD, ST, ED, ET, privacy, maxPoolers);
-  }
-
   Future<void> exitGroup() async {
     await DatabaseService().exitGroup();
   }
