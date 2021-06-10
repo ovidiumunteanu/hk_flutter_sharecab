@@ -26,10 +26,13 @@ class Wrapper extends StatelessWidget {
         } else {
           if (user == null) {
             return Authenticate();
-          } else if (user.isEmailVerified) {
+          } 
+          // else if (user.isEmailVerified) {
+          //   return RootScreen();
+          // } 
+          else {
+            // return VerificationCheck();
             return RootScreen();
-          } else {
-            return VerificationCheck();
           }
         }
       },

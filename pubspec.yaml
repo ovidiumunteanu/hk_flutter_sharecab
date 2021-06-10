@@ -38,6 +38,7 @@ dependencies:
   location: ^2.5.0
   geocoder: ^0.2.1
   google_maps_flutter: ^2.0.4
+  flutter_svg: ^0.22.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -61,6 +62,11 @@ flutter:
     - assets/images/require permission to join trip.jpg
     - assets/images/logo.png
     - assets/images/marker_icon.png
+    - assets/svgs/logo.svg
+    - assets/svgs/vert_divider.svg
+    - assets/svgs/way.svg
+    - assets/svgs/plus.svg
+    - assets/svgs/message.svg
   fonts:
     - family: Poiret
       fonts:

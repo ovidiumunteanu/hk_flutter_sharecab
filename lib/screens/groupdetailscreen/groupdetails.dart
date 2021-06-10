@@ -16,7 +16,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shareacab/main.dart';
 import 'package:flutter/scheduler.dart';
-
+import 'package:shareacab/utils/constant.dart';
 import 'package:shareacab/screens/notifications/services/notifservices.dart';
 import './appbar.dart';
 
@@ -92,7 +92,6 @@ class _GroupDetailsState extends State<GroupDetails>
       await pr.hide();
       print(e.toString());
     }
-    
   }
 
   Widget buildUserListItem(
@@ -187,9 +186,82 @@ class _GroupDetailsState extends State<GroupDetails>
                               floating: false,
                               expandedHeight: 40,
                               titleTextStyle: TextStyle(fontSize: 14),
-                              flexibleSpace: FlexibleSpaceBar(
-                                title: AppBarTitle(''),
+                              leading: InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(
+                                  Icons.chevron_left,
+                                  color: text_color1,
+                                  size: 36,
+                                ),
                               ),
+                              flexibleSpace: FlexibleSpaceBar(
+                                titlePadding: EdgeInsets.only(
+                                  left: 48,
+                                  bottom: 7,
+                                ),
+                                title: Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'assets/images/logo.png',
+                                      width: 35,
+                                      height: 40,
+                                    ),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                      'AA制車資',
+                                      style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w600,
+                                          color: text_color1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              backgroundColor: yellow_color2,
+                              actions: <Widget>[
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.filter_list,
+                                    color: text_color1,
+                                    size: 30.0,
+                                  ),
+                                  tooltip: 'Filter',
+                                  onPressed: () async {
+                                    // _startFilter(context);
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.help,
+                                    color: text_color1,
+                                  ),
+                                  tooltip: 'Help',
+                                  onPressed: () {
+                                    // Navigator.push(
+                                    //     context,
+                                    //     MaterialPageRoute(
+                                    //         builder: (context) => Help()));
+                                  },
+                                ),
+                                IconButton(
+                                    icon: Icon(
+                                      Icons.settings,
+                                      color: text_color1,
+                                    ),
+                                    tooltip: 'Settings',
+                                    onPressed: () {
+                                      // return Navigator.push(context,
+                                      //     MaterialPageRoute(builder: (context) {
+                                      //   return Settings(_auth);
+                                      // }));
+                                    }),
+                              ],
                             ),
                           ];
                         },
@@ -199,19 +271,32 @@ class _GroupDetailsState extends State<GroupDetails>
                               mainAxisSize: MainAxisSize.max,
                               children: <Widget>[
                                 Container(
+                                    width: double.infinity,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: yellow_color1,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '「一個都半價」慳錢、慳時間。',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: text_color4,
+                                        ),
+                                      ),
+                                    )),
+                                Container(
                                   margin: EdgeInsets.only(top: 30),
                                   child: Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceAround,
-                                        mainAxisSize : MainAxisSize.max,
+                                    mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: Text('Departure Location'),
                                       ),
-                                      Flexible(
-                                        child : Text(departure_location)
-                                      ),
+                                      Flexible(child: Text(departure_location)),
                                       Padding(
                                         padding: const EdgeInsets.all(8.0),
                                         child: IconButton(

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shareacab/main.dart';
 import 'package:shareacab/models/alltrips.dart';
@@ -13,6 +14,7 @@ import 'package:shareacab/screens/tripslist.dart';
 import 'package:shareacab/services/auth.dart';
 import 'package:location/location.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:shareacab/utils/constant.dart';
 
 class Dashboard extends StatefulWidget {
   @override
@@ -120,6 +122,98 @@ class _DashboardState extends State<Dashboard>
     getLoc();
   }
 
+  String curDeparture = 'ANY';
+  String curDestination = 'ANY';
+  String sortbyTime = 'ANY';
+  Widget filterBtn(List<String> items, String type) {
+    var curValue = curDeparture;
+    if (type == 'destination') {
+      curValue = curDestination;
+    } else if (type == 'sortbytime') {
+      curValue = sortbyTime;
+    }
+    return DropdownButton<String>(
+      value: curValue,
+      // icon: const Icon(Icons.arrow_downward),
+      iconSize: 15,
+      elevation: 16,
+      style: TextStyle(
+          fontSize: 14, fontWeight: FontWeight.w600, color: text_color2),
+      underline: Container(
+        height: 0,
+      ),
+      onChanged: (String newValue) {
+        if (type == 'destination') {
+          setState(() {
+            curDestination = newValue;
+          });
+        } else if (type == 'sortbytime') {
+          setState(() {
+            sortbyTime = newValue;
+          });
+        } else {
+          setState(() {
+            curDeparture = newValue;
+          });
+        }
+      },
+      items: items.map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget filterView() {
+    return Container(
+      width: double.infinity,
+      // height: 60,
+      decoration: BoxDecoration(color: Colors.white),
+      child: Row(
+        children: [
+          Expanded(
+              child: Column(
+            children: [
+              SizedBox(height: 8,),
+              Text('Departure'),
+              filterBtn(departure_list, 'departure')
+            ],
+          )),
+          Container(
+            width: 40,
+            child: SvgPicture.asset(
+              'assets/svgs/vert_divider.svg',
+            ),
+          ),
+          Expanded(
+              child: Column(
+            children: [
+              SizedBox(height: 8,),
+              Text('Destination'),
+              filterBtn(destination_list, 'destination')
+            ],
+          )),
+          Container(
+            width: 40,
+            child: SvgPicture.asset(
+              'assets/svgs/vert_divider.svg',
+            ),
+          ),
+          Expanded(
+              child: Column(
+            children: [
+              SizedBox(height: 8,),
+              Text('Sort by time'),
+              filterBtn(['ANY', 'Most recent', 'Most old'], 'sortbytime')
+            ],
+          )),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var fetched = false;
@@ -128,21 +222,43 @@ class _DashboardState extends State<Dashboard>
     return Scaffold(
       key: scaffoldKey,
       appBar: AppBar(
-        title: Text('Dashboard'),
+        backgroundColor: yellow_color2,
+        title: Row(
+          children: [
+            Image.asset(
+              'assets/images/logo.png',
+              width: 35,
+              height: 40,
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Text(
+              'AA制車資',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: text_color1),
+            ),
+          ],
+        ),
         actions: <Widget>[
-          FlatButton.icon(
-            textColor: getVisibleColorOnPrimaryColor(context),
+          IconButton(
             icon: Icon(
               Icons.filter_list,
+              color: text_color1,
               size: 30.0,
             ),
+            tooltip: 'Filter',
             onPressed: () async {
               _startFilter(context);
             },
-            label: Text('Filter'),
           ),
           IconButton(
-            icon: Icon(Icons.help),
+            icon: Icon(
+              Icons.help,
+              color: text_color1,
+            ),
             tooltip: 'Help',
             onPressed: () {
               Navigator.push(
@@ -150,7 +266,10 @@ class _DashboardState extends State<Dashboard>
             },
           ),
           IconButton(
-              icon: Icon(Icons.settings),
+              icon: Icon(
+                Icons.settings,
+                color: text_color1,
+              ),
               tooltip: 'Settings',
               onPressed: () {
                 return Navigator.push(context,
@@ -184,48 +303,47 @@ class _DashboardState extends State<Dashboard>
             if (snapshot.connectionState == ConnectionState.active &&
                 fetched == true) {
               return Scaffold(
-                body: SingleChildScrollView(
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(top: 20, bottom: 8),
-                        child: Text('Your current location : ',
-                            style: TextStyle(
-                              fontSize: 18,
-                            )),
+                body: Column(children: <Widget>[
+                  Container(
+                      width: double.infinity,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: yellow_color1,
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Center(
+                        child: Text(
+                          '「一個都半價」慳錢、慳時間。',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: text_color4,
+                          ),
+                        ),
+                      )),
+                  filterView(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
                         children: <Widget>[
-                          Flexible(
-                            child: Text(
-                              _address,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: getVisibleTextColorOnScaffold(context),
-                              ),
+                          Container(
+                            // margin: EdgeInsets.all(5),
+                            height: (MediaQuery.of(context).size.height -
+                                    MediaQuery.of(context).padding.top) *
+                                0.79,
+                            width: double.infinity,
+                            child: TripsList(
+                              _dest,
+                              _selecteddest,
+                              _notPrivacy,
+                              inGroup: inGroup,
+                              inGroupFetch: inGroupFetch,
+                              startCreatingTrip: _startCreatingTrip,
                             ),
                           ),
                         ],
                       ),
-                      Container(
-                        margin: EdgeInsets.all(5),
-                        height: (MediaQuery.of(context).size.height -
-                                MediaQuery.of(context).padding.top) *
-                            0.79,
-                        width: double.infinity,
-                        child: TripsList(
-                          _dest,
-                          _selecteddest,
-                          _notPrivacy,
-                          inGroup: inGroup,
-                          inGroupFetch: inGroupFetch,
-                          startCreatingTrip: _startCreatingTrip,
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
+                ]),
               );
             }
           } catch (e) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shareacab/screens/dashboard.dart';
 import 'messages.dart';
 import 'profile/userprofile.dart';
@@ -8,6 +9,7 @@ import 'requests/myrequests.dart';
 import 'package:shareacab/services/auth.dart';
 import 'package:shareacab/shared/loading.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:shareacab/utils/constant.dart';
 
 class RootScreen extends StatefulWidget {
   @override
@@ -26,46 +28,28 @@ class _RootScreenState extends State<RootScreen> {
   bool isHome = true;
 
   int _selectedPage = 0;
-  List<Widget> buildBottomNavBarItems() {
+
+  List<BottomNavigationBarItem> buildBottomNavBarItems() {
     return [
-      Tooltip(
-        message: 'Dashboard',
-        child: Icon(
-          Icons.home,
-          size: 20.0,
-          color: _selectedPage == 0 ? Theme.of(context).accentColor : Colors.white,
+      BottomNavigationBarItem(
+        title: Container(),
+        icon: SvgPicture.asset(
+          'assets/svgs/way.svg',
+          color: _selectedPage == 0 ? Colors.white : grey_color5,
         ),
       ),
-      Tooltip(
-        message: 'My Requests',
-        child: Icon(
-          Icons.format_list_bulleted,
-          size: 20.0,
-          color: _selectedPage == 1 ? Theme.of(context).accentColor : Colors.white,
+      BottomNavigationBarItem(
+        title: Container(),
+        icon: SvgPicture.asset(
+          'assets/svgs/plus.svg',
+          color: _selectedPage == 1 ? Colors.white : grey_color5,
         ),
       ),
-      Tooltip(
-        message: 'Messages',
-        child: Icon(
-          _selectedPage == 2 ? Icons.chat_bubble : Icons.chat_bubble_outline,
-          size: 20.0,
-          color: _selectedPage == 2 ? Theme.of(context).accentColor : Colors.white,
-        ),
-      ),
-      Tooltip(
-        message: 'Notifications',
-        child: Icon(
-          _selectedPage == 3 ? Icons.notifications : Icons.notifications_none,
-          size: 20.0,
-          color: _selectedPage == 3 ? Theme.of(context).accentColor : Colors.white,
-        ),
-      ),
-      Tooltip(
-        message: 'Profile',
-        child: Icon(
-          _selectedPage == 4 ? Icons.person : Icons.person_outline,
-          size: 20.0,
-          color: _selectedPage == 4 ? Theme.of(context).accentColor : Colors.white,
+      BottomNavigationBarItem(
+        title: Container(),
+        icon: SvgPicture.asset(
+          'assets/svgs/message.svg',
+          color: _selectedPage == 2 ? Colors.white : grey_color5,
         ),
       ),
     ];
@@ -92,8 +76,8 @@ class _RootScreenState extends State<RootScreen> {
     pagelist.add(Dashboard());
     pagelist.add(MyRequests());
     pagelist.add(Messages());
-    pagelist.add(Notifications());
-    pagelist.add(MyProfile(_auth));
+    // pagelist.add(Notifications());
+    // pagelist.add(MyProfile(_auth));
     super.initState();
   }
 
@@ -106,7 +90,8 @@ class _RootScreenState extends State<RootScreen> {
   void bottomTapped(int index) {
     setState(() {
       _selectedPage = index;
-      pageController.animateToPage(index, duration: Duration(milliseconds: 200), curve: Curves.bounceInOut);
+      pageController.animateToPage(index,
+          duration: Duration(milliseconds: 200), curve: Curves.bounceInOut);
     });
   }
 
@@ -118,17 +103,12 @@ class _RootScreenState extends State<RootScreen> {
             key: _scaffoldKey,
             extendBody: true,
             body: buildPageView(),
-            bottomNavigationBar: CurvedNavigationBar(
-              color: Color(0xFF212121),
-              //color: Theme.of(context).bottomAppBarColor,
-              backgroundColor: Colors.black,
-              //backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              animationDuration: Duration(milliseconds: 200),
-              index: _selectedPage,
+            bottomNavigationBar: BottomNavigationBar(
               onTap: (index) {
                 bottomTapped(index);
               },
               items: buildBottomNavBarItems(),
+              backgroundColor: text_color1,
             ),
           );
   }

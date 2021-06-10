@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:shareacab/utils/constant.dart';
 
 import 'groupdetailscreen/groupdetails.dart';
 import 'groupscreen/group.dart';
@@ -45,13 +46,13 @@ class _TripsListState extends State<TripsList>
       mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: const EdgeInsets.only(top: 10.0, left: 12),
+          padding: const EdgeInsets.only(
+            top: 10.0,
+          ),
           child: Text(
             key,
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+                fontSize: 12, fontWeight: FontWeight.w400, color: text_color3),
             textAlign: TextAlign.start,
           ),
         ),
@@ -63,9 +64,9 @@ class _TripsListState extends State<TripsList>
             child: Text(
               value,
               style: TextStyle(
-                fontSize: 16,
-                // fontWeight: FontWeight.bold,
-              ),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: text_color1),
               textAlign: TextAlign.start,
             ),
           ),
@@ -172,6 +173,7 @@ class _TripsListState extends State<TripsList>
                             child: Card(
                               color: Theme.of(context).scaffoldBackgroundColor,
                               elevation: 0.0,
+                              margin: EdgeInsets.zero,
                               child: InkWell(
                                 onTap: () {
                                   Navigator.push(
@@ -186,45 +188,112 @@ class _TripsListState extends State<TripsList>
                                               data)));
                                 },
                                 child: Card(
-                                  shape: flag
-                                      ? RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(25.0)),
-                                          side: BorderSide(
-                                              color:
-                                                  Theme.of(context).accentColor,
-                                              width: 2.0),
-                                        )
-                                      : requestsArray.contains(docId)
-                                          ? RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(25.0)),
-                                              side: BorderSide(
-                                                  color: Colors.pink[300],
-                                                  width: 2.0),
-                                            )
-                                          : RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(25.0)),
-                                            ),
-                                  elevation: 5,
                                   margin: EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 5),
+                                      vertical: 2, horizontal: 0),
                                   child: Container(
-                                    padding: EdgeInsets.all(10),
+                                    padding: EdgeInsets.only(
+                                        top: 12,
+                                        bottom: 12,
+                                        left: 25,
+                                        right: 25),
                                     child: SingleChildScrollView(
-                                      child: Column(
-                                        children: <Widget>[
-                                          buildRowInfo('Destination : ', '${snapshot.data.documents[index].data['destination']}'),
-                                          buildRowInfo('Destination Location : ', '${snapshot.data.documents[index].data['destination_location']}'),
-                                          buildRowInfo('Departure Date : ', '${DateFormat('yyyy.MM.dd').format(snapshot.data.documents[index].data['departure_time'].toDate())}'),
-                                          buildRowInfo('Departure Time : ', '${DateFormat('kk:mm a').format(snapshot.data.documents[index].data['departure_time'].toDate())}'),
-                                          buildRowInfo('Departure Location : ', '${snapshot.data.documents[index].data['departure_location']}'),
-                                          buildRowInfo('Rule : ', '${snapshot.data.documents[index].data['rule']} , ${snapshot.data.documents[index].data['sex']}'),
-                                          buildRowInfo('Number of people who joined : ', '${snapshot.data.documents[index].data['maxPoolers']}'),
-                                        ],
-                                      ),
-                                    ),
+                                        child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                children: <Widget>[
+                                                  Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment.end,
+                                                    children: [
+                                                      // Text('${snapshot.data.documents[index].data['destination']}', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: red_color2),),
+                                                      Text(
+                                                        '觀塘',
+                                                        style: TextStyle(
+                                                            fontSize: 28,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: red_color2),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                bottom: 5,
+                                                                left: 12,
+                                                                right: 12),
+                                                        child: Text(
+                                                          '往',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  text_color3),
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        '${snapshot.data.documents[index].data['destination_location']}',
+                                                        style: TextStyle(
+                                                            fontSize: 28,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color: grey_color4),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                bottom: 5,
+                                                                left: 12,
+                                                                right: 12),
+                                                        child: Text(
+                                                          '於',
+                                                          style: TextStyle(
+                                                              color:
+                                                                  text_color3),
+                                                        ),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                bottom: 5),
+                                                        child: Column(
+                                                          children: [
+                                                            Text(
+                                                              '${DateFormat('kk:mm a').format(snapshot.data.documents[index].data['departure_time'].toDate())}',
+                                                              style: TextStyle(
+                                                                  fontSize: 14,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w700,
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                            Text(
+                                                              '${DateFormat('yyyy.MM.dd').format(snapshot.data.documents[index].data['departure_time'].toDate())}',
+                                                              style: TextStyle(
+                                                                  fontSize: 12,
+                                                                  color: Colors
+                                                                      .black),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  buildRowInfo('集合點  ',
+                                                      '${snapshot.data.documents[index].data['departure_location']}'),
+                                                  buildRowInfo('出發到  ',
+                                                      '${snapshot.data.documents[index].data['destination_location']}'),
+                                                ],
+                                              ),
+                                            ),
+                                            Text(
+                                              '${snapshot.data.documents[index].data['users'].length}/${snapshot.data.documents[index].data['maxPoolers']}',
+                                              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black),
+                                              )
+                                          ],
+                                        ),
+                                      ],
+                                    )),
                                   ),
                                 ),
                               ),
@@ -235,39 +304,41 @@ class _TripsListState extends State<TripsList>
                 ),
               );
             }),
-        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-        floatingActionButton: FadeTransition(
-          opacity: _hideFabController,
-          child: ScaleTransition(
-            scale: _hideFabController,
-            child: widget.inGroupFetch
-                ? !widget.inGroup
-                    ? Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
-                        child: FloatingActionButton(
-                          onPressed: () => widget.startCreatingTrip(context),
-                          child: Tooltip(
-                            message: 'Create Group',
-                            verticalOffset: -60,
-                            child: Icon(Icons.add),
-                          ),
-                        ),
-                      )
-                    : Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
-                        child: FloatingActionButton.extended(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => GroupPage()));
-                          },
-                          icon: Icon(Icons.group),
-                          label: Text('Group'),
-                        ),
-                      )
-                : null,
-          ),
-        ));
+        // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        // floatingActionButton: FadeTransition(
+        //   opacity: _hideFabController,
+        //   child: ScaleTransition(
+        //     scale: _hideFabController,
+        //     child: widget.inGroupFetch
+        //         ? !widget.inGroup
+        //             ? Padding(
+        //                 padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
+        //                 child: FloatingActionButton(
+        //                   onPressed: () => widget.startCreatingTrip(context),
+        //                   child: Tooltip(
+        //                     message: 'Create Group',
+        //                     verticalOffset: -60,
+        //                     child: Icon(Icons.add),
+        //                   ),
+        //                 ),
+        //               )
+        //             : Padding(
+        //                 padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
+        //                 child: FloatingActionButton.extended(
+        //                   onPressed: () {
+        //                     Navigator.push(
+        //                         context,
+        //                         MaterialPageRoute(
+        //                             builder: (context) => GroupPage()));
+        //                   },
+        //                   icon: Icon(Icons.group),
+        //                   label: Text('Group'),
+        //                 ),
+        //               )
+        //         : null,
+        //   ),
+        // )
+        
+        );
   }
 }
