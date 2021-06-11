@@ -11,12 +11,16 @@ class DatabaseService {
   DatabaseService({this.uid});
 
   //collection reference
-  final CollectionReference userDetails = Firestore.instance.collection('userdetails');
-  final CollectionReference groupdetails = Firestore.instance.collection('group');
-  final CollectionReference requests = Firestore.instance.collection('requests');
+  final CollectionReference userDetails =
+      Firestore.instance.collection('userdetails');
+  final CollectionReference groupdetails =
+      Firestore.instance.collection('group');
+  final CollectionReference requests =
+      Firestore.instance.collection('requests');
 
   // Enter user data (W=1, R=0)
-  Future enterUserData({String name, String mobileNumber, String hostel, String sex}) async {
+  Future enterUserData(
+      {String name, String mobileNumber, String hostel, String sex}) async {
     return await userDetails.document(uid).setData({
       'name': name,
       'mobileNumber': mobileNumber,
@@ -30,10 +34,15 @@ class DatabaseService {
   }
 
   // Update user data (W=1/2,R=1)
-  Future updateUserData({String name, String mobileNumber, String hostel, String sex}) async {
+  Future updateUserData(
+      {String name, String mobileNumber, String hostel, String sex}) async {
     var currentGrp;
     var user = await _auth.currentUser();
-    await Firestore.instance.collection('userdetails').document(user.uid).get().then((value) {
+    await Firestore.instance
+        .collection('userdetails')
+        .document(user.uid)
+        .get()
+        .then((value) {
       currentGrp = value.data['currentGroup'];
     });
     await userDetails.document(uid).updateData({
@@ -43,7 +52,11 @@ class DatabaseService {
       'sex': sex,
     });
     if (currentGrp != null) {
-      await groupdetails.document(currentGrp).collection('users').document(user.uid).setData({
+      await groupdetails
+          .document(currentGrp)
+          .collection('users')
+          .document(user.uid)
+          .setData({
         'name': name,
         'mobilenum': mobileNumber,
         'hostel': hostel,
@@ -85,59 +98,84 @@ class DatabaseService {
 
     // CODE FOR CONVERTING DATE TIME TO TIMESTAMP
     var temp = requestDetails.departureTime;
-    var departure_time = DateTime(requestDetails.departureDate.year, requestDetails.departureDate.month, requestDetails.departureDate.day, temp.hour, temp.minute);
-    
+    var departure_time = DateTime(
+        requestDetails.departureDate.year,
+        requestDetails.departureDate.month,
+        requestDetails.departureDate.day,
+        temp.hour,
+        temp.minute);
+
     final docRef = await groupdetails.add({
       'owner': user.uid.toString(),
       'users': FieldValue.arrayUnion([user.uid]),
-      'destination': requestDetails.destination.toString(),
-      'destination_location': requestDetails.destination_location.toString(),
-      'departure_location': requestDetails.departure_location.toString(),
+      'transportation': requestDetails.transportation,
+      'departure': requestDetails.departure,
+      'destination': requestDetails.destination,
+      'departure_location': requestDetails.departure_location,
+      'destination_location': requestDetails.destination_location,
       'departure_time': departure_time,
-      'rule': requestDetails.rule,
+      'maxMembers': requestDetails.maxMembers,
       'sex': requestDetails.sex,
+      'tunnel': requestDetails.tunnel,
       'waiting_time': requestDetails.waiting_time,
-      'wait_all_member': requestDetails.wait_all_member,
-      'require_permission': requestDetails.require_permission,
-      'maxPoolers': requestDetails.maxPoolers,
-      'end' : false,
-      'created': Timestamp.now(),
+      'wait_all_member': requestDetails.wait_all_member, 
+      'end': false,
+      'created': Timestamp.now(), 
     });
 
     //adding user to group chat
-    await ChatService().createChatRoom(docRef.documentID, user.uid.toString(), requestDetails.destination.toString());
+    await ChatService().createChatRoom(docRef.documentID, user.uid.toString(),
+        requestDetails.destination.toString());
 
     await userDetails.document(user.uid).updateData({
       'currentGroup': docRef.documentID,
     });
 
     var request = groupdetails.document(docRef.documentID).collection('users');
-    await Firestore.instance.collection('userdetails').document(user.uid).get().then((value) async {
+    await Firestore.instance
+        .collection('userdetails')
+        .document(user.uid)
+        .get()
+        .then((value) async {
       if (value.exists) {
-        await request.document(user.uid).setData({'uid' : user.uid, 'name': value.data['name'], 'hostel': value.data['hostel'], 'sex': value.data['sex'], 'mobilenum': value.data['mobileNumber'], 'totalrides': value.data['totalRides'], 'cancelledrides': value.data['cancelledRides'], 'actualrating': value.data['actualRating'], 'numberofratings': value.data['numberOfRatings']});
+        await request.document(user.uid).setData({
+          'uid': user.uid,
+          'name': value.data['name'],
+          'hostel': value.data['hostel'],
+          'sex': value.data['sex'],
+          'mobilenum': value.data['mobileNumber'],
+          'totalrides': value.data['totalRides'],
+          'cancelledrides': value.data['cancelledRides'],
+          'actualrating': value.data['actualRating'],
+          'numberofratings': value.data['numberOfRatings']
+        });
       }
     });
   }
 
   Future<void> updateGroup(RequestDetails requestDetails) async {
-    
     // CODE FOR CONVERTING DATE TIME TO TIMESTAMP
     var temp = requestDetails.departureTime;
-    var departure_time = DateTime(requestDetails.departureDate.year, requestDetails.departureDate.month, requestDetails.departureDate.day, temp.hour, temp.minute);
-    
-    await groupdetails.document(requestDetails.id).setData({
-      'destination': requestDetails.destination.toString(),
-      'destination_location': requestDetails.destination_location.toString(),
-      'departure_location': requestDetails.departure_location.toString(),
-      'departure_time': departure_time,
-      'rule': requestDetails.rule,
-      'sex': requestDetails.sex,
-      'waiting_time': requestDetails.waiting_time,
-      'wait_all_member': requestDetails.wait_all_member,
-      'require_permission': requestDetails.require_permission,
-      'maxPoolers': requestDetails.maxPoolers,
-    }, merge: true);
+    var departure_time = DateTime(
+        requestDetails.departureDate.year,
+        requestDetails.departureDate.month,
+        requestDetails.departureDate.day,
+        temp.hour,
+        temp.minute);
 
+    await groupdetails.document(requestDetails.id).setData({ 
+      'transportation': requestDetails.transportation,
+      'departure': requestDetails.departure,
+      'destination': requestDetails.destination,
+      'departure_location': requestDetails.departure_location,
+      'destination_location': requestDetails.destination_location,
+      'departure_time': departure_time,
+      'maxMembers': requestDetails.maxMembers,
+      'sex': requestDetails.sex,
+      'tunnel': requestDetails.tunnel,
+      'waiting_time': requestDetails.waiting_time,
+      'wait_all_member': requestDetails.wait_all_member, 
+    }, merge: true);
   }
 
   // exit a group (W=4/5, R =3/4)
@@ -148,7 +186,11 @@ class DatabaseService {
     var totalRides;
     var cancelledRides;
     var owner;
-    await Firestore.instance.collection('userdetails').document(user.uid).get().then((value) {
+    await Firestore.instance
+        .collection('userdetails')
+        .document(user.uid)
+        .get()
+        .then((value) {
       currentGrp = value.data['currentGroup'];
       totalRides = value.data['totalRides'];
       cancelledRides = value.data['cancelledRides'];
@@ -157,17 +199,21 @@ class DatabaseService {
       presentNum = value.data['users'].length;
       owner = value.data['owner'];
     });
-    
+
     await userDetails.document(user.uid).updateData({
       'currentGroup': null,
     });
 
-    if (presentNum > 1 ) {
+    if (presentNum > 1) {
       await groupdetails.document(currentGrp).updateData({
         'users': FieldValue.arrayRemove([user.uid]),
       });
-      await groupdetails.document(currentGrp).collection('users').document(user.uid).delete();
-      if (owner == user.uid ) {
+      await groupdetails
+          .document(currentGrp)
+          .collection('users')
+          .document(user.uid)
+          .delete();
+      if (owner == user.uid) {
         var newowner;
         await groupdetails.document(currentGrp).get().then((value) {
           newowner = value.data['users'][0];
@@ -178,8 +224,7 @@ class DatabaseService {
       }
       //deleting user from chat group
       await ChatService().exitChatRoom(currentGrp);
-    }
-    else {
+    } else {
       await groupdetails.document(currentGrp).delete();
     }
   }
@@ -187,7 +232,7 @@ class DatabaseService {
   // join a group from dashboard (W=4,R=2)
   Future<void> joinGroup(String listuid) async {
     var user = await _auth.currentUser();
- 
+
     await userDetails.document(user.uid).updateData({
       'currentGroup': listuid,
     });
@@ -196,10 +241,14 @@ class DatabaseService {
     });
 
     var request = groupdetails.document(listuid).collection('users');
-    await Firestore.instance.collection('userdetails').document(user.uid).get().then((value) async {
+    await Firestore.instance
+        .collection('userdetails')
+        .document(user.uid)
+        .get()
+        .then((value) async {
       if (value.exists) {
         await request.document(user.uid).setData({
-          'uid' : user.uid,
+          'uid': user.uid,
           'name': value.data['name'],
           'hostel': value.data['hostel'],
           'sex': value.data['sex'],
@@ -217,11 +266,9 @@ class DatabaseService {
 
   Future<void> setArrived(String listuid) async {
     var user = await _auth.currentUser();
- 
+
     var request = groupdetails.document(listuid).collection('users');
-    await request.document(user.uid).setData({
-          'isArrived' : true
-    }, merge: true);
+    await request.document(user.uid).setData({'isArrived': true}, merge: true);
   }
 
   // set device token (W=1,R=0)
@@ -232,7 +279,11 @@ class DatabaseService {
 
   // Function for kicking a user (ADMIN ONLY) (W=4,R=1)
   Future<void> kickUser(String currentGrp, String uid) async {
-    await groupdetails.document(currentGrp).collection('users').document(uid).delete();
+    await groupdetails
+        .document(currentGrp)
+        .collection('users')
+        .document(uid)
+        .delete();
 
     await userDetails.document(uid).updateData({
       'currentGroup': null,

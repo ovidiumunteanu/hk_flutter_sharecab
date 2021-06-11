@@ -21,6 +21,7 @@ class _ChatTileState extends State<ChatTile> {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 15),
       decoration: BoxDecoration(
+        color: Colors.white,
           border: Border(
         bottom: BorderSide(width: 0.15, color: Theme.of(context).accentColor),
       )),
@@ -28,27 +29,27 @@ class _ChatTileState extends State<ChatTile> {
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) => ChatScreen(widget.docId)));
         },
-        leading: CircleAvatar(
-          backgroundColor: Theme.of(context).accentColor,
-          radius: 30,
-          child: Padding(
-            padding: EdgeInsets.all(6),
-            child: widget.destination == 'New Delhi Railway Station' || widget.destination == 'Hazrat Nizamuddin Railway Station'
-                ? Icon(
-                    Icons.train,
-                    color: getVisibleColorOnAccentColor(context),
-                  )
-                : widget.destination == 'Indira Gandhi International Airport'
-                    ? Icon(
-                        Icons.flight_takeoff,
-                        color: getVisibleColorOnAccentColor(context),
-                      )
-                    : Icon(
-                        Icons.directions_bus,
-                        color: getVisibleColorOnAccentColor(context),
-                      ),
-          ),
-        ),
+        // leading: CircleAvatar(
+        //   backgroundColor: Theme.of(context).accentColor,
+        //   radius: 30,
+        //   child: Padding(
+        //     padding: EdgeInsets.all(6),
+        //     child: widget.destination == 'New Delhi Railway Station' || widget.destination == 'Hazrat Nizamuddin Railway Station'
+        //         ? Icon(
+        //             Icons.train,
+        //             color: getVisibleColorOnAccentColor(context),
+        //           )
+        //         : widget.destination == 'Indira Gandhi International Airport'
+        //             ? Icon(
+        //                 Icons.flight_takeoff,
+        //                 color: getVisibleColorOnAccentColor(context),
+        //               )
+        //             : Icon(
+        //                 Icons.directions_bus,
+        //                 color: getVisibleColorOnAccentColor(context),
+        //               ),
+        //   ),
+        // ),
         title: Text(
           widget.destination,
           style: Theme.of(context).textTheme.bodyText1,

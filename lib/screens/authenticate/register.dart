@@ -192,7 +192,7 @@ class _RegisterState extends State<Register> {
                                   children: [
                                     SizedBox(
                                       width: 110,
-                                      child: Dropdown(
+                                      child: DropdownInput(
                                         label: 'Gender',
                                         curItem: sex,
                                         items: _sex,
@@ -270,7 +270,7 @@ class _RegisterState extends State<Register> {
                                     ),
                                     TextButton(
                                         onPressed: () {
-                                          widget.toggleView();
+                                          widget.toggleView(2);
                                         },
                                         child: Text(
                                           'Log in',

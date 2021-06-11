@@ -242,7 +242,6 @@ class MyApp extends StatelessWidget {
           '/rootscreen': (context) => RootScreen(),
           '/edituserdetails': (context) => EditForm(),
           '/dashboard': (context) => Dashboard(),
-          CreateTrip.routeName: (context) => CreateTrip(),
           ChatScreen.routeName: (context) => ChatScreen(' '),
 //          GroupDetails.routeName : (context) => GroupDetails(' '),
         },

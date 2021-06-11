@@ -45,7 +45,7 @@ class _NewMessageState extends State<NewMessage> {
             controller: _controller,
             maxLength: 50,
             decoration: InputDecoration(
-              labelText: 'Send a message...',
+              labelText: '發送信息...',
             ),
             onChanged: (value) {
               setState(() {

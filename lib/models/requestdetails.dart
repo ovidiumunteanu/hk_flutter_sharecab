@@ -1,47 +1,50 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+     
 class RequestDetails {
-   @required
+  @required
   final String id;
   @required
   final String name;
   @required
+  final String transportation;
+  @required
+  final String departure;
+  @required
   final String destination;
   @required
-  final String destination_location;
-  @required
   final String departure_location;
+  @required
+  final String destination_location;
   @required
   final DateTime departureDate;
   @required
   final TimeOfDay departureTime;
   @required
-  final String rule;
+  final int maxMembers;
   @required
   final String sex;
   @required
+  final String tunnel;
+  @required
   final int waiting_time;
   @required
-  final bool wait_all_member;
-  @required
-  final bool require_permission;
-  @required
-  final int maxPoolers;
+  final bool wait_all_member; 
 
   RequestDetails({
     this.id, 
     this.name, 
+    this.transportation,
+    this.departure,
     this.destination, 
-    this.destination_location, 
     this.departure_location,
+    this.destination_location, 
     this.departureDate, 
     this.departureTime,
-    this.rule,
+    this.maxMembers,
     this.sex,
+    this.tunnel, 
     this.waiting_time,
-    this.wait_all_member,
-    this.require_permission,
-    this.maxPoolers
+    this.wait_all_member, 
   });
 }

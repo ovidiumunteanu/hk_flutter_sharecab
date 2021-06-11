@@ -48,13 +48,13 @@ class AuthInput extends StatelessWidget {
   }
 }
 
-class Dropdown extends StatelessWidget {
+class DropdownInput extends StatelessWidget {
   final Function onChange;
   String label;
   String hint;
   String curItem;
   List<String> items ;
-  Dropdown({this.label, this.hint , this.curItem, this.items, this.onChange});
+  DropdownInput({this.label, this.hint , this.curItem, this.items, this.onChange});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -68,7 +68,7 @@ class Dropdown extends StatelessWidget {
                 fontSize: 14, fontWeight: FontWeight.w400, color: text_color2),
           ),
           SizedBox(
-            height: 40,
+            height: 50,
             child: DropdownButtonFormField(
               style: TextStyle(
                   fontSize: 14,
@@ -90,13 +90,13 @@ class Dropdown extends StatelessWidget {
               }).toList(),
             ),
           ),
-          Container(
-            width: double.infinity,
-            height: 1,
-            decoration: BoxDecoration(
-              color: grey_color1,
-            ),
-          ),
+          // Container(
+          //   width: double.infinity,
+          //   height: 1,
+          //   decoration: BoxDecoration(
+          //     color: grey_color1,
+          //   ),
+          // ),
         ],
       ),
     );

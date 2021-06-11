@@ -3,6 +3,7 @@ import 'package:shareacab/screens/chatscreen/chat_widgets/new_message.dart';
 import 'package:shareacab/screens/chatscreen/chat_widgets/message.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shareacab/services/trips.dart';
+import 'package:shareacab/utils/constant.dart';
 
 class ChatScreen extends StatefulWidget {
   final String docId;
@@ -47,7 +48,21 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
+        backgroundColor: yellow_color2,
+        leading: InkWell(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Icon(
+            Icons.chevron_left,
+            color: text_color1,
+            size: 36,
+          ),
+        ),
+        title: Text(
+          '聊天',
+          style: TextStyle(color: text_color1),
+        ),
       ),
       body: Container(
         child: Column(

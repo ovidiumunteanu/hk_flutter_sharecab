@@ -13,7 +13,7 @@ class ChatUsersList extends StatelessWidget {
     range = DateTime.now().subtract(Duration(days: 30));
     final user = Provider.of<FirebaseUser>(context);
     return StreamBuilder(
-      stream: Firestore.instance.collection('chatroom').where('users', arrayContains: user.uid).where('lastMessage', isGreaterThan: range).orderBy('lastMessage', descending: true).snapshots(),
+      stream: Firestore.instance.collection('chatroom').where('users', arrayContains: user == null ? '' : user.uid).where('lastMessage', isGreaterThan: range).orderBy('lastMessage', descending: true).snapshots(),
       builder: (ctx, futureSnapshot) {
         if (futureSnapshot.connectionState == ConnectionState.waiting) {
           return Center(

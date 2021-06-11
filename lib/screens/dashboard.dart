@@ -10,10 +10,13 @@ import 'package:shareacab/screens/createtrip.dart';
 import 'package:shareacab/screens/filter.dart';
 import 'package:shareacab/screens/help.dart';
 import 'package:shareacab/screens/settings.dart';
+import 'profile/userprofile.dart';
 import 'package:shareacab/screens/tripslist.dart';
 import 'package:shareacab/services/auth.dart';
 import 'package:location/location.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:progress_dialog/progress_dialog.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:shareacab/utils/constant.dart';
 
 class Dashboard extends StatefulWidget {
@@ -125,6 +128,7 @@ class _DashboardState extends State<Dashboard>
   String curDeparture = 'ANY';
   String curDestination = 'ANY';
   String sortbyTime = 'ANY';
+
   Widget filterBtn(List<String> items, String type) {
     var curValue = curDeparture;
     if (type == 'destination') {
@@ -132,6 +136,7 @@ class _DashboardState extends State<Dashboard>
     } else if (type == 'sortbytime') {
       curValue = sortbyTime;
     }
+
     return DropdownButton<String>(
       value: curValue,
       // icon: const Icon(Icons.arrow_downward),
@@ -167,6 +172,11 @@ class _DashboardState extends State<Dashboard>
   }
 
   Widget filterView() {
+    var dest_list = ['ANY'];
+    var dep_list = ['ANY'];
+    dest_list.insertAll(1, destination_list);
+    dep_list.insertAll(1, departure_list);
+
     return Container(
       width: double.infinity,
       // height: 60,
@@ -176,9 +186,11 @@ class _DashboardState extends State<Dashboard>
           Expanded(
               child: Column(
             children: [
-              SizedBox(height: 8,),
-              Text('Departure'),
-              filterBtn(departure_list, 'departure')
+              SizedBox(
+                height: 8,
+              ),
+              Text('離開'),
+              filterBtn(dep_list, 'departure')
             ],
           )),
           Container(
@@ -190,9 +202,11 @@ class _DashboardState extends State<Dashboard>
           Expanded(
               child: Column(
             children: [
-              SizedBox(height: 8,),
-              Text('Destination'),
-              filterBtn(destination_list, 'destination')
+              SizedBox(
+                height: 8,
+              ),
+              Text('目的地'),
+              filterBtn(dest_list, 'destination')
             ],
           )),
           Container(
@@ -204,14 +218,42 @@ class _DashboardState extends State<Dashboard>
           Expanded(
               child: Column(
             children: [
-              SizedBox(height: 8,),
-              Text('Sort by time'),
-              filterBtn(['ANY', 'Most recent', 'Most old'], 'sortbytime')
+              SizedBox(
+                height: 8,
+              ),
+              Text('按時間排序'),
+              filterBtn(['ANY', '最近的', '最老'], 'sortbytime')
             ],
           )),
         ],
       ),
     );
+  }
+
+  void logout() async {
+    ProgressDialog pr;
+    pr = ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+    pr.style(
+      message: '註銷...',
+      backgroundColor: Theme.of(context).backgroundColor,
+      messageTextStyle: TextStyle(color: Theme.of(context).accentColor),
+    );
+    await pr.show();
+    await Future.delayed(Duration(
+        seconds:
+            1)); // sudden logout will show ProgressDialog for a very short time making it not very nice to see :p
+    try {
+      await _auth.signOut();
+      await pr.hide();
+    } catch (err) {
+      await pr.hide();
+      String errStr = err.message ?? err.toString();
+      final snackBar =
+          SnackBar(content: Text(errStr), duration: Duration(seconds: 3));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+    }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -243,40 +285,76 @@ class _DashboardState extends State<Dashboard>
           ],
         ),
         actions: <Widget>[
+          // IconButton(
+          //   icon: Icon(
+          //     Icons.filter_list,
+          //     color: text_color1,
+          //     size: 30.0,
+          //   ),
+          //   tooltip: 'Filter',
+          //   onPressed: () async {
+          //     _startFilter(context);
+          //   },
+          // ),
+          // IconButton(
+          //   icon: Icon(
+          //     Icons.help,
+          //     color: text_color1,
+          //   ),
+          //   tooltip: 'Help',
+          //   onPressed: () {
+          //     Navigator.push(
+          //         context, MaterialPageRoute(builder: (context) => Help()));
+          //   },
+          // ),
           IconButton(
             icon: Icon(
-              Icons.filter_list,
+              FontAwesomeIcons.signOutAlt,
               color: text_color1,
-              size: 30.0,
             ),
-            tooltip: 'Filter',
             onPressed: () async {
-              _startFilter(context);
+              await showDialog(
+                  context: context,
+                  builder: (BuildContext ctx) {
+                    return AlertDialog(
+                      title: Text('登出'),
+                      content: Text('您確定要退出嗎？'),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0)),
+                      actions: <Widget>[
+                        FlatButton(
+                          child: Text('登出',
+                              style: TextStyle(
+                                  color: Theme.of(context).accentColor)),
+                          onPressed: () {
+                            logout();
+                          },
+                        ),
+                        FlatButton(
+                          child: Text('取消',
+                              style: TextStyle(
+                                  color: Theme.of(context).accentColor)),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  });
             },
           ),
-          IconButton(
-            icon: Icon(
-              Icons.help,
-              color: text_color1,
-            ),
-            tooltip: 'Help',
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Help()));
-            },
-          ),
-          IconButton(
-              icon: Icon(
-                Icons.settings,
-                color: text_color1,
-              ),
-              tooltip: 'Settings',
-              onPressed: () {
-                return Navigator.push(context,
-                    MaterialPageRoute(builder: (context) {
-                  return Settings(_auth);
-                }));
-              }),
+          // IconButton(
+          //     icon: Icon(
+          //       Icons.person,
+          //       color: text_color1,
+          //     ),
+          //     tooltip: '帳戶',
+          //     onPressed: () {
+          //       return Navigator.push(context,
+          //           MaterialPageRoute(builder: (context) {
+          //         return MyProfile(_auth);
+          //       }));
+          //     }),
         ],
       ),
       resizeToAvoidBottomInset: false,
@@ -326,14 +404,12 @@ class _DashboardState extends State<Dashboard>
                         children: <Widget>[
                           Container(
                             // margin: EdgeInsets.all(5),
-                            height: (MediaQuery.of(context).size.height -
-                                    MediaQuery.of(context).padding.top) *
-                                0.79,
+                            height: (MediaQuery.of(context).size.height - 260),
                             width: double.infinity,
                             child: TripsList(
-                              _dest,
-                              _selecteddest,
-                              _notPrivacy,
+                              curDeparture,
+                              curDestination,
+                              sortbyTime,
                               inGroup: inGroup,
                               inGroupFetch: inGroupFetch,
                               startCreatingTrip: _startCreatingTrip,

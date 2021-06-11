@@ -10,17 +10,19 @@ Color text_color4 = const Color(0xFF292347);
 
 Color red_color1 = const Color(0xFFFF0000);
 Color red_color2 = const Color(0xFFDAA210);
+Color red_color3 = const Color(0xFFFF5244);
 
 Color grey_color1 = const Color(0xFFB3BABF);
 Color grey_color2 = const Color(0xFFDCE3DE);
 Color grey_color3 = const Color(0xFFA7BAAD);
 Color grey_color4 = const Color(0xFF4F755B);
 Color grey_color5 = const Color(0x99B3BABF);
+Color grey_color6 = const Color(0xFFDDDDDD);
+Color grey_color7 = const Color(0xFFF2F7F8);
 
 Color blue_color1 = const Color(0xFF2F80ED);
 
 List<String> departure_list = [
-  'ANY',
   '柴灣',
   '杏花邨',
   '筲箕灣',
@@ -44,7 +46,6 @@ List<String> departure_list = [
   '海怡半島',
 ];
 List<String> destination_list = [
-  'ANY',
   '黃埔',
   '何文田',
   '油麻地',

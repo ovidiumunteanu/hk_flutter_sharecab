@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:shareacab/screens/createtrip.dart';
 import 'package:shareacab/screens/dashboard.dart';
 import 'messages.dart';
 import 'profile/userprofile.dart';
@@ -74,7 +75,7 @@ class _RootScreenState extends State<RootScreen> {
   @override
   void initState() {
     pagelist.add(Dashboard());
-    pagelist.add(MyRequests());
+    pagelist.add(CreateTrip(bottomTapped));
     pagelist.add(Messages());
     // pagelist.add(Notifications());
     // pagelist.add(MyProfile(_auth));

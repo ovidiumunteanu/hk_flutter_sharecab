@@ -7,8 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shareacab/screens/chatscreen/chat_screen.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:shareacab/main.dart';
-import 'package:shareacab/screens/groupscreen/editgroup.dart';
+import 'package:shareacab/main.dart'; 
 import 'package:shareacab/screens/notifications/services/notifservices.dart';
 import 'package:shareacab/services/trips.dart';
 import 'package:shareacab/shared/loading.dart';
@@ -480,13 +479,7 @@ class _GroupPageState extends State<GroupPage>
                                                           'Press here to edit the details: '),
                                                       FlatButton.icon(
                                                           onPressed: () {
-                                                            Navigator.push(
-                                                                context,
-                                                                MaterialPageRoute(
-                                                                    builder: (context) =>
-                                                                        EditGroup(
-                                                                            groupUID:
-                                                                                groupUID)));
+                                                            //  
                                                           },
                                                           icon: Icon(
                                                             FontAwesomeIcons
