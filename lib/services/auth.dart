@@ -32,8 +32,13 @@ class AuthService {
     var result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
     var user = result.user;
     // creating a new document for user
-    await DatabaseService(uid: user.uid).enterUserData(name: name, mobileNumber: mobilenum, hostel: hostel, sex: sex);
+    await DatabaseService(uid: user.uid).enterUserData(name: name, mobileNumber: mobilenum, email: email, sex: sex);
     await result.user.sendEmailVerification();
+  }
+
+  Future<void> registerUser({String userid, String email, String phone, String name, String sex}) async {
+    // creating a new document for user
+    await DatabaseService(uid: userid).enterUserData(name: name, mobileNumber: phone, email: email, sex: sex);
   }
 
   // forgot password

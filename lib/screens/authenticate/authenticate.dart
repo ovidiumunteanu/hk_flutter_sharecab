@@ -3,6 +3,7 @@ import 'package:shareacab/screens/authenticate/register.dart';
 import 'package:shareacab/screens/authenticate/sign_in.dart';
 import 'package:shareacab/screens/authenticate/splash1.dart';
 import 'package:shareacab/screens/authenticate/splash2.dart';
+import 'package:shareacab/screens/authenticate/phoneverify.dart';
 
 class Authenticate extends StatefulWidget {
   @override
@@ -21,14 +22,14 @@ class _AuthenticateState extends State<Authenticate> {
     if (page == 0) {
       return Splash1(toggleView: toggleView);
     } 
-    if (page == 1) {
+    else if (page == 1) {
       return Splash2(toggleView: toggleView);
     } 
-    if (page == 2) {
+    else if (page == 2) {
       return SignIn(toggleView: toggleView);
     } 
-    else {
+    else  {
       return Register(toggleView: toggleView);
-    }
+    } 
   }
 }

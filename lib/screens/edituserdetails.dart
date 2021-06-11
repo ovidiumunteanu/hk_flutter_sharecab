@@ -16,6 +16,7 @@ class _EditFormState extends State<EditForm> {
   final _formKey = GlobalKey<FormState>();
   String name = '';
   String mobileNum = '';
+  String email;
   String hostel;
   String sex;
   String error = '';
@@ -76,7 +77,7 @@ class _EditFormState extends State<EditForm> {
                             await DatabaseService(uid: user.uid).updateUserData(
                               name: name,
                               mobileNumber: mobileNum,
-                              hostel: hostel,
+                              email: email,
                               sex: sex,
                             );
                           }

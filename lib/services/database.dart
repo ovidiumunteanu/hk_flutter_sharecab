@@ -20,22 +20,18 @@ class DatabaseService {
 
   // Enter user data (W=1, R=0)
   Future enterUserData(
-      {String name, String mobileNumber, String hostel, String sex}) async {
+      {String name, String mobileNumber, String email, String sex}) async {
     return await userDetails.document(uid).setData({
       'name': name,
       'mobileNumber': mobileNumber,
-      'hostel': hostel,
+      'email': email,
       'sex': sex,
-      'totalRides': 0,
-      'cancelledRides': 0,
-      'actualRating': 0,
-      'numberOfRatings': 0,
     });
   }
 
   // Update user data (W=1/2,R=1)
   Future updateUserData(
-      {String name, String mobileNumber, String hostel, String sex}) async {
+      {String name, String mobileNumber, String email, String sex}) async {
     var currentGrp;
     var user = await _auth.currentUser();
     await Firestore.instance
@@ -48,7 +44,7 @@ class DatabaseService {
     await userDetails.document(uid).updateData({
       'name': name,
       'mobileNumber': mobileNumber,
-      'hostel': hostel,
+      'email': email,
       'sex': sex,
     });
     if (currentGrp != null) {
@@ -59,7 +55,7 @@ class DatabaseService {
           .setData({
         'name': name,
         'mobilenum': mobileNumber,
-        'hostel': hostel,
+        'email': email,
         'sex': sex,
       }, merge: true);
     }
@@ -71,6 +67,7 @@ class DatabaseService {
       return Userdetails(
         uid: doc.documentID,
         name: doc.data['name'] ?? '',
+        email: doc.data['email'] ?? '',
         mobilenum: doc.data['mobileNumber'] ?? '',
         hostel: doc.data['hostel'] ?? '',
         sex: doc.data['sex'] ?? '',
@@ -90,6 +87,10 @@ class DatabaseService {
   // get user doc
   Stream<DocumentSnapshot> get userData {
     return userDetails.document(uid).snapshots();
+  }
+
+  Future<QuerySnapshot> getUserbyPhone(String phonenumber) {
+    return userDetails.where('mobileNumber', isEqualTo: phonenumber).getDocuments();
   }
 
   // add group details (W = 4, R = 0)

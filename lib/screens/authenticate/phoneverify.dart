@@ -3,67 +3,92 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shareacab/main.dart';
-import 'package:shareacab/screens/authenticate/phoneverify.dart';
 import 'package:shareacab/screens/settings.dart';
 import 'package:shareacab/services/auth.dart';
-import 'package:shareacab/services/database.dart';
 import 'package:shareacab/shared/loading.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:shareacab/components/inputs.dart';
 import 'package:shareacab/components/buttons.dart';
 
-class SignIn extends StatefulWidget {
-  final Function toggleView;
-  SignIn({this.toggleView});
+class PhoneVerify extends StatefulWidget {
+  // final Function toggleView;
+  String verificationId;
+  String PhoneNumber;
+  String userName;
+  String email;
+  String sex;
+  int forceCodeResend;
+  PhoneVerify(
+      {this.PhoneNumber,
+      this.verificationId,
+      this.userName,
+      this.email,
+      this.sex,
+      this.forceCodeResend});
   @override
-  _SignInState createState() => _SignInState();
+  _PhoneVerifyState createState() => _PhoneVerifyState();
 }
 
-class _SignInState extends State<SignIn> {
+class _PhoneVerifyState extends State<PhoneVerify> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final AuthService _auth = AuthService();
-  final DatabaseService _db = DatabaseService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
 
-  String phone = '';
+  String verification_id;
+  int forceResendToken;
+  String code = '';
 
   @override
   void initState() {
     super.initState();
+    verification_id = widget.verificationId;
+    forceResendToken = widget.forceCodeResend;
   }
 
-  Future<bool> isRegistered() async {
-    var data = await _db.getUserbyPhone('+852' + phone);
-    if (data == null) {
-      return false;
+  void onResendCode() async {
+    FocusScope.of(context).unfocus();
+    ProgressDialog pr;
+    pr = ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+    pr.style(
+      message: '重發代碼中...',
+      backgroundColor: Theme.of(context).backgroundColor,
+      messageTextStyle: TextStyle(
+        color: getVisibleTextColorOnScaffold(context),
+      ),
+    );
+    await pr.show();
+    await Future.delayed(Duration(seconds: 1));
+    try {
+      await resendCode();
+      await pr.hide();
+    } catch (e) {
+      await pr.hide();
+      _scaffoldKey.currentState.hideCurrentSnackBar();
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        backgroundColor: yellow_color2,
+        duration: Duration(seconds: 2),
+        content: Text(
+          e.toString(),
+          style: TextStyle(color: text_color1),
+        ),
+      ));
     }
-    return data.documents.length > 0;
   }
 
-  Future<String> verifyPhone() async {
-    String verificationId;
-    final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verId) {
-      verificationId = verId;
-    };
+  Future<String> resendCode() async {
+    final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verId) {};
+    final PhoneVerificationCompleted verifySuccess = (AuthCredential user) {};
     final PhoneCodeSent smsCodeSent = (String verId, [int forceCodeResend]) {
-      verificationId = verId;
-      //print('code has been sent');
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => PhoneVerify(
-                    PhoneNumber: '+852' + phone,
-                    verificationId: verificationId,
-                    forceCodeResend: forceCodeResend,
-                  )));
-    };
-    final PhoneVerificationCompleted verifySuccess = (AuthCredential user) {
-      //print('verify');
+      setState(() {
+        verification_id = verId;
+        forceResendToken = forceCodeResend;
+      });
     };
     final PhoneVerificationFailed verifyFail = (AuthException exception) {
       //print('${exception.message}');
-      Scaffold.of(context).showSnackBar(SnackBar(
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
         backgroundColor: yellow_color2,
         duration: Duration(seconds: 2),
         content: Text(
@@ -73,16 +98,57 @@ class _SignInState extends State<SignIn> {
       ));
     };
     await FirebaseAuth.instance.verifyPhoneNumber(
-        phoneNumber: '+852' + phone,
+        phoneNumber: widget.PhoneNumber,
         codeAutoRetrievalTimeout: autoRetrieve,
+        forceResendingToken: forceResendToken,
         codeSent: smsCodeSent,
         timeout: const Duration(minutes: 1),
         verificationCompleted: verifySuccess,
         verificationFailed: verifyFail);
-    return verificationId;
+    return '';
   }
 
-  void onSignIn() async {
+  Future<String> verifyCode() async {
+    final credential = PhoneAuthProvider.getCredential(
+        verificationId: verification_id, smsCode: code);
+
+    try {
+      await FirebaseAuth.instance
+          .signInWithCredential(credential)
+          .then((AuthResult user) async {
+        if (user != null) {
+          print('correct code ' + user.user.uid);
+          if (widget.userName == null) {
+            //signin
+            // get profile
+            Navigator.pop(context);
+          } else {
+            // register
+            await _auth.registerUser(
+                userid: user.user.uid,
+                email: widget.email,
+                phone: widget.PhoneNumber,
+                name: widget.userName,
+                sex: widget.sex);
+            Navigator.pop(context);
+          }
+        }
+      });
+    } catch (e) {
+      print(e.toString());
+      _scaffoldKey.currentState.hideCurrentSnackBar();
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        backgroundColor: yellow_color2,
+        duration: Duration(seconds: 2),
+        content: Text(
+          '錯誤的驗證碼',
+          style: TextStyle(color: text_color1),
+        ),
+      ));
+    }
+  }
+
+  void onVerify() async {
     if (_formKey.currentState.validate()) {
       FocusScope.of(context).unfocus();
       ProgressDialog pr;
@@ -91,7 +157,7 @@ class _SignInState extends State<SignIn> {
           isDismissible: false,
           showLogs: false);
       pr.style(
-        message: '登錄中...',
+        message: '驗證中...',
         backgroundColor: Theme.of(context).backgroundColor,
         messageTextStyle: TextStyle(
           color: getVisibleTextColorOnScaffold(context),
@@ -100,31 +166,17 @@ class _SignInState extends State<SignIn> {
       await pr.show();
       await Future.delayed(Duration(seconds: 1));
       try {
-        var res = await isRegistered();
-        if (res == false) {
-          await pr.hide();
-          _scaffoldKey.currentState.hideCurrentSnackBar();
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
-            backgroundColor: yellow_color2,
-            duration: Duration(seconds: 2),
-            content: Text(
-              '此電話號碼尚未註冊。',
-              style: TextStyle(color: text_color1),
-            ),
-          ));
-          return;
-        }
-        await verifyPhone();
+        await verifyCode();
         await pr.hide();
       } catch (e) {
         await pr.hide();
         _scaffoldKey.currentState.hideCurrentSnackBar();
         _scaffoldKey.currentState.showSnackBar(SnackBar(
-          backgroundColor: yellow_color2,
+          backgroundColor: Theme.of(context).primaryColor,
           duration: Duration(seconds: 2),
           content: Text(
             e.toString(),
-            style: TextStyle(color: text_color1),
+            style: TextStyle(color: Theme.of(context).accentColor),
           ),
         ));
       }
@@ -142,8 +194,18 @@ class _SignInState extends State<SignIn> {
               backgroundColor: Colors.white,
               elevation: 0.0,
               title: Text(
-                '登入',
+                '驗證電話號碼',
                 style: TextStyle(color: text_color1),
+              ),
+              leading: InkWell(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(
+                  Icons.chevron_left,
+                  color: text_color1,
+                  size: 36,
+                ),
               ),
             ),
             body: Builder(builder: (BuildContext context) {
@@ -160,20 +222,18 @@ class _SignInState extends State<SignIn> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: <Widget>[
-                          SizedBox(height: 80.0),
-                          SizedBox(height: 20.0),
+                          SizedBox(height: 100.0),
                           AuthInput(
-                              label: '電話號碼',
-                              type: 'phone',
+                              label: '驗證碼',
                               onChange: (val) {
-                                setState(() => phone = val);
+                                setState(() => code = val);
                               }),
                           SizedBox(height: 80.0),
                           MainBtn(
-                            label: '登入',
+                            label: '核實',
                             height: 64,
                             onPress: () {
-                              onSignIn();
+                              onVerify();
                             },
                           ),
                           SizedBox(height: 20.0),
@@ -181,7 +241,7 @@ class _SignInState extends State<SignIn> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '沒有賬戶？',
+                                '沒有收到驗證碼？',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
@@ -190,10 +250,10 @@ class _SignInState extends State<SignIn> {
                               ),
                               TextButton(
                                   onPressed: () {
-                                    widget.toggleView(3);
+                                    onResendCode();
                                   },
                                   child: Text(
-                                    '註冊',
+                                    '重發',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,

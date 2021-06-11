@@ -23,6 +23,8 @@ class GroupDetails extends StatefulWidget {
   final docId;
   final data;
   static bool inGroup = false;
+  static bool hasGroup = false;
+  static String myName = '';
   GroupDetails(this.docId, this.data);
 
   @override
@@ -31,6 +33,7 @@ class GroupDetails extends StatefulWidget {
 
 class _GroupDetailsState extends State<GroupDetails>
     with AutomaticKeepAliveClientMixin<GroupDetails> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final RequestService _request = RequestService();
   final DatabaseService _databaseService = DatabaseService();
   final NotifServices _notifServices = NotifServices();
@@ -194,6 +197,66 @@ class _GroupDetailsState extends State<GroupDetails>
                     // );
                     // Scaffold.of(ctx).hideCurrentSnackBar();
                     // Scaffold.of(ctx).showSnackBar(snackBar);
+                  },
+                ),
+                FlatButton(
+                  child: Text('取消',
+                      style: TextStyle(color: Theme.of(context).accentColor)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void onLeaveGroup() async {
+    try {
+      await showDialog(
+          context: context,
+          builder: (BuildContext ctx) {
+            return AlertDialog(
+              title: Text('離開組'),
+              content: Text('你確定要離開這個群嗎？'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('是的',
+                      style: TextStyle(color: Theme.of(context).accentColor)),
+                  onPressed: () async {
+                    ProgressDialog pr;
+                    pr = ProgressDialog(context,
+                        type: ProgressDialogType.Normal,
+                        isDismissible: false,
+                        showLogs: false);
+                    pr.style(
+                      message: '離開組...',
+                      backgroundColor: Theme.of(context).backgroundColor,
+                      messageTextStyle: TextStyle(
+                        color: text_color1,
+                      ),
+                    );
+                    await pr.show();
+                    await Future.delayed(Duration(seconds: 1));
+                    try {
+                      await _notifServices.leftGroup(
+                          GroupDetails.myName, widget.docId);
+                      await _request.exitGroup();
+                      Navigator.pop(context);
+                      await pr.hide();
+                    } catch (e) {
+                      await pr.hide();
+                      print(e.toString());
+                      var errStr = e.message == null ? '' : e.toString();
+                      final snackBar = SnackBar(
+                          content: Text(errStr),
+                          duration: Duration(seconds: 3));
+                      _scaffoldKey.currentState.showSnackBar(snackBar);
+                    }
+                    // Navigator.pop(context);
                   },
                 ),
                 FlatButton(
@@ -404,7 +467,7 @@ class _GroupDetailsState extends State<GroupDetails>
         //           color: text_color2)),
         // );
       }
-    } else {
+    } else if (GroupDetails.hasGroup == false) {
       // if require_permission == false
       return Container(
         height: 100,
@@ -413,13 +476,16 @@ class _GroupDetailsState extends State<GroupDetails>
           children: [
             Container(
               width: double.infinity,
-              height: 30, 
+              height: 30,
               color: text_color1,
               child: Center(
-                child: Text('下次加入将节省 50%', style: TextStyle(color: Colors.white),),
+                child: Text(
+                  '下次加入将节省 50%',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
-            FlatButton( 
+            FlatButton(
               height: 70,
               color: yellow_color1,
               onPressed: () {
@@ -435,6 +501,8 @@ class _GroupDetailsState extends State<GroupDetails>
           ],
         ),
       );
+    } else {
+      return null;
     }
   }
 
@@ -457,10 +525,17 @@ class _GroupDetailsState extends State<GroupDetails>
           if (usersnapshot.connectionState == ConnectionState.active) {
             var groupUID = usersnapshot.data['currentGroup'];
             if (groupUID != null) {
+              GroupDetails.hasGroup = true;
+            } else {
+              GroupDetails.hasGroup = false;
+            }
+            if (groupUID == widget.docId) {
               GroupDetails.inGroup = true;
             } else {
               GroupDetails.inGroup = false;
             }
+            GroupDetails.myName = usersnapshot.data['name'];
+
             return StreamBuilder(
                 stream: Firestore.instance
                     .collection('group')
@@ -539,6 +614,19 @@ class _GroupDetailsState extends State<GroupDetails>
                               ),
                               backgroundColor: yellow_color2,
                               actions: <Widget>[
+                                GroupDetails.inGroup
+                                    ? FlatButton(
+                                        onPressed: () {
+                                          onLeaveGroup();
+                                        },
+                                        child: Text(
+                                          '離開組',
+                                          style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              color: text_color1),
+                                        ))
+                                    : Container(),
                                 // IconButton(
                                 //   icon: Icon(
                                 //     Icons.filter_list,
@@ -580,6 +668,7 @@ class _GroupDetailsState extends State<GroupDetails>
                           ];
                         },
                         body: Scaffold(
+                            key: _scaffoldKey,
                             backgroundColor: Colors.white,
                             body: SingleChildScrollView(
                               child: Column(

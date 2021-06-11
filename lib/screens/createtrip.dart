@@ -111,6 +111,7 @@ class _CreateTripState extends State<CreateTrip> {
       return;
     } else {
       _formKey.currentState.save();
+      FocusScope.of(context).unfocus();
       _addNewRequest();
       widget.setTabChange(0);
     }
@@ -710,8 +711,8 @@ class _CreateTripState extends State<CreateTrip> {
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () {
-        FocusScope.of(context).requestFocus(FocusNode());
+      onTap: () { 
+        FocusScope.of(context).unfocus();
       },
       child: Scaffold(
         key: _scaffoldKey,

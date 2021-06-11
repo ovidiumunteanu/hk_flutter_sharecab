@@ -18,10 +18,9 @@ class AuthInput extends StatelessWidget {
             style: TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w400, color: text_color2),
           ),
-          SizedBox(
-            height: 40,
-            child: TextFormField(
+          TextFormField(
               obscureText: type == 'pass',
+              keyboardType: type == 'phone' ? TextInputType.phone : TextInputType.text,
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -34,14 +33,13 @@ class AuthInput extends StatelessWidget {
                 onChange(val);
               },
             ),
-          ),
-          Container(
-            width: double.infinity,
-            height: 1,
-            decoration: BoxDecoration(
-              color: grey_color1,
-            ),
-          ),
+          // Container(
+          //   width: double.infinity,
+          //   height: 1,
+          //   decoration: BoxDecoration(
+          //     color: grey_color1,
+          //   ),
+          // ),
         ],
       ),
     );
