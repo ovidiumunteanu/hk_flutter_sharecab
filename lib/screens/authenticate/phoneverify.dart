@@ -16,8 +16,8 @@ class PhoneVerify extends StatefulWidget {
   String PhoneNumber;
   String userName;
   String email;
-  String sex;
-  int forceCodeResend;
+  String sex ;
+  int forceCodeResend = -1;
   PhoneVerify(
       {this.PhoneNumber,
       this.verificationId,

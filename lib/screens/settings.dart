@@ -39,7 +39,7 @@ class _SettingsState extends State<Settings> {
   Brightness brightness = WidgetsBinding.instance.window.platformBrightness;
   var _theme;
   String _chosenAccentColor;
-  int _selectedIndex;
+  int _selectedIndex = 0;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   var availableThemes = ['system', 'dark', 'light'];
   List<ThemeModel> themeList = [

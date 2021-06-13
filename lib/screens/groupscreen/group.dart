@@ -44,7 +44,7 @@ class _GroupPageState extends State<GroupPage>
   bool loading = true;
 
   int i = 0, numberOfMessages = 696;
-  double userRating;
+  double userRating = 0;
 
   Future getMembers(String docid) async {
     var qp = await Firestore.instance

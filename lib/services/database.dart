@@ -183,7 +183,7 @@ class DatabaseService {
   Future<void> exitGroup() async {
     var user = await _auth.currentUser();
     var currentGrp;
-    int presentNum;
+    int presentNum = 0;
     var totalRides;
     var cancelledRides;
     var owner;

@@ -5,7 +5,7 @@ class MainBtn extends StatelessWidget {
   final Function onPress;
   String label;
   Color textColor;
-  double height;
+  double height = 0;
   MainBtn({this.label, this.textColor, this.height, this.onPress});
   @override
   Widget build(BuildContext context) {

@@ -8,8 +8,8 @@ class TripItem extends StatelessWidget {
   String destination;
   String departure_loc;
   String destination_loc;
-  int maxMember;
-  int joinedMember;
+  int maxMember = 1;
+  int joinedMember = 0;
   DateTime departure_time;
   TripItem(
       {this.departure,
