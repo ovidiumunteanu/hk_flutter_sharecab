@@ -141,9 +141,24 @@ class _SignInState extends State<SignIn> {
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0.0,
-              title: Text(
-                '登入',
-                style: TextStyle(color: text_color1),
+              title: Row(
+                children: [
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 35,
+                    height: 35,
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    '登入',
+                    style: TextStyle(
+                        color: text_color1,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20),
+                  )
+                ],
               ),
             ),
             body: Builder(builder: (BuildContext context) {
@@ -181,7 +196,7 @@ class _SignInState extends State<SignIn> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                '沒有賬戶？',
+                                '還未有賬號？',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w400,
@@ -193,7 +208,7 @@ class _SignInState extends State<SignIn> {
                                     widget.toggleView(3);
                                   },
                                   child: Text(
-                                    '註冊',
+                                    '立即註冊',
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500,

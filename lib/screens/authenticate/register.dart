@@ -31,24 +31,21 @@ class _RegisterState extends State<Register> {
   bool loading = false;
 
   String phone = '';
-  String email = ''; 
-  String name = ''; 
-  String sex; 
+  String email = '';
+  String name = '';
+  String sex = '男性';
   String verify = '';
 
-  final List<String> _sex = [
-    'Female',
-    'Male',
-    'Others',
-  ];
-  
+  final List<String> _sex = [ '男性', '女性',];
+
   bool isPolicyChecked = false;
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
   }
- Future<bool> isRegistered() async {
+
+  Future<bool> isRegistered() async {
     var data = await _db.getUserbyPhone('+852' + phone);
     if (data == null) {
       return false;
@@ -102,7 +99,7 @@ class _RegisterState extends State<Register> {
 
   void onRegister() async {
     if (_formKey.currentState.validate()) {
-      if(isPolicyChecked == false) { 
+      if (isPolicyChecked == false) {
         return;
       }
       FocusScope.of(context).unfocus();
@@ -122,7 +119,7 @@ class _RegisterState extends State<Register> {
       await Future.delayed(Duration(seconds: 1));
       try {
         var res = await isRegistered();
-        if (res ) {
+        if (res) {
           await pr.hide();
           _scaffoldKey.currentState.hideCurrentSnackBar();
           _scaffoldKey.currentState.showSnackBar(SnackBar(
@@ -169,9 +166,24 @@ class _RegisterState extends State<Register> {
                 appBar: AppBar(
                   backgroundColor: Colors.white,
                   elevation: 0.0,
-                  title: Text(
-                    '註冊',
-                    style: TextStyle(color: text_color1),
+                  title: Row(
+                    children: [
+                      Image.asset(
+                        'assets/images/logo.png',
+                        width: 35,
+                        height: 35,
+                      ),
+                      SizedBox(
+                        width: 5,
+                      ),
+                      Text(
+                        '註冊',
+                        style: TextStyle(
+                            color: text_color1,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 20),
+                      )
+                    ],
                   ),
                   actions: <Widget>[],
                 ),
@@ -219,6 +231,7 @@ class _RegisterState extends State<Register> {
                                       width: 110,
                                       child: DropdownInput(
                                         label: '性別',
+                                        hint: '請選擇',
                                         curItem: sex,
                                         items: _sex,
                                         onChange: (newValue) {
@@ -269,7 +282,7 @@ class _RegisterState extends State<Register> {
                                                 width: 8,
                                               ),
                                               Text(
-                                                '參加此活動及同意此活動的免責條款',
+                                                '註冊”AA車”應用程式即表示您同意免責條款',
                                                 style: TextStyle(
                                                     fontSize: 14,
                                                     color: Colors.black),
@@ -279,7 +292,7 @@ class _RegisterState extends State<Register> {
                                     ]),
                                 SizedBox(height: 60.0),
                                 MainBtn(
-                                  label: '立即創建帳戶',
+                                  label: '註冊',
                                   height: 64,
                                   onPress: () {
                                     onRegister();
@@ -290,7 +303,7 @@ class _RegisterState extends State<Register> {
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      '有一個賬戶？',
+                                      '已經有賬號？',
                                       style: TextStyle(
                                         fontSize: 14,
                                         fontWeight: FontWeight.w400,
@@ -302,7 +315,7 @@ class _RegisterState extends State<Register> {
                                           widget.toggleView(2);
                                         },
                                         child: Text(
-                                          '登入',
+                                          '請登入',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,

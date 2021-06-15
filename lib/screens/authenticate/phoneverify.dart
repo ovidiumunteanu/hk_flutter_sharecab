@@ -16,7 +16,7 @@ class PhoneVerify extends StatefulWidget {
   String PhoneNumber;
   String userName;
   String email;
-  String sex ;
+  String sex;
   int forceCodeResend = -1;
   PhoneVerify(
       {this.PhoneNumber,
@@ -34,6 +34,8 @@ class _PhoneVerifyState extends State<PhoneVerify> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
+  String msg = '驗證碼已發出，請查閱相關訊息。';
+  bool wrongCode = false;
 
   String verification_id;
   int forceResendToken;
@@ -47,6 +49,10 @@ class _PhoneVerifyState extends State<PhoneVerify> {
   }
 
   void onResendCode() async {
+    setState(() {
+      msg = '';
+      wrongCode = false;
+    });
     FocusScope.of(context).unfocus();
     ProgressDialog pr;
     pr = ProgressDialog(context,
@@ -63,6 +69,10 @@ class _PhoneVerifyState extends State<PhoneVerify> {
     try {
       await resendCode();
       await pr.hide();
+      setState(() {
+        msg = '驗證碼已發出，請查閱相關訊息。';
+        wrongCode = false;
+      });
     } catch (e) {
       await pr.hide();
       _scaffoldKey.currentState.hideCurrentSnackBar();
@@ -80,7 +90,7 @@ class _PhoneVerifyState extends State<PhoneVerify> {
   Future<String> resendCode() async {
     final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verId) {};
     final PhoneVerificationCompleted verifySuccess = (AuthCredential user) {};
-    final PhoneCodeSent smsCodeSent = (String verId, [int forceCodeResend]) {
+    final PhoneCodeSent smsCodeSent = (String verId, [int forceCodeResend]) { 
       setState(() {
         verification_id = verId;
         forceResendToken = forceCodeResend;
@@ -112,7 +122,7 @@ class _PhoneVerifyState extends State<PhoneVerify> {
     final credential = PhoneAuthProvider.getCredential(
         verificationId: verification_id, smsCode: code);
 
-    try {
+    try { 
       await FirebaseAuth.instance
           .signInWithCredential(credential)
           .then((AuthResult user) async {
@@ -136,15 +146,19 @@ class _PhoneVerifyState extends State<PhoneVerify> {
       });
     } catch (e) {
       print(e.toString());
-      _scaffoldKey.currentState.hideCurrentSnackBar();
-      _scaffoldKey.currentState.showSnackBar(SnackBar(
-        backgroundColor: yellow_color2,
-        duration: Duration(seconds: 2),
-        content: Text(
-          '錯誤的驗證碼',
-          style: TextStyle(color: text_color1),
-        ),
-      ));
+      setState(() {
+        msg = '錯誤驗證碼，請重新輸入。';
+        wrongCode = true;
+      });
+      // _scaffoldKey.currentState.hideCurrentSnackBar();
+      // _scaffoldKey.currentState.showSnackBar(SnackBar(
+      //   backgroundColor: yellow_color2,
+      //   duration: Duration(seconds: 2),
+      //   content: Text(
+      //     '錯誤的驗證碼',
+      //     style: TextStyle(color: text_color1),
+      //   ),
+      // ));
     }
   }
 
@@ -228,9 +242,22 @@ class _PhoneVerifyState extends State<PhoneVerify> {
                               onChange: (val) {
                                 setState(() => code = val);
                               }),
-                          SizedBox(height: 80.0),
+                          SizedBox(height: 50.0),
+                          Center(
+                            child: Text(
+                              msg,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
+                                color: wrongCode ? red_color2 : text_color1,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
                           MainBtn(
-                            label: '核實',
+                            label: '確認驗證碼',
                             height: 64,
                             onPress: () {
                               onVerify();

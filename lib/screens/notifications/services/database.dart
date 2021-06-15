@@ -183,8 +183,8 @@ class NotificationDatabase {
     });
 
     for (var i = 0; i < allUsers.length; i++) {
-      if (user.uid != allUsers[i]) {
-        await userDetails.document(allUsers[i]).collection('Notifications').add({
+      if (user.uid != allUsers[i]['uid']) {
+        await userDetails.document(allUsers[i]['uid']).collection('Notifications').add({
           'from': user.uid,
           'senderName': name,
           'createdAt': Timestamp.now(),

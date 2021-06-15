@@ -14,9 +14,10 @@ class TripsList extends StatefulWidget {
   final bool inGroup;
   final filterDeparture;
   final filterDestination;
+  final filterGender;
   final sortTime;
   final Function startCreatingTrip;
-  TripsList(this.filterDeparture, this.filterDestination, this.sortTime,
+  TripsList(this.filterDeparture, this.filterDestination, this.filterGender, this.sortTime,
       {this.inGroupFetch, this.inGroup, this.startCreatingTrip});
   @override
   _TripsListState createState() => _TripsListState();
@@ -41,22 +42,25 @@ class _TripsListState extends State<TripsList>
   }
 
   Stream<QuerySnapshot> getStream() {
-    var query = Firestore.instance.collection('group').where('end', isEqualTo: false);
-    if(widget.filterDeparture != 'ANY') {
+    var query =
+        Firestore.instance.collection('group').where('end', isEqualTo: false);
+    if (widget.filterDeparture != '任何') {
       query = query.where('departure', isEqualTo: widget.filterDeparture);
     }
-    if (widget.filterDestination != 'ANY') {
+    if (widget.filterDestination != '任何') {
       query = query.where('destination', isEqualTo: widget.filterDestination);
     }
+    if (widget.filterGender != '男女也可') {
+      query = query.where('sex', isEqualTo: widget.filterGender);
+    }
 
-    if (widget.sortTime == '最近的') {
+    if (widget.sortTime == '最近時間') {
       query = query.orderBy('departure_time', descending: true);
-    }   
-    else if (widget.sortTime == '最老') {
+    } else if (widget.sortTime == '最遠時間') {
       query = query.orderBy('departure_time', descending: false);
     }
 
-    return  query.snapshots();
+    return query.snapshots();
   }
 
   @override
@@ -117,8 +121,14 @@ class _TripsListState extends State<TripsList>
                         final destination_location =
                             docData.data['destination_location'];
                         final departure_time = docData.data['departure_time'];
-                        final maxMembers = docData.data['maxMembers'];
-                        final joinedMember = docData.data['users'].length;
+                        final maxMembers = docData.data['maxMembers']; 
+                        var joinedMember = 0;
+                        for (var i = 0;
+                            i < docData.data['users'].length;
+                            i++) {
+                          joinedMember = joinedMember +
+                              docData.data['users'][i]['num'];
+                        }
 
                         if (docId == usersnapshot.data['currentGroup']) {
                           flag = true;

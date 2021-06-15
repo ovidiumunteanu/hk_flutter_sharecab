@@ -41,6 +41,12 @@ class AuthService {
     await DatabaseService(uid: userid).enterUserData(name: name, mobileNumber: phone, email: email, sex: sex);
   }
 
+  Future<void> updateUser({String userid, String email, String phone, String name, String sex}) async {
+    // creating a new document for user
+    await DatabaseService(uid: userid).updateUserData(name: name, mobileNumber: phone, email: email, sex: sex);
+  }
+
+
   // forgot password
 
   Future<void> resetPassword(String email) async {

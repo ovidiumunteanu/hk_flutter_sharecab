@@ -1,24 +1,23 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shareacab/components/buttons.dart';
 import 'package:shareacab/models/requestdetails.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:shareacab/main.dart';
 import 'package:shareacab/services/trips.dart';
 import 'package:shareacab/services/auth.dart';
-import 'package:shareacab/screens/help.dart';
-import 'package:shareacab/screens/settings.dart';
 import 'package:shareacab/components/inputs.dart';
-import 'package:progress_dialog/progress_dialog.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shareacab/components/appbar.dart';
 import 'package:shareacab/utils/constant.dart';
 
 TextStyle descTxt =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: text_color2);
 TextStyle optionTxt =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: text_color1);
+TextStyle hintTxt =
+    TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: text_color3);
 
 class CreateTrip extends StatefulWidget {
   final Function setTabChange;
@@ -31,27 +30,36 @@ class CreateTrip extends StatefulWidget {
   _CreateTripState createState() => _CreateTripState();
 }
 
-class _CreateTripState extends State<CreateTrip> {
+class _CreateTripState extends State<CreateTrip>
+    with AutomaticKeepAliveClientMixin<CreateTrip> {
   final _formKey = GlobalKey<FormState>();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final _finalDestinationController = TextEditingController();
   final RequestService _request = RequestService();
   final AuthService _auth = AuthService();
 
-  String _transportation = 'Taxi';
-  String _departure = departure_list[0];
-  String _destination = destination_list[0];
+  final departure_loc_ctr = TextEditingController();
+  final destination_loc_ctr = TextEditingController();
+
+  bool hasGroup = false;
+  List<String> members = ['1', '2', '3'];
+
+  String _transportation = '的士';
+  String _departure = location_list[0];
+  String _destination = location_list[1];
   String _departure_location;
   String _destination_location;
   DateTime _selectedDepartureDate;
   TimeOfDay _selectedDepartureTime;
   int _maxMembers = 1;
-  String _sex = 'Both';
-  String _tunnel = 'USE TUNNEL';
+  String _sex = '男女也可';
+  String _tunnel = '行隧道';
   int _waiting_time = 0;
-  bool _wait_all_member = false;
+  bool _wait_all_member = true;
 
   void _addNewRequest() async {
+    // _departure_location = departure_loc_ctr.text;
+    // _destination_location = destination_loc_ctr.text;
+
     final newRq = RequestDetails(
       id: DateTime.now().toString(),
       name: 'Name',
@@ -88,6 +96,9 @@ class _CreateTripState extends State<CreateTrip> {
   void _submitData() {
     _formKey.currentState.validate();
 
+    // _departure_location = departure_loc_ctr.text;
+    // _destination_location = destination_loc_ctr.text;
+
     if (_destination == null ||
         _destination_location == null ||
         _departure_location == null) {
@@ -110,247 +121,32 @@ class _CreateTripState extends State<CreateTrip> {
       ));
       return;
     } else {
-      _formKey.currentState.save();
+      // _formKey.currentState.save();
       FocusScope.of(context).unfocus();
       _addNewRequest();
+
+      departure_loc_ctr.text = '';
+      destination_loc_ctr.text = '';
+      // setState(() {
+      //   _transportation = '的士';
+      //   _departure = location_list[0];
+      //   _destination = location_list[1];
+      //   _departure_location = null;
+      //   _destination_location = null;
+      //   _maxMembers = 1;
+      //   _sex = '男女也可';
+      //   _tunnel = '行隧道';
+      //   _waiting_time = 0;
+      //   _wait_all_member = true;
+      // });
+
       widget.setTabChange(0);
     }
-  }
-
-  void _startDatePicker() {
-    showDatePicker(
-            context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime.now().subtract(Duration(days: 1)),
-            lastDate: DateTime.now().add(Duration(days: 30)))
-        .then((pickedDate) {
-      if (pickedDate == null) {
-        return;
-      }
-      setState(() {
-        _selectedDepartureDate = pickedDate;
-        FocusScope.of(context).requestFocus(FocusNode());
-      });
-    });
-  }
-
-  void _startTimePicker() {
-    showTimePicker(
-      context: context,
-      initialTime: _selectedDepartureTime ?? TimeOfDay.now(),
-    ).then((pickedTime) {
-      if (pickedTime == null) {
-        return;
-      }
-      setState(() {
-        _selectedDepartureTime = pickedTime;
-        FocusScope.of(context).requestFocus(FocusNode());
-      });
-    });
-  }
-
-  Widget buildLabel(String label) {
-    return Container(
-      margin: EdgeInsets.only(
-        top: 40,
-        left: 40,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Flexible(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 25,
-                color: getVisibleTextColorOnScaffold(context),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildDateTime(String point, DateTime date, TimeOfDay time,
-      Function DatePicker, Function TimePicker) {
-    return Container(
-      width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Depart',
-                    style: descTxt,
-                  ),
-                  Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                        color: grey_color5,
-                      ))),
-                      child: FlatButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => DatePicker(),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.calendar_today_outlined,
-                              color: text_color1,
-                            ),
-                            SizedBox(
-                              width: 8,
-                            ),
-                            Expanded(
-                              child: Text(
-                                date == null
-                                    ? ''
-                                    : '${DateFormat.yMd().format(date)}',
-                                style: optionTxt,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 40,
-          ),
-          Expanded(
-            child: Container(
-              width: double.infinity,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Time',
-                    style: descTxt,
-                  ),
-                  Container(
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                          border: Border(
-                              bottom: BorderSide(
-                        color: grey_color5,
-                      ))),
-                      child: FlatButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: () => TimePicker(),
-                        child: Row(
-                          children: [
-                            Text(
-                              time == null
-                                  ? ''
-                                  : '${time.toString().substring(10, 15)}',
-                              style: optionTxt,
-                            ),
-                          ],
-                        ),
-                      )),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
   void initState() {
     super.initState();
-  }
-
-  Widget CheckBoxBtn(isChecked, onSelect) {
-    return InkWell(
-      onTap: () {
-        onSelect(!isChecked);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-            border: Border.all(color: grey_color3, width: 2),
-            borderRadius: BorderRadius.circular(30),
-            color: isChecked ? grey_color2 : grey_color7),
-        child: isChecked
-            ? Icon(
-                Icons.check,
-                size: 18.0,
-                color: grey_color4,
-              )
-            : Icon(
-                null,
-                size: 18.0,
-              ),
-      ),
-    );
-  }
-
-  Widget buildCheckboxRow(String label, bool isChecked, onSelect) {
-    return Container(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            child: Text(
-              label,
-              style: optionTxt,
-            ),
-          ),
-          CheckBoxBtn(isChecked, onSelect),
-        ],
-      ),
-    );
-  }
-
-  Widget buildTransportation() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      decoration: BoxDecoration(
-        border: Border.all(color: grey_color2),
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '交通',
-            style: descTxt,
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('Taxi', _transportation == 'Taxi', (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _transportation = 'Taxi';
-              });
-            }
-          }),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('Uber', _transportation == 'Uber', (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _transportation = 'Uber';
-              });
-            }
-          }),
-        ],
-      ),
-    );
   }
 
   Widget buildFromTo() {
@@ -368,26 +164,30 @@ class _CreateTripState extends State<CreateTrip> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           DropdownInput(
-            label: '出發（從）',
+            label: '所在地',
             curItem: _departure,
-            items: departure_list,
+            items: location_list,
             onChange: (newValue) {
-              setState(() {
-                _departure = newValue;
-              });
+              // setState(() {
+              //   _departure = newValue;
+              // });
+              _departure = newValue;
+              FocusScope.of(context).requestFocus(FocusNode());
             },
           ),
           SizedBox(
             height: 12,
           ),
           DropdownInput(
-            label: '目的地（至）',
+            label: '目的地',
             curItem: _destination,
-            items: destination_list,
+            items: location_list,
             onChange: (newValue) {
-              setState(() {
-                _destination = newValue;
-              });
+              // setState(() {
+              //   _destination = newValue;
+              // });
+              _destination = newValue;
+              FocusScope.of(context).requestFocus(FocusNode());
             },
           ),
         ],
@@ -407,377 +207,146 @@ class _CreateTripState extends State<CreateTrip> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '你去哪兒？ （請明確點）',
+            '您會去哪裡？ （請明確說明目的地）',
             style: descTxt,
           ),
           Container(
             child: TextFormField(
-              decoration: InputDecoration(
-                  // hintText: 'Destination Location',
-                  ),
+              // controller: destination_loc_ctr,
+              // decoration: InputDecoration(
+              //     // hintText: 'Destination Location',
+              //     ),
               validator: (val) => val.length == 0 ? '輸入目的地位置。' : null,
               onChanged: (val) {
-                setState(() => _destination_location = val);
+                _destination_location = val;
+                FocusScope.of(context).requestFocus(FocusNode());
+                // setState(() => _destination_location = val);
               },
             ),
+          ),
+          Text(
+            '例如：元朗西地鐵站, YOHO MALL 附近',
+            style: hintTxt,
           ),
           SizedBox(
             height: 20,
           ),
           Text(
-            '你去哪兒？ （請明確點）',
+            '您會想在哪裡與團友集合？（請明確說明集合地點）',
             style: descTxt,
           ),
           Container(
             child: TextFormField(
-              decoration: InputDecoration(
-                  // hintText: 'Departure Location',
-                  ),
+              // controller: departure_loc_ctr,
+              // decoration: InputDecoration(
+              //     // hintText: 'Departure Location',
+              //     ),
               validator: (val) => val.length == 0 ? '輸入出發地點。' : null,
               onChanged: (val) {
-                setState(() => _departure_location = val);
+                _departure_location = val;
+                FocusScope.of(context).requestFocus(FocusNode());
+                // setState(() => _departure_location = val);
               },
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
-          buildDateTime('離開', _selectedDepartureDate, _selectedDepartureTime,
-              _startDatePicker, _startTimePicker),
-          SizedBox(
-            height: 20,
-          ),
           Text(
-            '你現在有多少乘客？',
-            style: descTxt,
+            '例如：觀塘APM, 滙豐銀行 ',
+            style: hintTxt,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          DateTimeInput((val) {
+            _selectedDepartureDate = val;
+          }, (val) {
+            _selectedDepartureTime = val;
+          }),
+          SizedBox(
+            height: 20,
           ),
           Container(
-            child: TextFormField(
-              decoration: InputDecoration(
-                  // hintText: 'Departure Location',
-                  ),
-              keyboardType: TextInputType.number,
-              validator: (val) => val.length == 0 ? '輸入乘客人數' : null,
-              onChanged: (val) {
-                setState(() => _maxMembers = int.parse(val));
+            child: DropdownInput(
+              label: '您現在已經有多少乘客在一起？(包括您自己本人)',
+              curItem: _maxMembers.toString(),
+              items: members,
+              onChange: (newValue) {
+                // setState(() => _maxMembers = int.parse(newValue));
+                _maxMembers = int.parse(newValue);
+                FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildPassengerType() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      margin: EdgeInsets.symmetric(
-        horizontal: 20,
-      ),
-      decoration: BoxDecoration(
-        border: Border.all(color: grey_color2),
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
           Text(
-            '乘客類型',
-            style: descTxt,
+            '* 四歲或四歲以上為一位乘客。',
+            style: hintTxt,
           ),
           SizedBox(
-            height: 12,
+            height: 10,
           ),
-          buildCheckboxRow('兩個都', _sex == 'Both', (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _sex = 'Both';
-              });
-            }
-          }),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('只有男性', _sex == 'Only Male', (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _sex = 'Only Male';
-              });
-            }
-          }),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('只有女性', _sex == 'Only Female', (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _sex = 'Only Female';
-              });
-            }
-          }),
         ],
       ),
     );
   }
 
-  Widget buildTunnel() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      margin: EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 8,
-      ),
-      decoration: BoxDecoration(
-        border: Border.all(color: grey_color2),
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '隧道（如有）',
-            style: descTxt,
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('是的', _tunnel == 'USE TUNNEL', (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _tunnel = 'USE TUNNEL';
-              });
+  Widget buildBottomBtn(currentuser) {
+    return StreamBuilder(
+        stream: Firestore.instance
+            .collection('userdetails')
+            .document(currentuser.uid)
+            .snapshots(),
+        builder: (context, usersnapshot) {
+          if (usersnapshot.connectionState == ConnectionState.active) {
+            var groupUID = usersnapshot.data['currentGroup'];
+            if (groupUID != null) {
+              return Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(bottom: 55),
+                  height: 55,
+                  color: grey_color6,
+                  child: Center(
+                    child: Text('您目前已經有群組了。',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: text_color2)),
+                  ));
+            } else {
+              return Container(
+                  width: double.infinity,
+                  margin: EdgeInsets.only(bottom: 55),
+                  child: FlatButton(
+                    padding: EdgeInsets.all(20),
+                    color: yellow_color1,
+                    onPressed: () {
+                      SystemChannels.textInput.invokeMethod('Text Input hide');
+                      _submitData();
+                    },
+                    child: Text('按此建立群組',
+                        style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            color: text_color2)),
+                  ));
             }
-          }),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('不', _tunnel == 'NO TUNNEL', (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _tunnel = 'NO TUNNEL';
-              });
-            }
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget buildWaitingBuffer() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      margin: EdgeInsets.symmetric(
-        horizontal: 20,
-      ),
-      decoration: BoxDecoration(
-        border: Border.all(color: grey_color2),
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Waiting Buffer',
-            style: descTxt,
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('0 minutes (No Waiting)', _waiting_time == 0,
-              (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _waiting_time = 0;
-              });
-            }
-          }),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('5 minutes', _waiting_time == 5, (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _waiting_time = 5;
-              });
-            }
-          }),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('10 minutes', _waiting_time == 10, (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _waiting_time = 10;
-              });
-            }
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget buildGoWithoutWaiting() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(20),
-      margin: EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 8,
-      ),
-      decoration: BoxDecoration(
-        border: Border.all(color: grey_color2),
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Going without waiting all passenger join',
-            style: descTxt,
-          ),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('是的', _wait_all_member, (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _wait_all_member = true;
-              });
-            }
-          }),
-          SizedBox(
-            height: 12,
-          ),
-          buildCheckboxRow('不', _wait_all_member == false, (isChecked) {
-            if (isChecked) {
-              setState(() {
-                _wait_all_member = false;
-              });
-            }
-          }),
-        ],
-      ),
-    );
-  }
-
-  Widget buildBottomBtn() {
-    return Container(
-      width: double.infinity,
-      margin: EdgeInsets.only(bottom: 55),
-      child: FlatButton(
-        padding: EdgeInsets.all(20),
-        color: yellow_color1,
-        onPressed: () {
-          SystemChannels.textInput.invokeMethod('Text Input hide');
-          _submitData();
-        },
-        child: Text('按此建立群組',
-            style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.w900, color: text_color2)),
-      ),
-    );
-  }
-
-  void logout() async {
-    ProgressDialog pr;
-    pr = ProgressDialog(context,
-        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
-    pr.style(
-      message: '註銷...',
-      backgroundColor: Theme.of(context).backgroundColor,
-      messageTextStyle: TextStyle(color: Theme.of(context).accentColor),
-    );
-    await pr.show();
-    await Future.delayed(Duration(
-        seconds:
-            1)); // sudden logout will show ProgressDialog for a very short time making it not very nice to see :p
-    try {
-      await _auth.signOut();
-      await pr.hide();
-    } catch (err) {
-      await pr.hide();
-      String errStr = err.message ?? err.toString();
-      final snackBar =
-          SnackBar(content: Text(errStr), duration: Duration(seconds: 3));
-      _scaffoldKey.currentState.showSnackBar(snackBar);
-    }
-    Navigator.of(context).pop();
+          } else {
+            return Container();
+          }
+        });
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
+    var currentuser = Provider.of<FirebaseUser>(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () { 
+      onTap: () {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          backgroundColor: yellow_color2,
-          title: Row(
-            children: [
-              Image.asset(
-                'assets/images/logo.png',
-                width: 35,
-                height: 40,
-              ),
-              SizedBox(
-                width: 5,
-              ),
-              Text(
-                'AA制車資',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: text_color1),
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            //
-            IconButton(
-              icon: Icon(
-                FontAwesomeIcons.signOutAlt,
-                color: text_color1,
-              ),
-              onPressed: () async {
-                await showDialog(
-                    context: context,
-                    builder: (BuildContext ctx) {
-                      return AlertDialog(
-                        title: Text('登出'),
-                        content: Text('您確定要退出嗎？'),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0)),
-                        actions: <Widget>[
-                          FlatButton(
-                            onPressed: () {
-                              logout();
-                            },
-                            child: Text('登出',
-                                style: TextStyle(
-                                    color: Theme.of(context).accentColor)),
-                          ),
-                          FlatButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: Text('取消',
-                                style: TextStyle(
-                                    color: Theme.of(context).accentColor)),
-                          ),
-                        ],
-                      );
-                    });
-              },
-            ),
-          ],
-        ),
+        appBar: CustomAppBar(context, _auth),
         body: Builder(builder: (BuildContext context) {
           return Container(
             color: Colors.white,
@@ -806,13 +375,37 @@ class _CreateTripState extends State<CreateTrip> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          buildTransportation(),
+                          RadioInput('您會選擇坐？', ['的士', 'Uber'], _transportation,
+                              (val) {
+                            _transportation = val;
+                          }),
+                          SizedBox(
+                            height: 8,
+                          ),
                           buildFromTo(),
-                          buildDetailInfo(),
-                          buildPassengerType(),
-                          buildTunnel(),
-                          // buildWaitingBuffer(),
-                          buildGoWithoutWaiting(),
+                          buildDetailInfo(), 
+                          RadioInput('團友性別', ['男女也可', '只限男性', '只限女性'], _sex,
+                              (val) {
+                            _sex = val;
+                          }),
+                          RadioInput('會行隧道嗎？（如果有）', ['會', '不會'], '會', (val) {
+                            if (val == '會') {
+                              _tunnel = '行隧道';
+                            } else {
+                              _tunnel = '不會行隧道';
+                            }
+                          }),
+                          RadioInput('會準時出發及不會等待任何遲到的團友？',
+                              ['是 (會準時出發)', '不是 (有權等待)'], '是 (會準時出發)', (val) {
+                            if (val == '是 (會準時出發)') {
+                              _wait_all_member = true;
+                            } else {
+                              _wait_all_member = false;
+                            }
+                          }),
+                          SizedBox(
+                            height: 20,
+                          ),
                         ],
                       ),
                     ),
@@ -822,8 +415,12 @@ class _CreateTripState extends State<CreateTrip> {
             ),
           );
         }),
-        bottomNavigationBar: buildBottomBtn(),
+        bottomNavigationBar: buildBottomBtn(currentuser),
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

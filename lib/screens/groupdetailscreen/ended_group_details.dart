@@ -8,8 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:shareacab/main.dart';
 import 'package:flutter/scheduler.dart';
-
-import './appbar.dart';
+ 
 
 class EndedGroupDetails extends StatefulWidget {
   final String destination;
@@ -61,7 +60,7 @@ class _EndedGroupDetailsState extends State<EndedGroupDetails> {
               floating: false,
               expandedHeight: 120,
               flexibleSpace: FlexibleSpaceBar(
-                title: AppBarTitle(widget.destination),
+                title: Text(widget.destination),
               ),
             ),
           ];

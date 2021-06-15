@@ -38,95 +38,92 @@ class _Splash1State extends State<Splash1> {
             body: Builder(builder: (BuildContext context) {
               return Column(
                 children: [
-                  SingleChildScrollView(
+                  Expanded(
                     child: Column(
-                      // crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        SizedBox(height: 46.0),
+                      children: [
+                        SizedBox(height: 40.0),
                         Image.asset(
                           'assets/images/logo_car.png',
-                          height: 80,
+                          height: 65,
                         ),
                         SizedBox(height: 12.0),
-                        Image.asset(
-                          'assets/images/splash1.png',
-                          width: MediaQuery.of(context).size.width - 60,
-                          height: 240,
-                          fit: BoxFit.contain,
-                        ),
-                        Image.asset(
-                          'assets/images/splash2.png',
-                          width: double.infinity,
-                          height: 140,
-                          fit: BoxFit.fitWidth,
-                        ),
-                        Container(
-                          color: Colors.white,
-                          width: double.infinity,
-                          padding: EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            children: [
-                              Text(
-                                'AA制車資',
-                                style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w600,
-                                    color: text_color1),
-                              ),
-                              SizedBox(height: 16.0),
-                              Text(
-                                '「一個都半價」可慳錢、慳時間。',
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
-                                    color: text_color4),
-                              ),
-                              SizedBox(height: 30.0),
-                              Container(
-                                  width: 80,
-                                  height: 4,
-                                  decoration: BoxDecoration(
-                                      color: grey_color7,
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(8))),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        width: 40,
-                                        height: 4,
-                                        decoration: BoxDecoration(
-                                            color: red_color3,
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(8))),
-                                      ),
-                                      Container(
-                                        width: 40,
-                                      )
-                                    ],
-                                  )),
-                            ],
+                        Expanded(
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 30, vertical: 12),
+                            child: Image.asset(
+                              'assets/images/splash1.png',
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.contain,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  Expanded(
-                      child: Container(
-                          color: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 20,),
-                          child: Column(
-                            children: [
-                              SizedBox(height: 40.0),
-                              MainBtn(
-                                label: '下一步',
-                                height: 64,
-                                onPress: () {
-                                  widget.toggleView(1);
-                                },
-                              ),
-                              SizedBox(height: 40.0),
-                            ],
-                          ))),
+                  Image.asset(
+                    'assets/images/splash2.png',
+                    width: double.infinity,
+                    height: 100,
+                    fit: BoxFit.fill,
+                  ),
+                  Container(
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 20,
+                      ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'AA制車資',
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                color: text_color1),
+                          ),
+                          SizedBox(height: 16.0),
+                          Text(
+                            '「一個都半價」可慳錢、慳時間。',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: text_color4),
+                          ),
+                          SizedBox(height: 24.0),
+                          Container(
+                              width: 80,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                  color: grey_color7,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(8))),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 4,
+                                    decoration: BoxDecoration(
+                                        color: red_color3,
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(8))),
+                                  ),
+                                  Container(
+                                    width: 40,
+                                  )
+                                ],
+                              )),
+                          SizedBox(height: 24.0),
+                          MainBtn(
+                            label: '下一步',
+                            height: 64,
+                            onPress: () {
+                              widget.toggleView(1);
+                            },
+                          ),
+                          SizedBox(height: 35.0),
+                        ],
+                      )),
                 ],
               );
             }));

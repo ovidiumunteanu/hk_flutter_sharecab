@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shareacab/screens/createtrip.dart';
 import 'package:shareacab/screens/dashboard.dart';
+import 'package:shareacab/screens/groupchat.dart';
 import 'messages.dart';
 import 'profile/userprofile.dart';
 import 'notifications/notifications.dart';
@@ -76,7 +77,7 @@ class _RootScreenState extends State<RootScreen> {
   void initState() {
     pagelist.add(Dashboard());
     pagelist.add(CreateTrip(bottomTapped));
-    pagelist.add(Messages());
+    pagelist.add(GroupChatScreen());
     // pagelist.add(Notifications());
     // pagelist.add(MyProfile(_auth));
     super.initState();

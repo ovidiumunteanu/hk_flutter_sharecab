@@ -101,7 +101,7 @@ class _MessagesState extends State<Messages> {
             //     }),
             IconButton(
               icon: Icon(
-                FontAwesomeIcons.signOutAlt,
+                FontAwesomeIcons.userCircle,
                 color: text_color1,
               ),
               onPressed: () async {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shareacab/utils/constant.dart';
 
 class MessageBubble extends StatelessWidget {
   MessageBubble(this.message, this.username, this.isMe, {this.key, this.time});
@@ -22,7 +23,7 @@ class MessageBubble extends StatelessWidget {
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    color: isMe ? Colors.grey : Theme.of(context).accentColor,
+                    color: isMe ? Colors.white : yellow_color1,
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(12),
                       topRight: Radius.circular(12),
@@ -52,10 +53,7 @@ class MessageBubble extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                           color: isMe
                               ? Colors.black
-                              : Theme.of(context)
-                                  .accentTextTheme
-                                  .subtitle1
-                                  .color,
+                              :  text_color4,
                         ),
                       ),
                       Text(
@@ -63,10 +61,7 @@ class MessageBubble extends StatelessWidget {
                         style: TextStyle(
                           color: isMe
                               ? Colors.black
-                              : Theme.of(context)
-                                  .accentTextTheme
-                                  .subtitle1
-                                  .color,
+                              : text_color4,
                         ),
                         textAlign: TextAlign.start,
                       ),
@@ -83,10 +78,7 @@ class MessageBubble extends StatelessWidget {
                         style: TextStyle(
                           color: isMe
                               ? Colors.black
-                              : Theme.of(context)
-                                  .accentTextTheme
-                                  .subtitle1
-                                  .color,
+                              : text_color4,
                           fontSize: 12,
                         ),
                       ),

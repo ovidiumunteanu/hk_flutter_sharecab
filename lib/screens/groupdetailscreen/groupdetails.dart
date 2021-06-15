@@ -17,7 +17,60 @@ import 'package:flutter/scheduler.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:shareacab/components/TripItem.dart';
 import 'package:shareacab/screens/notifications/services/notifservices.dart';
-import './appbar.dart';
+import 'package:shareacab/components/inputs.dart';
+
+class AddNewJoinNum extends StatefulWidget {
+  final Function onJoin;
+  final List<String> items;
+
+  AddNewJoinNum(this.items, this.onJoin);
+
+  @override
+  _AddNewJoinNumState createState() => _AddNewJoinNumState();
+}
+
+class _AddNewJoinNumState extends State<AddNewJoinNum> {
+  int newJoiningMember = 1;
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      // title: Text('加入组'),
+      content: Container(
+        height: 120,
+        child: Column(
+          children: [
+            Text('您有多少人加入此群組？'),
+            SizedBox(height: 20),
+            DropdownInput(
+              label: ' ',
+              curItem: newJoiningMember.toString(),
+              items: widget.items,
+              onChange: (newValue) {
+                setState(() => newJoiningMember = int.parse(newValue));
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: Text('取消',
+              style: TextStyle(color: Theme.of(context).accentColor)),
+        ),
+        FlatButton(
+          onPressed: () {
+            widget.onJoin(newJoiningMember);
+          },
+          child: Text('確定',
+              style: TextStyle(color: Theme.of(context).accentColor)),
+        ),
+      ],
+    );
+  }
+}
 
 class GroupDetails extends StatefulWidget {
   final docId;
@@ -37,14 +90,6 @@ class _GroupDetailsState extends State<GroupDetails>
   final RequestService _request = RequestService();
   final DatabaseService _databaseService = DatabaseService();
   final NotifServices _notifServices = NotifServices();
-  Future getUserDetails() async {
-    final userDetails = await Firestore.instance
-        .collection('group')
-        .document(widget.docId)
-        .collection('users')
-        .snapshots();
-    return userDetails;
-  }
 
   String transportation = '';
   String departure = '';
@@ -59,9 +104,14 @@ class _GroupDetailsState extends State<GroupDetails>
   String tunnel = '';
   bool wait_all_member = false;
 
+  int curUsers = 0;
+
+  String ownerUser = '';
+
   bool require_permission;
   bool requestedToJoin;
   bool full = false;
+  bool genderOK = true;
 
   Timer _countdownTimer;
   @override
@@ -74,6 +124,14 @@ class _GroupDetailsState extends State<GroupDetails>
   void onShowLocationInMap(String location) {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => MapView(location)));
+  }
+
+  List<String> getAvailableNewMembers() {
+    var ret = <String>[];
+    for (var i = 1; i <= (MAX_GROUP_MEMBERS - joinedMember); i++) {
+      ret.add(i.toString());
+    }
+    return ret;
   }
 
   void setArrived() async {
@@ -152,66 +210,38 @@ class _GroupDetailsState extends State<GroupDetails>
       await showDialog(
           context: context,
           builder: (BuildContext ctx) {
-            return AlertDialog(
-              title: Text('加入组'),
-              content: Text('您确定要加入此群组吗？'),
-              actions: <Widget>[
-                FlatButton(
-                  child: Text('加入',
-                      style: TextStyle(color: Theme.of(context).accentColor)),
-                  onPressed: () async {
-                    ProgressDialog pr;
-                    pr = ProgressDialog(context,
-                        type: ProgressDialogType.Normal,
-                        isDismissible: false,
-                        showLogs: false);
-                    pr.style(
-                      message: '加入群...',
-                      backgroundColor: Theme.of(context).backgroundColor,
-                      messageTextStyle:
-                          TextStyle(color: Theme.of(context).accentColor),
-                    );
-                    await pr.show();
-                    await Future.delayed(Duration(seconds: 1));
-                    try {
-                      await _request.joinGroup(widget.docId);
-                      GroupDetails.inGroup = true;
-                      // await _notifServices
-                      //     .groupJoin(
-                      //         usersnapshot
-                      //             .data['name'],
-                      //         widget.docId);
-                      await pr.hide();
-                    } catch (e) {
-                      await pr.hide();
-                      print(e.toString());
-                    }
-                    Navigator.of(context).pop();
-                    // final snackBar = SnackBar(
-                    //   backgroundColor: Theme.of(context).primaryColor,
-                    //   content: Text(
-                    //     'Yayyy!! You joined the trip.',
-                    //     style: TextStyle(color: Theme.of(context).accentColor),
-                    //   ),
-                    //   duration: Duration(seconds: 1),
-                    // );
-                    // Scaffold.of(ctx).hideCurrentSnackBar();
-                    // Scaffold.of(ctx).showSnackBar(snackBar);
-                  },
-                ),
-                FlatButton(
-                  child: Text('取消',
-                      style: TextStyle(color: Theme.of(context).accentColor)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
+            return AddNewJoinNum(getAvailableNewMembers(), onJoin);
           });
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  void onJoin(int numUsers) async {
+    ProgressDialog pr;
+    pr = ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+    pr.style(
+      message: '加入群...',
+      backgroundColor: Theme.of(context).backgroundColor,
+      messageTextStyle: TextStyle(color: Theme.of(context).accentColor),
+    );
+    await pr.show();
+    await Future.delayed(Duration(seconds: 1));
+    try {
+      await _request.joinGroup(widget.docId, numUsers);
+      GroupDetails.inGroup = true;
+      // await _notifServices
+      //     .groupJoin(
+      //         usersnapshot
+      //             .data['name'],
+      //         widget.docId);
+      await pr.hide();
+    } catch (e) {
+      await pr.hide();
+      print(e.toString());
+    }
+    Navigator.of(context).pop();
   }
 
   void onLeaveGroup() async {
@@ -224,8 +254,13 @@ class _GroupDetailsState extends State<GroupDetails>
               content: Text('你確定要離開這個群嗎？'),
               actions: <Widget>[
                 FlatButton(
-                  child: Text('是的',
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text('取消',
                       style: TextStyle(color: Theme.of(context).accentColor)),
+                ),
+                FlatButton(
                   onPressed: () async {
                     ProgressDialog pr;
                     pr = ProgressDialog(context,
@@ -247,10 +282,13 @@ class _GroupDetailsState extends State<GroupDetails>
                       await _request.exitGroup();
                       Navigator.pop(context);
                       await pr.hide();
+                      if (curUsers <= 1) {
+                        Navigator.pop(context);
+                      }
                     } catch (e) {
                       await pr.hide();
                       print(e.toString());
-                      var errStr = e.message == null ? '' : e.toString();
+                      var errStr = e.toString();
                       final snackBar = SnackBar(
                           content: Text(errStr),
                           duration: Duration(seconds: 3));
@@ -258,13 +296,8 @@ class _GroupDetailsState extends State<GroupDetails>
                     }
                     // Navigator.pop(context);
                   },
-                ),
-                FlatButton(
-                  child: Text('取消',
+                  child: Text('確定',
                       style: TextStyle(color: Theme.of(context).accentColor)),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
                 ),
               ],
             );
@@ -357,8 +390,15 @@ class _GroupDetailsState extends State<GroupDetails>
         ));
   }
 
-  Widget buildUserListItem(
-      FirebaseUser curUser, Map<String, dynamic> userItem) {
+  Widget buildUserListItem(FirebaseUser curUser, Map<String, dynamic> userItem,
+      dynamic usersInGroup) {
+    var numUsers = 1;
+    for (var i = 0; i < usersInGroup.length; i++) {
+      if (usersInGroup[i]['uid'] == userItem['uid']) {
+        numUsers = usersInGroup[i]['num'];
+      }
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -366,7 +406,7 @@ class _GroupDetailsState extends State<GroupDetails>
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              userItem['name'],
+              userItem['name'] + (numUsers > 1 ? ' x $numUsers' : ''),
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -426,7 +466,7 @@ class _GroupDetailsState extends State<GroupDetails>
         },
         padding: EdgeInsets.all(20),
         child: Text(
-          '进入聊天室', // You are in a group and viewing a private group
+          '按此與團友溝通', // You are in a group and viewing a private group
           style: TextStyle(
               fontSize: 18, fontWeight: FontWeight.w900, color: text_color2),
         ),
@@ -467,7 +507,7 @@ class _GroupDetailsState extends State<GroupDetails>
         //           color: text_color2)),
         // );
       }
-    } else if (GroupDetails.hasGroup == false) {
+    } else if (GroupDetails.hasGroup == false && genderOK == true) {
       // if require_permission == false
       return Container(
         height: 100,
@@ -480,7 +520,7 @@ class _GroupDetailsState extends State<GroupDetails>
               color: text_color1,
               child: Center(
                 child: Text(
-                  '下次加入将节省 50%',
+                  '下一位可節省 50% 車資',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
@@ -543,28 +583,55 @@ class _GroupDetailsState extends State<GroupDetails>
                     .snapshots(),
                 builder: (context, groupsnapshot) {
                   if (groupsnapshot.connectionState == ConnectionState.active) {
-                    transportation = groupsnapshot.data['transportation'];
-                    departure = groupsnapshot.data['departure'];
-                    destination = groupsnapshot.data['destination'];
-                    departure_location =
-                        groupsnapshot.data['departure_location'];
-                    destination_location =
-                        groupsnapshot.data['destination_location'];
-                    departure_time =
-                        groupsnapshot.data['departure_time'].toDate();
-                    maxMembers = groupsnapshot.data['maxMembers'];
-                    joinedMember = groupsnapshot.data['users'].length;
-
-                    waiting_time = groupsnapshot.data['waiting_time'];
-                    sex = groupsnapshot.data['sex'];
-                    tunnel = groupsnapshot.data['tunnel'];
-                    wait_all_member = groupsnapshot.data['wait_all_member'];
-
-                    if (joinedMember >= maxMembers) {
-                      full = true;
+                    if (groupsnapshot.data == null ||
+                        groupsnapshot.data.data == null) {
+                      return Center(child: CircularProgressIndicator());
                     } else {
-                      full = false;
+                      transportation = groupsnapshot.data['transportation'];
+                      departure = groupsnapshot.data['departure'];
+                      destination = groupsnapshot.data['destination'];
+                      departure_location =
+                          groupsnapshot.data['departure_location'];
+                      destination_location =
+                          groupsnapshot.data['destination_location'];
+                      departure_time =
+                          groupsnapshot.data['departure_time'].toDate();
+                      maxMembers = groupsnapshot.data['maxMembers'];
+
+                      curUsers = groupsnapshot.data['users'].length;
+                      joinedMember = 0;
+                      for (var i = 0;
+                          i < groupsnapshot.data['users'].length;
+                          i++) {
+                        joinedMember = joinedMember +
+                            groupsnapshot.data['users'][i]['num'];
+                      }
+
+                      waiting_time = groupsnapshot.data['waiting_time'];
+                      sex = groupsnapshot.data['sex'];
+                      tunnel = groupsnapshot.data['tunnel'];
+                      wait_all_member = groupsnapshot.data['wait_all_member'];
+
+                      if (joinedMember >= MAX_GROUP_MEMBERS) {
+                        full = true;
+                      } else {
+                        full = false;
+                      }
+
+                      if (groupsnapshot.data['sex'] == '男女也可') {
+                        genderOK = true;
+                      } else if (groupsnapshot.data['sex'] == '只限男性' &&
+                          usersnapshot.data['sex'] == '男性') {
+                        genderOK = true;
+                      } else if (groupsnapshot.data['sex'] == '只限女性' &&
+                          usersnapshot.data['sex'] == '女性') {
+                        genderOK = true;
+                      } else {
+                        genderOK = false;
+                      }
+                      ownerUser = groupsnapshot.data['owner'];
                     }
+
                     return NestedScrollView(
                         controller: ScrollController(keepScrollOffset: true),
                         headerSliverBuilder:
@@ -595,74 +662,38 @@ class _GroupDetailsState extends State<GroupDetails>
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     Image.asset(
-                                      'assets/images/logo.png',
-                                      width: 35,
+                                      'assets/images/logo_full_qq.png',
+                                      width: 180,
                                       height: 40,
                                     ),
-                                    SizedBox(
-                                      width: 5,
-                                    ),
-                                    Text(
-                                      'AA制車資',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w600,
-                                          color: text_color1),
-                                    ),
+                                    // SizedBox(
+                                    //   width: 5,
+                                    // ),
+                                    // Text(
+                                    //   'AA制車資',
+                                    //   style: TextStyle(
+                                    //       fontSize: 20,
+                                    //       fontWeight: FontWeight.w600,
+                                    //       color: text_color1),
+                                    // ),
                                   ],
                                 ),
                               ),
                               backgroundColor: yellow_color2,
                               actions: <Widget>[
-                                GroupDetails.inGroup
-                                    ? FlatButton(
-                                        onPressed: () {
-                                          onLeaveGroup();
-                                        },
-                                        child: Text(
-                                          '離開組',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                              color: text_color1),
-                                        ))
-                                    : Container(),
-                                // IconButton(
-                                //   icon: Icon(
-                                //     Icons.filter_list,
-                                //     color: text_color1,
-                                //     size: 30.0,
-                                //   ),
-                                //   tooltip: 'Filter',
-                                //   onPressed: () async {
-                                //     // _startFilter(context);
-                                //   },
-                                // ),
-                                // IconButton(
-                                //   icon: Icon(
-                                //     Icons.help,
-                                //     color: text_color1,
-                                //   ),
-                                //   tooltip: 'Help',
-                                //   onPressed: () {
-                                //     // Navigator.push(
-                                //     //     context,
-                                //     //     MaterialPageRoute(
-                                //     //         builder: (context) => Help()));
-                                //   },
-                                // ),
-                                // IconButton(
-                                //     icon: Icon(
-                                //       Icons.settings,
-                                //       color: text_color1,
-                                //     ),
-                                //     tooltip: 'Settings',
-                                //     onPressed: () {
-                                //       // return Navigator.push(context,
-                                //       //     MaterialPageRoute(builder: (context) {
-                                //       //   return Settings(_auth);
-                                //       // }));
-                                //     }),
+                                // GroupDetails.inGroup
+                                //     ? FlatButton(
+                                //         onPressed: () {
+                                //           onLeaveGroup();
+                                //         },
+                                //         child: Text(
+                                //           '離開組',
+                                //           style: TextStyle(
+                                //               fontSize: 16,
+                                //               fontWeight: FontWeight.w600,
+                                //               color: text_color1),
+                                //         ))
+                                //     : Container(),
                               ],
                             ),
                           ];
@@ -712,7 +743,7 @@ class _GroupDetailsState extends State<GroupDetails>
                                   ),
                                   Container(
                                     width: double.infinity,
-                                    height: joinedMember.toDouble() * 60,
+                                    height: curUsers.toDouble() * 60,
                                     child: StreamBuilder(
                                       stream: Firestore.instance
                                           .collection('group')
@@ -750,7 +781,9 @@ class _GroupDetailsState extends State<GroupDetails>
                                                 child: buildUserListItem(
                                                     currentuser,
                                                     futureSnapshot.data
-                                                        .documents[index].data),
+                                                        .documents[index].data,
+                                                    groupsnapshot
+                                                        .data['users']),
                                               );
                                             });
                                       },
@@ -765,17 +798,9 @@ class _GroupDetailsState extends State<GroupDetails>
                                     child: Column(
                                       children: [
                                         Text(
-                                          '* Going without waiting all passenger join',
-                                          style: TextStyle(
-                                              fontSize: 12, color: text_color2),
-                                        ),
-                                        SizedBox(
-                                          height: 17,
-                                        ),
-                                        Text(
                                           wait_all_member
-                                              ? '此群組有權「準時出發」及不再等待個別團友。*如果有團友遲到或沒有回覆狀況的情況下，此群組有權「準時出發」。'
-                                              : '此群組有權「等待團友到達」才可以出發。*如果有團友遲到或未到達的情況下，此群組有權「等待團友到達」才可出發。',
+                                              ? '此群組有權「準時出發」及不會等待個別團友。*如果有團友遲到的情況下，此群組有權「準時出發」。'
+                                              : '此群組有權「等待任何團友到達」才出發。*如果有團友遲到的情況下，此群組有權「等待團友到達」才出發。',
                                           style: TextStyle(
                                               fontSize: 12,
                                               color: Colors.black),
@@ -786,6 +811,24 @@ class _GroupDetailsState extends State<GroupDetails>
                                       ],
                                     ),
                                   ),
+                                  GroupDetails.inGroup
+                                      ? Container(
+                                          width: 200,
+                                          height: 40,
+                                          child: InkWell(
+                                            onTap: () {
+                                              onLeaveGroup();
+                                            },
+                                            child: Center(
+                                              child: Text(
+                                                '按此離開群組',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.red),
+                                              ),
+                                            ),
+                                          ))
+                                      : Container(),
                                 ],
                               ),
                             ),

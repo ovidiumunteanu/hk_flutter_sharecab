@@ -11,8 +11,8 @@ class RequestService {
     await DatabaseService().exitGroup();
   }
 
-  Future<void> joinGroup(String listuid) async {
-    await DatabaseService().joinGroup(listuid);
+  Future<void> joinGroup(String listuid, int numUsers) async {
+    await DatabaseService().joinGroup(listuid, numUsers);
   }
 
   Future<void> setDeviceToken(String token) async {

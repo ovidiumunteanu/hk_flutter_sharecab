@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +14,9 @@ import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shareacab/services/auth.dart';
+import 'package:shareacab/components/inputs.dart';
+import 'package:shareacab/components/buttons.dart';
+import 'package:shareacab/services/database.dart';
 import 'package:shareacab/utils/constant.dart';
 
 class MyProfile extends StatefulWidget {
@@ -23,456 +28,241 @@ class MyProfile extends StatefulWidget {
 
 class _MyProfileState extends State<MyProfile>
     with AutomaticKeepAliveClientMixin<MyProfile> {
-  FirebaseUser currentUser;
-  var namefirst = 'P';
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final _formKey = GlobalKey<FormState>();
+
+  FirebaseUser currentUser;
+  String phone = '';
+  String email = '';
+  String name = '';
+  String sex = '男性';
+
+  bool genderChanged = false;
 
   @override
   void initState() {
     super.initState();
-
-    _loadCurrentUser();
   }
+ 
+  final List<String> _sex = [ '男性', '女性',];
 
-  void _loadCurrentUser() {
-    FirebaseAuth.instance.currentUser().then((FirebaseUser user) {
-      setState(() {
-        // call setState to rebuild the view
-        currentUser = user;
-      });
-    });
-  }
+  void onUpdate(DocumentSnapshot curData) async {
+    if (_formKey.currentState.validate()) {
+      FocusScope.of(context).unfocus();
+      ProgressDialog pr;
+      pr = ProgressDialog(context,
+          type: ProgressDialogType.Normal,
+          isDismissible: false,
+          showLogs: false);
+      pr.style(
+        message: '更新中...',
+        backgroundColor: Theme.of(context).backgroundColor,
+        messageTextStyle: TextStyle(
+          color: getVisibleTextColorOnScaffold(context),
+        ),
+      );
+      await pr.show();
+      await Future.delayed(Duration(seconds: 1));
+      try {
+        final UID = await widget._auth.getCurrentUID();
 
-  String _email() {
-    if (currentUser != null) {
-      return currentUser.email;
-    } else {
-      return 'no current user';
+        var newGender = (curData.data['sex'] == null || curData.data['sex'] == '') ? sex : curData.data['sex'];
+        await widget._auth.updateUser(
+            userid: UID,
+            email: email == '' ? curData.data['email'] : email, 
+            phone: curData.data['mobileNumber'],
+            name: name == '' ? curData.data['name'] : name,
+            sex: genderChanged ? sex : newGender );
+        Navigator.pop(context);
+        await pr.hide();
+      } catch (e) {
+        print(e.toString());
+        await pr.hide();
+        scaffoldKey.currentState.hideCurrentSnackBar();
+        scaffoldKey.currentState.showSnackBar(SnackBar(
+          backgroundColor: yellow_color2,
+          duration: Duration(seconds: 2),
+          content: Text(
+            e.toString(),
+            style: TextStyle(color: text_color1),
+          ),
+        ));
+      }
     }
   }
 
-  String userId = 'DEV CLUB';
-  String name = '';
-  String kerberosEmailID = 'random@gmail.com';
-  String password = '';
-  String mobilenum = '6969696969';
-  String hostel = '';
-  String sex = 'Male';
-  int cancelledrides = 0;
-  int actualrating = 0;
-  int totalrides = 0;
-  int numberofratings = 0;
-  double rating = 0;
-  int finalrating = 0;
-  bool loading = true;
+  void logout() async {
+    ProgressDialog pr;
+    pr = ProgressDialog(context,
+        type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
+    pr.style(
+      message: '註銷...',
+      backgroundColor: Theme.of(context).backgroundColor,
+      messageTextStyle: TextStyle(color: Theme.of(context).accentColor),
+    );
+    await pr.show();
+    await Future.delayed(Duration(seconds: 1));
+    try {
+      await widget._auth.signOut();
+      await pr.hide();
+      Navigator.of(context).pop();
+    } catch (err) {
+      await pr.hide();
+      String errStr = err.message ?? err.toString();
+      final snackBar =
+          SnackBar(content: Text(errStr), duration: Duration(seconds: 3));
+      scaffoldKey.currentState.showSnackBar(snackBar);
+    }
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
-    final currentuser = Provider.of<FirebaseUser>(context);
-    return WillPopScope(
-      onWillPop: () {
-        Navigator.pop(context);
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => RootScreen()));
-        return Future.value(false);
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: yellow_color2,
-          leading: InkWell(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(
-              Icons.chevron_left,
-              color: text_color1,
-              size: 36,
-            ),
-          ),
-          title: Text(
-            '帳戶',
-            style: TextStyle(fontSize: 22, color: text_color1),
-          ),
-          elevation: 0,
-          actions: <Widget>[
-            // FlatButton.icon(
-            //     textColor: getVisibleColorOnPrimaryColor(context),
-            //     onPressed: () {
-            //       Navigator.pushNamed(context, '/edituserdetails');
-            //     },
-            //     icon: Icon(Icons.edit), ), 
-            FlatButton.icon(
-              textColor: getVisibleColorOnPrimaryColor(context),
-              icon: Icon(FontAwesomeIcons.signOutAlt, color: text_color1,),
-              onPressed: () async {
-                await showDialog(
-                    context: context,
-                    builder: (BuildContext ctx) {
-                      return AlertDialog(
-                        title: Text('Log out'),
-                        content: Text('Are you sure you want to log out?'),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0)),
-                        actions: <Widget>[
-                          FlatButton(
-                            child: Text('Log out',
-                                style: TextStyle(
-                                    color: Theme.of(context).accentColor)),
-                            onPressed: () async {
-                              ProgressDialog pr;
-                              pr = ProgressDialog(context,
-                                  type: ProgressDialogType.Normal,
-                                  isDismissible: false,
-                                  showLogs: false);
-                              pr.style(
-                                message: 'Logging out...',
-                                backgroundColor:
-                                    Theme.of(context).backgroundColor,
-                                messageTextStyle: TextStyle(
-                                    color: Theme.of(context).accentColor),
-                              );
-                              await pr.show();
-                              await Future.delayed(Duration(
-                                  seconds:
-                                      1)); // sudden logout will show ProgressDialog for a very short time making it not very nice to see :p
-                              try {
-                                await widget._auth.signOut();
-                                await pr.hide();
-                              } catch (err) {
-                                await pr.hide();
-                                String errStr = err.message ?? err.toString();
-                                final snackBar = SnackBar(
-                                    content: Text(errStr),
-                                    duration: Duration(seconds: 3));
-                                scaffoldKey.currentState.showSnackBar(snackBar);
-                              }
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                          FlatButton(
-                            child: Text('Cancel',
-                                style: TextStyle(
-                                    color: Theme.of(context).accentColor)),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    });
+    final user = Provider.of<FirebaseUser>(context);
+    return StreamBuilder<DocumentSnapshot>(
+        stream: DatabaseService(uid: user == null ? '' : user.uid).userData,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) { 
+            return GestureDetector(
+              onTap: () {
+                FocusScope.of(context).unfocus();
               },
-              label: Text(''),
-            )
-          ],
-        ),
-        body: StreamBuilder(
-            stream: Firestore.instance
-                .collection('userdetails')
-                .document(currentuser.uid)
-                .snapshots(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.active) {
-                name = snapshot.data['name'];
-                hostel = snapshot.data['hostel'];
-                sex = snapshot.data['sex'];
-                mobilenum = snapshot.data['mobileNumber'];
-                totalrides = snapshot.data['totalRides'];
-                actualrating = snapshot.data['actualRating'];
-                cancelledrides = snapshot.data['cancelledRides'];
-                numberofratings = snapshot.data['numberOfRatings'];
-                loading = false;
-
-                namefirst = name.substring(0, 1);
-
-                rating = 5 - (0.2 * cancelledrides) + (0.35 * totalrides);
-                if (rating < 0) {
-                  rating = 0;
-                }
-                if (rating > 5) {
-                  rating = 5;
-                }
-                finalrating = rating.round();
-              }
-              if (snapshot.connectionState == ConnectionState.active) {
-                return loading
-                    ? Loading()
-                    : Scaffold(
-                        body: ListView(
-                          children: <Widget>[
-                            Stack(
-                              overflow: Overflow.visible,
-                              alignment: Alignment.center,
-                              children: <Widget>[
-                                Container(
-                                  height:
-                                      MediaQuery.of(context).size.height / 6,
-                                  width: MediaQuery.of(context).size.width,
-                                  color: Theme.of(context).primaryColor,
+              child: Scaffold(
+                key: scaffoldKey,
+                backgroundColor: Colors.white,
+                appBar: AppBar(
+                  backgroundColor: yellow_color2,
+                  leading: InkWell(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(
+                      Icons.chevron_left,
+                      color: text_color1,
+                      size: 36,
+                    ),
+                  ),
+                  title: Text(
+                    '帳戶',
+                    style: TextStyle(fontSize: 22, color: text_color1),
+                  ),
+                  elevation: 0,
+                  actions: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        FontAwesomeIcons.signOutAlt,
+                        color: text_color1,
+                      ),
+                      onPressed: () async {
+                        await showDialog(
+                            context: context,
+                            builder: (BuildContext ctx) {
+                              return AlertDialog(
+                                title: Text('登出'),
+                                content: Text('您確定要退出嗎？'),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0)),
+                                actions: <Widget>[
+                                  FlatButton(
+                                    onPressed: () {
+                                      logout();
+                                    },
+                                    child: Text('登出',
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).accentColor)),
+                                  ),
+                                  FlatButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: Text('取消',
+                                        style: TextStyle(
+                                            color:
+                                                Theme.of(context).accentColor)),
+                                  ),
+                                ],
+                              );
+                            });
+                      },
+                    )
+                  ],
+                ),
+                body: Container(
+                  padding:
+                      EdgeInsets.symmetric(vertical: 20.0, horizontal: 25.0),
+                  child: Form(
+                    key: _formKey,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: <Widget>[
+                          SizedBox(height: 20.0),
+                          AuthInput(
+                              label: '名稱',
+                              type: 'text',
+                              initVal: snapshot.data['name'],
+                              onChange: (val) {
+                                setState(() => name = val);
+                              }),
+                          SizedBox(height: 20.0),
+                          AuthInput(
+                              label: '電子郵件',
+                              type: 'email',
+                              initVal: snapshot.data['email'],
+                              onChange: (val) {
+                                setState(() => email = val);
+                              }),
+                          SizedBox(height: 20.0),
+                          AuthInput(
+                              label: '電話號碼',
+                              type: 'phone',
+                              enabled: false,
+                              initVal: snapshot.data['mobileNumber'],
+                              onChange: (val) {
+                                setState(() => phone = val);
+                              }),
+                          SizedBox(height: 20.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 110,
+                                child: DropdownInput(
+                                  label: '性別',
+                                  hint: '請選擇',
+                                  curItem: (snapshot.data['sex'] == null || snapshot.data['sex'] == '') ? sex : snapshot.data['sex'],
+                                  items: _sex,
+                                  onChange: (newValue) {
+                                    setState(() {
+                                      sex = newValue;
+                                      genderChanged = true;
+                                    });
+                                  },
                                 ),
-                                Positioned(
-                                  top: MediaQuery.of(context).size.height / 6 -
-                                      74,
-                                  child: CircleAvatar(
-                                    radius: 50,
-                                    backgroundColor:
-                                        Theme.of(context).accentColor,
-                                    child: Text(
-                                      namefirst.toUpperCase(),
-                                      style: TextStyle(
-                                        fontSize: 48,
-                                        fontFamily: 'Poiret',
-                                        fontWeight: FontWeight.bold,
-                                        color: getVisibleColorOnAccentColor(
-                                            context),
-                                      ),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            ),
-                            Container(
-                                margin: EdgeInsets.only(
-                                    top: 50, bottom: 20, right: 20, left: 20),
-                                child: Center(
-                                  child: FittedBox(
-                                    child: SelectableText(
-                                      name,
-                                      style: TextStyle(
-                                        fontSize: 40,
-                                      ),
-                                    ),
-                                  ),
-                                )),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 40, vertical: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  // Expanded(
-                                  //   child: ListTile(
-                                  //     onTap: () {},
-                                  //     title: Center(
-                                  //       child: Text(
-                                  //         'HOSTEL',
-                                  //         style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20),
-                                  //       ),
-                                  //     ),
-                                  //     subtitle: Center(
-                                  //       child: Text(
-                                  //         hostel,
-                                  //         style: TextStyle(fontSize: 15),
-                                  //       ),
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  Expanded(
-                                    child: ListTile(
-                                      onTap: () {},
-                                      title: Center(
-                                        child: Text(
-                                          'GENDER',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 20),
-                                        ),
-                                      ),
-                                      subtitle: Center(
-                                        child: Text(
-                                          sex,
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ListTile(
-                                      onTap: () {},
-                                      title: Center(
-                                        child: Text(
-                                          'TOTAL RIDES',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 18),
-                                        ),
-                                      ),
-                                      subtitle: Center(
-                                        child: Text(
-                                          '${totalrides}',
-                                          style: TextStyle(fontSize: 15),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                      child: ListTile(
-                                          onTap: () {},
-                                          title: Center(
-                                            child: Text(
-                                              'CANCELLED TRIPS',
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.w700,
-                                                  fontSize: 18),
-                                            ),
-                                          ),
-                                          subtitle: Center(
-                                            child: Text(
-                                              '${cancelledrides}',
-                                              style: TextStyle(fontSize: 15),
-                                            ),
-                                          ))),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 20),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ListTile(
-                                      onTap: () async {
-                                        try {
-                                          if (Platform.isIOS) {
-                                            await Clipboard.setData(
-                                                    ClipboardData(
-                                                        text: '${mobilenum}'))
-                                                .then((result) {
-                                              final snackBar = SnackBar(
-                                                backgroundColor:
-                                                    Theme.of(context)
-                                                        .primaryColor,
-                                                content: Text(
-                                                  'Copied to Clipboard',
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .accentColor),
-                                                ),
-                                                duration: Duration(seconds: 1),
-                                              );
-                                              Scaffold.of(context)
-                                                  .hideCurrentSnackBar();
-                                              Scaffold.of(context)
-                                                  .showSnackBar(snackBar);
-                                            });
-                                          } else {
-                                            await launch('tel://${mobilenum}');
-                                          }
-                                        } catch (e) {
-                                          await Clipboard.setData(ClipboardData(
-                                                  text: '${mobilenum}'))
-                                              .then((result) {
-                                            final snackBar = SnackBar(
-                                              backgroundColor: Theme.of(context)
-                                                  .primaryColor,
-                                              content: Text(
-                                                'Copied to Clipboard',
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .accentColor),
-                                              ),
-                                              duration: Duration(seconds: 1),
-                                            );
-                                            Scaffold.of(context)
-                                                .hideCurrentSnackBar();
-                                            Scaffold.of(context)
-                                                .showSnackBar(snackBar);
-                                          });
-                                        }
-                                      },
-                                      title: Center(
-                                        child: Text(
-                                          'MOBILE NUMBER',
-                                          textAlign: TextAlign.center,
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.w700,
-                                              fontSize: 18),
-                                        ),
-                                      ),
-                                      // subtitle: Center(
-                                      //   child: Text(
-                                      //     mobilenum,
-                                      //     style: TextStyle(fontSize: 15),
-                                      //   ),
-                                      // )
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ListTile(
-                                        onTap: () {},
-                                        title: Center(
-                                          child: Text(
-                                            'USER RATING',
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 18),
-                                          ),
-                                        ),
-                                        subtitle: Center(
-                                          child: Text(
-                                            '${finalrating}',
-                                            style: TextStyle(fontSize: 15),
-                                          ),
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: 30, vertical: 20),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: ListTile(
-                                        onTap: () {},
-                                        title: Center(
-                                          child: Text(
-                                            'EMAIL ID',
-                                            style: TextStyle(
-                                                fontWeight: FontWeight.w700,
-                                                fontSize: 18),
-                                          ),
-                                        ),
-                                        subtitle: Center(
-                                          child: Text(
-                                            _email(),
-                                            style: TextStyle(fontSize: 15),
-                                          ),
-                                        )),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ],
-                        ),
-                      );
-              } else {
-                return Center(
-                  child: Text('Loading..'),
-                );
-              }
-            }),
-      ),
-    );
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 60.0),
+                          MainBtn(
+                            label: '更新',
+                            height: 64,
+                            onPress: () {
+                              onUpdate(snapshot.data);
+                            },
+                          ),
+                          SizedBox(height: 20.0),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          } else {
+            return Loading();
+          }
+        });
   }
 
   @override

@@ -108,7 +108,7 @@ class DatabaseService {
 
     final docRef = await groupdetails.add({
       'owner': user.uid.toString(),
-      'users': FieldValue.arrayUnion([user.uid]),
+      'users': FieldValue.arrayUnion([{ 'uid' : user.uid, 'num' : requestDetails.maxMembers}]),
       'transportation': requestDetails.transportation,
       'departure': requestDetails.departure,
       'destination': requestDetails.destination,
@@ -187,6 +187,7 @@ class DatabaseService {
     var totalRides;
     var cancelledRides;
     var owner;
+    var userInGroup;
     await Firestore.instance
         .collection('userdetails')
         .document(user.uid)
@@ -196,9 +197,17 @@ class DatabaseService {
       totalRides = value.data['totalRides'];
       cancelledRides = value.data['cancelledRides'];
     });
+
     await groupdetails.document(currentGrp).get().then((value) {
       presentNum = value.data['users'].length;
       owner = value.data['owner'];
+
+      for(var i = 0; i < value.data['users'].length; i ++) {
+          if(value.data['users'][i]['uid'] == user.uid) {
+            userInGroup = value.data['users'][i];
+          }
+      }
+      
     });
 
     await userDetails.document(user.uid).updateData({
@@ -207,7 +216,7 @@ class DatabaseService {
 
     if (presentNum > 1) {
       await groupdetails.document(currentGrp).updateData({
-        'users': FieldValue.arrayRemove([user.uid]),
+        'users': FieldValue.arrayRemove([userInGroup]),
       });
       await groupdetails
           .document(currentGrp)
@@ -220,7 +229,7 @@ class DatabaseService {
           newowner = value.data['users'][0];
         });
         await groupdetails.document(currentGrp).updateData({
-          'owner': newowner,
+          'owner': newowner['uid'],
         });
       }
       //deleting user from chat group
@@ -231,14 +240,14 @@ class DatabaseService {
   }
 
   // join a group from dashboard (W=4,R=2)
-  Future<void> joinGroup(String listuid) async {
+  Future<void> joinGroup(String listuid, int numUsers) async {
     var user = await _auth.currentUser();
 
     await userDetails.document(user.uid).updateData({
       'currentGroup': listuid,
     });
     await groupdetails.document(listuid).updateData({
-      'users': FieldValue.arrayUnion([user.uid.toString()]),
+      'users': FieldValue.arrayUnion([{ 'uid' : user.uid, 'num' : numUsers}]),
     });
 
     var request = groupdetails.document(listuid).collection('users');
