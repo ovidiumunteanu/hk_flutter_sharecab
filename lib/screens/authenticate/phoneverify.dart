@@ -38,7 +38,7 @@ class _PhoneVerifyState extends State<PhoneVerify> {
   bool wrongCode = false;
 
   String verification_id;
-  int forceResendToken;
+  int forceResendToken = -1;
   String code = '';
 
   @override
