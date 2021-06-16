@@ -43,8 +43,8 @@ class _DashboardState extends State<Dashboard>
 
   String curDeparture = '任何';
   String curDestination = '任何';
-  String curGender = '男女也可';
-  String sortbyTime = '最近時間';
+  String curGender = '任何';
+  String sortbyTime = '任何';
 
   Widget filterBtn(List<String> items, String type) {
     var curValue = curDeparture;
@@ -55,42 +55,47 @@ class _DashboardState extends State<Dashboard>
     } else if (type == 'gender') {
       curValue = curGender;
     }
-
-    return DropdownButton<String>(
-      value: curValue,
-      // icon: const Icon(Icons.arrow_downward),
-      iconSize: 15,
-      elevation: 16,
-      style: TextStyle(
-          fontSize: 14, fontWeight: FontWeight.w600, color: text_color2),
-      underline: Container(
-        height: 0,
+    return Container(
+      child: DropdownButton<String>(
+        value: curValue,
+        icon: null,
+        iconSize: 0,
+        elevation: 16,
+        style: TextStyle(
+            fontSize: 12, fontWeight: FontWeight.w600, color: text_color2),
+        underline: Container(
+          height: 0,
+        ),
+        onChanged: (String newValue) {
+          if (type == 'destination') {
+            setState(() {
+              curDestination = newValue;
+            });
+          } else if (type == 'sortbytime') {
+            setState(() {
+              sortbyTime = newValue;
+            });
+          } else if (type == 'departure') {
+            setState(() {
+              curDeparture = newValue;
+            });
+          } else {
+            setState(() {
+              curGender = newValue;
+            });
+          }
+        },
+        items: items.map<DropdownMenuItem<String>>((String value) {
+          return DropdownMenuItem<String>(
+            value: value,
+            child:  Container(
+              width: MediaQuery.of(context).size.width / 4 - 20, 
+              // color: red_color1,
+              child: Text(value,  textAlign: TextAlign.center,),
+            ),
+          );
+        }).toList(),
       ),
-      onChanged: (String newValue) {
-        if (type == 'destination') {
-          setState(() {
-            curDestination = newValue;
-          });
-        } else if (type == 'sortbytime') {
-          setState(() {
-            sortbyTime = newValue;
-          });
-        } else if (type == 'departure') {
-          setState(() {
-            curDeparture = newValue;
-          });
-        } else {
-          setState(() {
-            curGender = newValue;
-          });
-        }
-      },
-      items: items.map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList(),
     );
   }
 
@@ -145,7 +150,7 @@ class _DashboardState extends State<Dashboard>
                 height: 8,
               ),
               Text('團友性別'),
-              filterBtn(['男女也可', '只限男性', '只限女性'], 'gender')
+              filterBtn(['任何', '只限男性', '只限女性'], 'gender')
             ],
           )),
           Container(
@@ -161,7 +166,7 @@ class _DashboardState extends State<Dashboard>
                 height: 8,
               ),
               Text('出發時間'),
-              filterBtn(['最近時間', '最遠時間'], 'sortbytime')
+              filterBtn(['任何', '最近', '最遠'], 'sortbytime')
             ],
           )),
         ],

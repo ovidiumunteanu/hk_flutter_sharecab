@@ -96,7 +96,7 @@ class _MyProfileState extends State<MyProfile>
     pr = ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
     pr.style(
-      message: '註銷...',
+      message: '處理中..',
       backgroundColor: Theme.of(context).backgroundColor,
       messageTextStyle: TextStyle(color: Theme.of(context).accentColor),
     );

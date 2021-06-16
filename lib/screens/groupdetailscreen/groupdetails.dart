@@ -138,7 +138,7 @@ class _GroupDetailsState extends State<GroupDetails>
     var pr = ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
     pr.style(
-      message: '设置到达状态..',
+      message: '處理中..',
       backgroundColor: Theme.of(context).backgroundColor,
       messageTextStyle: TextStyle(color: Theme.of(context).accentColor),
     );
@@ -222,7 +222,7 @@ class _GroupDetailsState extends State<GroupDetails>
     pr = ProgressDialog(context,
         type: ProgressDialogType.Normal, isDismissible: false, showLogs: false);
     pr.style(
-      message: '加入群...',
+      message: '加入群組中..',
       backgroundColor: Theme.of(context).backgroundColor,
       messageTextStyle: TextStyle(color: Theme.of(context).accentColor),
     );
@@ -250,8 +250,8 @@ class _GroupDetailsState extends State<GroupDetails>
           context: context,
           builder: (BuildContext ctx) {
             return AlertDialog(
-              title: Text('離開組'),
-              content: Text('你確定要離開這個群嗎？'),
+              title: Text('離開群組'),
+              content: Text('您確定要離開這群組嗎？'),
               actions: <Widget>[
                 FlatButton(
                   onPressed: () {
@@ -268,7 +268,7 @@ class _GroupDetailsState extends State<GroupDetails>
                         isDismissible: false,
                         showLogs: false);
                     pr.style(
-                      message: '離開組...',
+                      message: '離開群組中..',
                       backgroundColor: Theme.of(context).backgroundColor,
                       messageTextStyle: TextStyle(
                         color: text_color1,
@@ -406,7 +406,7 @@ class _GroupDetailsState extends State<GroupDetails>
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              userItem['name'] + (numUsers > 1 ? ' x $numUsers' : ''),
+              userItem['name'] + (numUsers > 1 ? ' x $numUsers 乘客' : ''),
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -797,14 +797,32 @@ class _GroupDetailsState extends State<GroupDetails>
                                     ),
                                     child: Column(
                                       children: [
-                                        Text(
-                                          wait_all_member
-                                              ? '此群組有權「準時出發」及不會等待個別團友。*如果有團友遲到的情況下，此群組有權「準時出發」。'
-                                              : '此群組有權「等待任何團友到達」才出發。*如果有團友遲到的情況下，此群組有權「等待團友到達」才出發。',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black),
-                                        ),
+                                        wait_all_member
+                                            ? Text(
+                                                '此群組有權「準時出發」及不會等待個別團友。',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black),
+                                              )
+                                            : Text(
+                                                '此群組有權「等待任何團友到達」才出發。',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black),
+                                              ),
+                                        wait_all_member
+                                            ? Text(
+                                                '*如果有團友遲到的情況下，此群組有權「準時出發」。',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black),
+                                              )
+                                            : Text(
+                                                '*如果有團友遲到的情況下，此群組有權「等待團友到達」才出發。', 
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.black),
+                                              ),
                                         SizedBox(
                                           height: 40,
                                         ),

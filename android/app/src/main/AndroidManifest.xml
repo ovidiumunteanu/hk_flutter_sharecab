@@ -9,7 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="Share a Cab"
+        android:label="AA車"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

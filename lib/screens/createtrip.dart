@@ -14,9 +14,9 @@ import 'package:shareacab/components/appbar.dart';
 import 'package:shareacab/utils/constant.dart';
 
 TextStyle descTxt =
-    TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: text_color2);
+    TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: text_color1);
 TextStyle optionTxt =
-    TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: text_color1);
+    TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: text_color1);
 TextStyle hintTxt =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: text_color3);
 
@@ -45,8 +45,8 @@ class _CreateTripState extends State<CreateTrip>
   List<String> members = ['1', '2', '3'];
 
   String _transportation = '的士';
-  String _departure = location_list[0];
-  String _destination = location_list[1];
+  String _departure;
+  String _destination;
   String _departure_location;
   String _destination_location;
   DateTime _selectedDepartureDate;
@@ -107,7 +107,7 @@ class _CreateTripState extends State<CreateTrip>
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
         backgroundColor: yellow_color2,
-        content: Text('One or more fields is missing',
+        content: Text('請輸入相關資料。',
             style: TextStyle(color: text_color1)),
       ));
       return; //return stops function execution and thus nothing is called or returned
@@ -117,7 +117,7 @@ class _CreateTripState extends State<CreateTrip>
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
         backgroundColor: yellow_color2,
-        content: Text('Date or Time is missing',
+        content: Text('請輸入相關資料。',
             style: TextStyle(color: text_color1)),
       ));
       return;
@@ -166,6 +166,8 @@ class _CreateTripState extends State<CreateTrip>
         children: [
           DropdownInput(
             label: '所在地',
+            labelStyle: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            hint : '請選擇',
             curItem: _departure,
             items: location_list,
             onChange: (newValue) {
@@ -181,6 +183,8 @@ class _CreateTripState extends State<CreateTrip>
           ),
           DropdownInput(
             label: '目的地',
+            labelStyle: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            hint : '請選擇',
             curItem: _destination,
             items: location_list,
             onChange: (newValue) {
@@ -209,9 +213,10 @@ class _CreateTripState extends State<CreateTrip>
         children: [
           Text(
             '您會去哪裡？ （請明確說明目的地）',
-            style: descTxt,
+            style: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
           Container(
+            margin: EdgeInsets.only(bottom: 4),
             child: TextFormField(
               // controller: destination_loc_ctr,
               // decoration: InputDecoration(
@@ -234,9 +239,10 @@ class _CreateTripState extends State<CreateTrip>
           ),
           Text(
             '您會想在哪裡與團友集合？（請明確說明集合地點）',
-            style: descTxt,
+            style: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
           Container(
+             margin: EdgeInsets.only(bottom: 4),
             child: TextFormField(
               // controller: departure_loc_ctr,
               // decoration: InputDecoration(
@@ -266,8 +272,10 @@ class _CreateTripState extends State<CreateTrip>
             height: 20,
           ),
           Container(
+            margin: EdgeInsets.only(bottom: 4),
             child: DropdownInput(
-              label: '您現在已經有多少乘客在一起？(包括您自己本人)',
+              label: '您現在有多少人？(包括您自己本人)',
+              labelStyle: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
               curItem: _maxMembers.toString(),
               items: members,
               onChange: (newValue) {

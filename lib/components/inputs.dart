@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:intl/intl.dart';
-
-TextStyle descTxt =
-    TextStyle(fontSize: 14, fontWeight: FontWeight.w400, color: text_color2);
+ 
 TextStyle optionTxt =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: text_color1);
 TextStyle hintTxt =
@@ -60,11 +58,12 @@ class AuthInput extends StatelessWidget {
 class DropdownInput extends StatelessWidget {
   final Function onChange;
   String label;
+  TextStyle labelStyle;
   String hint;
   String curItem;
   List<String> items;
   DropdownInput(
-      {this.label, this.hint, this.curItem, this.items, this.onChange});
+      {this.label, this.labelStyle, this.hint, this.curItem, this.items, this.onChange});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -74,7 +73,7 @@ class DropdownInput extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: labelStyle != null ? labelStyle : TextStyle(
                 fontSize: 14, fontWeight: FontWeight.w400, color: text_color2),
           ),
           SizedBox(
@@ -181,7 +180,7 @@ class _RadioInputState extends State<RadioInput> {
     var list = <Widget>[
       Text(
         widget.label,
-        style: descTxt,
+        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: text_color1),
       ),
     ];
 
@@ -279,7 +278,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
                 children: [
                   Text(
                     '出發日期',
-                    style: descTxt,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: text_color1),
                   ),
                   Container(
                       width: double.infinity,
@@ -326,7 +325,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
                 children: [
                   Text(
                     '出發時間',
-                    style: descTxt,
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: text_color1),
                   ),
                   Container(
                       width: double.infinity,

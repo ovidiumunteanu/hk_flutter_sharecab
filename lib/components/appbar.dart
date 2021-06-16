@@ -8,12 +8,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 AppBar CustomAppBar(BuildContext context, AuthService _auth) {
   return AppBar(
     backgroundColor: yellow_color2,
+    titleSpacing: 0,
     title: Row(
       children: [
         Image.asset(
           'assets/images/logo_full_qq.png',
-          width: 180,
-          height: 26,
+          width: 160,
+          height: 22,
         ),
         // SizedBox(
         //   width: 5,
@@ -26,18 +27,18 @@ AppBar CustomAppBar(BuildContext context, AuthService _auth) {
       ],
     ),
     actions: <Widget>[
-      IconButton(
-        icon: Icon(
-          Icons.help,
-          color: text_color1,
-          size: 28,
-        ),
-        tooltip: 'Help',
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Help()));
-        },
-      ),
+      // IconButton(
+      //   icon: Icon(
+      //     Icons.help,
+      //     color: text_color1,
+      //     size: 28,
+      //   ),
+      //   tooltip: 'Help',
+      //   onPressed: () {
+      //     Navigator.push(
+      //         context, MaterialPageRoute(builder: (context) => Help()));
+      //   },
+      // ),
       IconButton(
           icon: Icon(
             FontAwesomeIcons.solidUserCircle,

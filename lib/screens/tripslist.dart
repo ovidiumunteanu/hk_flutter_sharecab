@@ -50,13 +50,13 @@ class _TripsListState extends State<TripsList>
     if (widget.filterDestination != '任何') {
       query = query.where('destination', isEqualTo: widget.filterDestination);
     }
-    if (widget.filterGender != '男女也可') {
+    if (widget.filterGender != '任何') {
       query = query.where('sex', isEqualTo: widget.filterGender);
     }
-
-    if (widget.sortTime == '最近時間') {
+ 
+    if (widget.sortTime == '最近' || widget.sortTime == '任何') {
       query = query.orderBy('departure_time', descending: true);
-    } else if (widget.sortTime == '最遠時間') {
+    } else if (widget.sortTime == '最遠') {
       query = query.orderBy('departure_time', descending: false);
     }
 
