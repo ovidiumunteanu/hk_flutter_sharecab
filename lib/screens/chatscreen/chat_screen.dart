@@ -60,8 +60,8 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
         title: Text(
-          '聊天',
-          style: TextStyle(color: text_color1),
+          '聊天室',
+          style: TextStyle(color: text_color1, fontSize: 18),
         ),
       ),
       body: Container(

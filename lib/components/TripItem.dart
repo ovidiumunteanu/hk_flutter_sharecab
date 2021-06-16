@@ -34,7 +34,7 @@ class TripItem extends StatelessWidget {
           child: Text(
             key,
             style: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w400, color: text_color3),
+                fontSize: 14, fontWeight: FontWeight.w400, color: text_color3),
             textAlign: TextAlign.start,
           ),
         ),
@@ -46,7 +46,7 @@ class TripItem extends StatelessWidget {
             child: Text(
               value,
               style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                   color: text_color1),
               textAlign: TextAlign.start,

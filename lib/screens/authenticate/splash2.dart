@@ -142,7 +142,7 @@ class _Splash2State extends State<Splash2> {
                               widget.toggleView(2);
                             },
                           ),
-                          SizedBox(height: 35.0),
+                          SizedBox(height: 90.0),
                         ],
                       )),
                 ],
