@@ -219,7 +219,7 @@ class _CreateTripState extends State<CreateTrip>
               validator: (val) => val.length == 0 ? '輸入目的地位置。' : null,
               onChanged: (val) {
                 _destination_location = val;
-                FocusScope.of(context).requestFocus(FocusNode());
+                // FocusScope.of(context).requestFocus(FocusNode());
                 // setState(() => _destination_location = val);
               },
             ),
@@ -244,7 +244,7 @@ class _CreateTripState extends State<CreateTrip>
               validator: (val) => val.length == 0 ? '輸入出發地點。' : null,
               onChanged: (val) {
                 _departure_location = val;
-                FocusScope.of(context).requestFocus(FocusNode());
+                // FocusScope.of(context).requestFocus(FocusNode());
                 // setState(() => _departure_location = val);
               },
             ),
@@ -272,7 +272,7 @@ class _CreateTripState extends State<CreateTrip>
               onChange: (newValue) {
                 // setState(() => _maxMembers = int.parse(newValue));
                 _maxMembers = int.parse(newValue);
-                FocusScope.of(context).requestFocus(FocusNode());
+                // FocusScope.of(context).requestFocus(FocusNode());
               },
             ),
           ),
