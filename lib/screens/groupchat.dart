@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:progress_dialog/progress_dialog.dart';
@@ -288,7 +289,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   Widget buildBottomBtn() {
     return Container(
         width: double.infinity,
-        margin: EdgeInsets.only(bottom: 55),
+        margin: EdgeInsets.only(bottom: (Platform.isIOS ? 80 : 55)),
         child: FlatButton(
           color: yellow_color1,
           onPressed: () async {

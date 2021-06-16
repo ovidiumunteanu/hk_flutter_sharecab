@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:shareacab/models/requestdetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -300,7 +301,7 @@ class _CreateTripState extends State<CreateTrip>
             if (groupUID != null) {
               return Container(
                   width: double.infinity,
-                  margin: EdgeInsets.only(bottom: 55),
+                  margin: EdgeInsets.only(bottom:  (Platform.isIOS ? 80 : 55)),
                   height: 55,
                   color: grey_color6,
                   child: Center(
@@ -313,7 +314,7 @@ class _CreateTripState extends State<CreateTrip>
             } else {
               return Container(
                   width: double.infinity,
-                  margin: EdgeInsets.only(bottom: 55),
+                  margin: EdgeInsets.only(bottom: (Platform.isIOS ? 80 : 55)),
                   child: FlatButton(
                     padding: EdgeInsets.all(20),
                     color: yellow_color1,
