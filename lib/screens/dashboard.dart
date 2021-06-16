@@ -150,7 +150,7 @@ class _DashboardState extends State<Dashboard>
                 height: 8,
               ),
               Text('團友性別'),
-              filterBtn(['任何', '只限男性', '只限女性'], 'gender')
+              filterBtn(['任何', '男女也可', '只限男性', '只限女性'], 'gender')
             ],
           )),
           Container(
@@ -166,7 +166,7 @@ class _DashboardState extends State<Dashboard>
                 height: 8,
               ),
               Text('出發時間'),
-              filterBtn(['任何', '最近', '最遠'], 'sortbytime')
+              filterBtn(['任何', '最早', '最遲'], 'sortbytime')
             ],
           )),
         ],

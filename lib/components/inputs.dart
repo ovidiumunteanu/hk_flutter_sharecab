@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:intl/intl.dart';
- 
+
 TextStyle optionTxt =
     TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: text_color1);
 TextStyle hintTxt =
@@ -63,7 +67,12 @@ class DropdownInput extends StatelessWidget {
   String curItem;
   List<String> items;
   DropdownInput(
-      {this.label, this.labelStyle, this.hint, this.curItem, this.items, this.onChange});
+      {this.label,
+      this.labelStyle,
+      this.hint,
+      this.curItem,
+      this.items,
+      this.onChange});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -73,8 +82,12 @@ class DropdownInput extends StatelessWidget {
         children: [
           Text(
             label,
-            style: labelStyle != null ? labelStyle : TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w400, color: text_color2),
+            style: labelStyle != null
+                ? labelStyle
+                : TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                    color: text_color2),
           ),
           SizedBox(
             height: 50,
@@ -180,7 +193,8 @@ class _RadioInputState extends State<RadioInput> {
     var list = <Widget>[
       Text(
         widget.label,
-        style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: text_color1),
+        style: TextStyle(
+            fontSize: 14, fontWeight: FontWeight.bold, color: text_color1),
       ),
     ];
 
@@ -240,7 +254,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
         return;
       }
       widget.onDateSelect(pickedDate);
-      setState(() { 
+      setState(() {
         _selectedDepartureDate = pickedDate;
         FocusScope.of(context).requestFocus(FocusNode());
       });
@@ -278,7 +292,10 @@ class _DateTimeInputState extends State<DateTimeInput> {
                 children: [
                   Text(
                     '出發日期',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: text_color1),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: text_color1),
                   ),
                   Container(
                       width: double.infinity,
@@ -325,7 +342,10 @@ class _DateTimeInputState extends State<DateTimeInput> {
                 children: [
                   Text(
                     '出發時間',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: text_color1),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: text_color1),
                   ),
                   Container(
                       width: double.infinity,
@@ -357,4 +377,82 @@ class _DateTimeInputState extends State<DateTimeInput> {
     );
   }
 }
- 
+
+class BottomCreateTripBtn extends StatefulWidget {
+  final Function onPress;
+  bool active;
+  BottomCreateTripBtn(this.active, this.onPress);
+
+  @override
+  _BottomCreateTripBtnState createState() => _BottomCreateTripBtnState();
+}
+
+class _BottomCreateTripBtnState extends State<BottomCreateTripBtn> {
+  bool keyboardOpened = false;
+  int keyboardAddListener = -1;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    keyboardAddListener =
+        KeyboardVisibilityNotification().addNewListener(onShow: () {
+      print("on show");
+      setState(() {
+        keyboardOpened = true;
+      });
+    }, onHide: () {
+      print("on hide");
+      setState(() {
+        keyboardOpened = false;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    KeyboardVisibilityNotification().removeListener(keyboardAddListener);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.active
+        ? Container(
+            width: double.infinity,
+            margin: EdgeInsets.only(
+                bottom: keyboardOpened ? 0 : (Platform.isIOS ? 80 : 55)),
+            child: FlatButton(
+              height: 85,
+              color: yellow_color1,
+              onPressed: () {
+                FocusScope.of(context).unfocus();
+                widget.onPress();
+              },
+              child: Text('按此建立群組',
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: text_color2)),
+            ))
+        : GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              FocusScope.of(context).unfocus();
+            },
+            child: Container(
+                width: double.infinity,
+                margin: EdgeInsets.only(
+                    bottom: keyboardOpened ? 0 : (Platform.isIOS ? 80 : 55)),
+                height: 70,
+                color: grey_color6,
+                child: Center(
+                  child: Text('您目前已經有群組了。',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: text_color2)),
+                )));
+  }
+}

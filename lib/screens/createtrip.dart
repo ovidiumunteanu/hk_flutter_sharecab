@@ -107,8 +107,7 @@ class _CreateTripState extends State<CreateTrip>
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
         backgroundColor: yellow_color2,
-        content: Text('請輸入相關資料。',
-            style: TextStyle(color: text_color1)),
+        content: Text('請輸入相關資料。', style: TextStyle(color: text_color1)),
       ));
       return; //return stops function execution and thus nothing is called or returned
     } else if (_selectedDepartureDate == null ||
@@ -117,8 +116,7 @@ class _CreateTripState extends State<CreateTrip>
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
         backgroundColor: yellow_color2,
-        content: Text('請輸入相關資料。',
-            style: TextStyle(color: text_color1)),
+        content: Text('請輸入相關資料。', style: TextStyle(color: text_color1)),
       ));
       return;
     } else {
@@ -166,8 +164,9 @@ class _CreateTripState extends State<CreateTrip>
         children: [
           DropdownInput(
             label: '所在地',
-            labelStyle: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
-            hint : '請選擇',
+            labelStyle: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            hint: '請選擇',
             curItem: _departure,
             items: location_list,
             onChange: (newValue) {
@@ -183,8 +182,9 @@ class _CreateTripState extends State<CreateTrip>
           ),
           DropdownInput(
             label: '目的地',
-            labelStyle: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
-            hint : '請選擇',
+            labelStyle: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            hint: '請選擇',
             curItem: _destination,
             items: location_list,
             onChange: (newValue) {
@@ -212,8 +212,9 @@ class _CreateTripState extends State<CreateTrip>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '您會去哪裡？ （請明確說明目的地）',
-            style: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            '您會去哪裡？ （請說明目的地）',
+            style: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
           Container(
             margin: EdgeInsets.only(bottom: 4),
@@ -238,11 +239,12 @@ class _CreateTripState extends State<CreateTrip>
             height: 20,
           ),
           Text(
-            '您會想在哪裡與團友集合？（請明確說明集合地點）',
-            style: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            '在哪裡與團友集合？（請說明集合地點）',
+            style: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
           Container(
-             margin: EdgeInsets.only(bottom: 4),
+            margin: EdgeInsets.only(bottom: 4),
             child: TextFormField(
               // controller: departure_loc_ctr,
               // decoration: InputDecoration(
@@ -275,7 +277,10 @@ class _CreateTripState extends State<CreateTrip>
             margin: EdgeInsets.only(bottom: 4),
             child: DropdownInput(
               label: '您現在有多少人？(包括您自己本人)',
-              labelStyle: TextStyle(fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+              labelStyle: TextStyle(
+                  fontSize: 14,
+                  color: text_color1,
+                  fontWeight: FontWeight.bold),
               curItem: _maxMembers.toString(),
               items: members,
               onChange: (newValue) {
@@ -286,7 +291,7 @@ class _CreateTripState extends State<CreateTrip>
             ),
           ),
           Text(
-            '* 四歲或四歲以上為一位乘客。',
+            '* 四歲或以上為一位乘客。',
             style: hintTxt,
           ),
           SizedBox(
@@ -305,38 +310,11 @@ class _CreateTripState extends State<CreateTrip>
             .snapshots(),
         builder: (context, usersnapshot) {
           if (usersnapshot.connectionState == ConnectionState.active) {
-            var groupUID = usersnapshot.data['currentGroup'];
-            if (groupUID != null) {
-              return Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.only(bottom:  (Platform.isIOS ? 80 : 55)),
-                  height: 55,
-                  color: grey_color6,
-                  child: Center(
-                    child: Text('您目前已經有群組了。',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: text_color2)),
-                  ));
-            } else {
-              return Container(
-                  width: double.infinity,
-                  margin: EdgeInsets.only(bottom: (Platform.isIOS ? 80 : 55)),
-                  child: FlatButton(
-                    padding: EdgeInsets.all(20),
-                    color: yellow_color1,
-                    onPressed: () {
-                      SystemChannels.textInput.invokeMethod('Text Input hide');
-                      _submitData();
-                    },
-                    child: Text('按此建立群組',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w900,
-                            color: text_color2)),
-                  ));
-            }
+            var groupUID = usersnapshot.data['currentGroup']; 
+            return BottomCreateTripBtn(groupUID == null, () {
+              SystemChannels.textInput.invokeMethod('Text Input hide');
+              _submitData();
+            });
           } else {
             return Container();
           }
@@ -346,11 +324,12 @@ class _CreateTripState extends State<CreateTrip>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+
     var currentuser = Provider.of<FirebaseUser>(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () {
-        FocusScope.of(context).unfocus();
+      onTap: () {  
+        // FocusScope.of(context).unfocus();
       },
       child: Scaffold(
         key: _scaffoldKey,
@@ -392,7 +371,7 @@ class _CreateTripState extends State<CreateTrip>
                             height: 8,
                           ),
                           buildFromTo(),
-                          buildDetailInfo(), 
+                          buildDetailInfo(),
                           RadioInput('團友性別', ['男女也可', '只限男性', '只限女性'], _sex,
                               (val) {
                             _sex = val;

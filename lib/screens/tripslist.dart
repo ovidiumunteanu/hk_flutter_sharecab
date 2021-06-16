@@ -54,10 +54,10 @@ class _TripsListState extends State<TripsList>
       query = query.where('sex', isEqualTo: widget.filterGender);
     }
  
-    if (widget.sortTime == '最近' || widget.sortTime == '任何') {
-      query = query.orderBy('departure_time', descending: true);
-    } else if (widget.sortTime == '最遠') {
-      query = query.orderBy('departure_time', descending: false);
+    if (widget.sortTime == '最早' || widget.sortTime == '任何') {
+      query = query.orderBy('created', descending: true);
+    } else if (widget.sortTime == '最遲') {
+      query = query.orderBy('created', descending: false);
     }
 
     return query.snapshots();

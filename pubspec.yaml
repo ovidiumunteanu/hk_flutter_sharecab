@@ -40,6 +40,8 @@ dependencies:
   google_maps_flutter: ^2.0.4
   flutter_svg: ^0.22.0
   dotted_line: ^3.0.0
+  keyboard_visibility: ^0.5.6 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

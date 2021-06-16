@@ -464,7 +464,7 @@ class _GroupDetailsState extends State<GroupDetails>
               MaterialPageRoute(
                   builder: (context) => ChatScreen(widget.docId)));
         },
-        padding: EdgeInsets.all(20),
+        height: 85,
         child: Text(
           '按此與團友溝通', // You are in a group and viewing a private group
           style: TextStyle(
@@ -526,7 +526,7 @@ class _GroupDetailsState extends State<GroupDetails>
               ),
             ),
             FlatButton(
-              height: 70,
+              height: 85,
               color: yellow_color1,
               onPressed: () {
                 onJoinGroup();
@@ -632,225 +632,181 @@ class _GroupDetailsState extends State<GroupDetails>
                       ownerUser = groupsnapshot.data['owner'];
                     }
 
-                    return NestedScrollView(
-                        controller: ScrollController(keepScrollOffset: true),
-                        headerSliverBuilder:
-                            (BuildContext context, bool innerBoxIsScrolled) {
-                          return <Widget>[
-                            SliverAppBar(
-                              pinned: true,
-                              floating: false,
-                              expandedHeight: 40,
-                              titleTextStyle: TextStyle(fontSize: 14),
-                              leading: InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Icon(
-                                  Icons.chevron_left,
-                                  color: text_color1,
-                                  size: 36,
-                                ),
+                    return Scaffold(
+                        key: _scaffoldKey,
+                        backgroundColor: Colors.white,
+                        appBar: AppBar(
+                          backgroundColor: yellow_color2,
+                          leadingWidth: 32,
+                          leading: Container(
+                            padding: EdgeInsets.only(left: 6),
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                              },
+                              child: Icon(
+                                Icons.chevron_left,
+                                color: text_color1,
+                                size: 32,
                               ),
-                              flexibleSpace: FlexibleSpaceBar(
-                                titlePadding: EdgeInsets.only(
-                                  left: 48,
-                                  bottom: 7,
+                            ),
+                          ),
+                          titleSpacing: 0,
+                          title: Row(children: [
+                            Image.asset(
+                              'assets/images/logo_full_qq.png',
+                              width: 160,
+                              height: 22,
+                            ),
+                          ]),
+                        ),
+                        body: Column(
+                          children: [
+                            Container(
+                                width: double.infinity,
+                                height: 30,
+                                decoration: BoxDecoration(
+                                  color: yellow_color1,
                                 ),
-                                title: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'assets/images/logo_full_qq.png',
-                                      width: 180,
-                                      height: 40,
+                                child: Center(
+                                  child: Text(
+                                    '「一個都半價」慳錢、慳時間。',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: text_color4,
                                     ),
-                                    // SizedBox(
-                                    //   width: 5,
-                                    // ),
-                                    // Text(
-                                    //   'AA制車資',
-                                    //   style: TextStyle(
-                                    //       fontSize: 20,
-                                    //       fontWeight: FontWeight.w600,
-                                    //       color: text_color1),
-                                    // ),
+                                  ),
+                                )),
+                            Expanded(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: <Widget>[
+                                    Container(
+                                      width: double.infinity,
+                                      color: Color(0xFFFAFAFA),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.stretch,
+                                        children: [
+                                          TripItem(
+                                            departure: departure,
+                                            destination: destination,
+                                            departure_loc: departure_location,
+                                            destination_loc:
+                                                destination_location,
+                                            departure_time: departure_time,
+                                            maxMember: maxMembers,
+                                            joinedMember: joinedMember,
+                                          ),
+                                          buildTransInfo(
+                                              transportation, tunnel, sex),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      width: double.infinity,
+                                      height: curUsers.toDouble() * 60,
+                                      child: StreamBuilder(
+                                        stream: Firestore.instance
+                                            .collection('group')
+                                            .document(widget.docId)
+                                            .collection('users')
+                                            .snapshots(),
+                                        builder: (ctx, futureSnapshot) {
+                                          if (futureSnapshot.connectionState ==
+                                              ConnectionState.waiting) {
+                                            return Column(
+                                              children: <Widget>[
+                                                CircularProgressIndicator(),
+                                              ],
+                                            );
+                                          }
+                                          return ListView.builder(
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              itemCount: futureSnapshot
+                                                  .data.documents.length,
+                                              padding: EdgeInsets.zero,
+                                              itemBuilder: (ctx, index) {
+                                                return Container(
+                                                  margin: EdgeInsets.symmetric(
+                                                      vertical: 0,
+                                                      horizontal: 20),
+                                                  decoration: BoxDecoration(
+                                                      border: Border(
+                                                          bottom: BorderSide(
+                                                              // width:
+                                                              //     double.infinity,
+                                                              color:
+                                                                  grey_color6))),
+                                                  width: double.infinity,
+                                                  child: buildUserListItem(
+                                                      currentuser,
+                                                      futureSnapshot
+                                                          .data
+                                                          .documents[index]
+                                                          .data,
+                                                      groupsnapshot
+                                                          .data['users']),
+                                                );
+                                              });
+                                        },
+                                      ),
+                                    ),
+                                    Container(
+                                      margin:
+                                          EdgeInsets.only(top: 40, bottom: 20),
+                                      width: double.infinity,
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: 50,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          wait_all_member
+                                              ? Text(
+                                                  '此群組有權「準時出發」及不會等待個別團友。',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black),
+                                                )
+                                              : Text(
+                                                  '此群組有權「等待任何團友到達」才出發。',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.black),
+                                                ),
+                                        ],
+                                      ),
+                                    ),
+                                    GroupDetails.inGroup
+                                        ? Container(
+                                            width: 200,
+                                            height: 40,
+                                            child: InkWell(
+                                              onTap: () {
+                                                onLeaveGroup();
+                                              },
+                                              child: Center(
+                                                child: Text(
+                                                  '按此離開群組',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.red),
+                                                ),
+                                              ),
+                                            ))
+                                        : Container(),
+                                    SizedBox(
+                                      height: 100,
+                                    ),
                                   ],
                                 ),
                               ),
-                              backgroundColor: yellow_color2,
-                              actions: <Widget>[
-                                // GroupDetails.inGroup
-                                //     ? FlatButton(
-                                //         onPressed: () {
-                                //           onLeaveGroup();
-                                //         },
-                                //         child: Text(
-                                //           '離開組',
-                                //           style: TextStyle(
-                                //               fontSize: 16,
-                                //               fontWeight: FontWeight.w600,
-                                //               color: text_color1),
-                                //         ))
-                                //     : Container(),
-                              ],
-                            ),
-                          ];
-                        },
-                        body: Scaffold(
-                            key: _scaffoldKey,
-                            backgroundColor: Colors.white,
-                            body: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Container(
-                                      width: double.infinity,
-                                      height: 30,
-                                      decoration: BoxDecoration(
-                                        color: yellow_color1,
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          '「一個都半價」慳錢、慳時間。',
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            color: text_color4,
-                                          ),
-                                        ),
-                                      )),
-                                  Container(
-                                    width: double.infinity,
-                                    color: Color(0xFFFAFAFA),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        TripItem(
-                                          departure: departure,
-                                          destination: destination,
-                                          departure_loc: departure_location,
-                                          destination_loc: destination_location,
-                                          departure_time: departure_time,
-                                          maxMember: maxMembers,
-                                          joinedMember: joinedMember,
-                                        ),
-                                        buildTransInfo(
-                                            transportation, tunnel, sex),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    width: double.infinity,
-                                    height: curUsers.toDouble() * 60,
-                                    child: StreamBuilder(
-                                      stream: Firestore.instance
-                                          .collection('group')
-                                          .document(widget.docId)
-                                          .collection('users')
-                                          .snapshots(),
-                                      builder: (ctx, futureSnapshot) {
-                                        if (futureSnapshot.connectionState ==
-                                            ConnectionState.waiting) {
-                                          return Column(
-                                            children: <Widget>[
-                                              CircularProgressIndicator(),
-                                            ],
-                                          );
-                                        }
-                                        return ListView.builder(
-                                            physics:
-                                                NeverScrollableScrollPhysics(),
-                                            itemCount: futureSnapshot
-                                                .data.documents.length,
-                                            padding: EdgeInsets.zero,
-                                            itemBuilder: (ctx, index) {
-                                              return Container(
-                                                margin: EdgeInsets.symmetric(
-                                                    vertical: 0,
-                                                    horizontal: 20),
-                                                decoration: BoxDecoration(
-                                                    border: Border(
-                                                        bottom: BorderSide(
-                                                            // width:
-                                                            //     double.infinity,
-                                                            color:
-                                                                grey_color6))),
-                                                width: double.infinity,
-                                                child: buildUserListItem(
-                                                    currentuser,
-                                                    futureSnapshot.data
-                                                        .documents[index].data,
-                                                    groupsnapshot
-                                                        .data['users']),
-                                              );
-                                            });
-                                      },
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(top: 40),
-                                    width: double.infinity,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 50,
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        wait_all_member
-                                            ? Text(
-                                                '此群組有權「準時出發」及不會等待個別團友。',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              )
-                                            : Text(
-                                                '此群組有權「等待任何團友到達」才出發。',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              ),
-                                        wait_all_member
-                                            ? Text(
-                                                '*如果有團友遲到的情況下，此群組有權「準時出發」。',
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              )
-                                            : Text(
-                                                '*如果有團友遲到的情況下，此群組有權「等待團友到達」才出發。', 
-                                                style: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black),
-                                              ),
-                                        SizedBox(
-                                          height: 40,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  GroupDetails.inGroup
-                                      ? Container(
-                                          width: 200,
-                                          height: 40,
-                                          child: InkWell(
-                                            onTap: () {
-                                              onLeaveGroup();
-                                            },
-                                            child: Center(
-                                              child: Text(
-                                                '按此離開群組',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.red),
-                                              ),
-                                            ),
-                                          ))
-                                      : Container(),
-                                ],
-                              ),
-                            ),
-                            bottomNavigationBar: buildBottomBtn()));
+                            )
+                          ],
+                        ),
+                        bottomNavigationBar: buildBottomBtn());
                   } else {
                     return Center(child: CircularProgressIndicator());
                   }

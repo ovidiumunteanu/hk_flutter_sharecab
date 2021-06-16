@@ -8,7 +8,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 AppBar CustomAppBar(BuildContext context, AuthService _auth) {
   return AppBar(
     backgroundColor: yellow_color2,
-    titleSpacing: 0,
+    titleSpacing: 6,
     title: Row(
       children: [
         Image.asset(
@@ -27,25 +27,29 @@ AppBar CustomAppBar(BuildContext context, AuthService _auth) {
       ],
     ),
     actions: <Widget>[
-      // IconButton(
-      //   icon: Icon(
-      //     Icons.help,
-      //     color: text_color1,
-      //     size: 28,
-      //   ),
-      //   tooltip: 'Help',
-      //   onPressed: () {
-      //     Navigator.push(
-      //         context, MaterialPageRoute(builder: (context) => Help()));
-      //   },
-      // ),
+      Container(
+        width: 28, height: 28,
+        child: IconButton(
+        padding: EdgeInsets.zero,
+        focusColor: Colors.amber,
+        icon: Icon(
+          Icons.help,
+          color: text_color1,
+          size: 28,
+        ), 
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => Help()));
+        },
+      ),
+      ), 
       IconButton(
+        padding: EdgeInsets.zero,
           icon: Icon(
             FontAwesomeIcons.solidUserCircle,
             color: text_color1,
             size: 24,
-          ),
-          tooltip: '帳戶',
+          ), 
           onPressed: () {
             return Navigator.push(context,
                 MaterialPageRoute(builder: (context) {
