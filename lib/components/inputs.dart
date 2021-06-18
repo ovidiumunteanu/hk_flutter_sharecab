@@ -246,8 +246,8 @@ class _DateTimeInputState extends State<DateTimeInput> {
   void _startDatePicker() {
     showDatePicker(
             context: context,
-            initialDate: DateTime.now(),
-            firstDate: DateTime.now().subtract(Duration(days: 1)),
+            initialDate: DateTime.now().add(Duration(days: 0)),
+            firstDate: DateTime.now().add(Duration(days: 0)) ,
             lastDate: DateTime.now().add(Duration(days: 30)))
         .then((pickedDate) {
       if (pickedDate == null) {

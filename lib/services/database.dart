@@ -17,6 +17,8 @@ class DatabaseService {
       Firestore.instance.collection('group');
   final CollectionReference requests =
       Firestore.instance.collection('requests');
+  final CollectionReference chat_collection =
+      Firestore.instance.collection('chatroom');
 
   // Enter user data (W=1, R=0)
   Future enterUserData(
@@ -235,6 +237,13 @@ class DatabaseService {
       //deleting user from chat group
       await ChatService().exitChatRoom(currentGrp);
     } else {
+      await chat_collection.document(currentGrp).delete();
+
+      await groupdetails
+          .document(currentGrp)
+          .collection('users')
+          .document(user.uid)
+          .delete();
       await groupdetails.document(currentGrp).delete();
     }
   }

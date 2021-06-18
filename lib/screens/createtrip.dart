@@ -212,34 +212,7 @@ class _CreateTripState extends State<CreateTrip>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '您會去哪裡？ （請說明目的地）',
-            style: TextStyle(
-                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 4),
-            child: TextFormField(
-              // controller: destination_loc_ctr,
-              // decoration: InputDecoration(
-              //     // hintText: 'Destination Location',
-              //     ),
-              validator: (val) => val.length == 0 ? '輸入目的地位置。' : null,
-              onChanged: (val) {
-                _destination_location = val;
-                // FocusScope.of(context).requestFocus(FocusNode());
-                // setState(() => _destination_location = val);
-              },
-            ),
-          ),
-          Text(
-            '例如：元朗西地鐵站, YOHO MALL 附近',
-            style: hintTxt,
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            '在哪裡與團友集合？（請說明集合地點）',
+            '在那𥚃集合？(請說明集合地點)',
             style: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
@@ -260,6 +233,33 @@ class _CreateTripState extends State<CreateTrip>
           ),
           Text(
             '例如：觀塘APM, 滙豐銀行 ',
+            style: hintTxt,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            '您去那裡？(請說明目的地)',
+            style: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: 4),
+            child: TextFormField(
+              // controller: destination_loc_ctr,
+              // decoration: InputDecoration(
+              //     // hintText: 'Destination Location',
+              //     ),
+              validator: (val) => val.length == 0 ? '輸入目的地位置。' : null,
+              onChanged: (val) {
+                _destination_location = val;
+                // FocusScope.of(context).requestFocus(FocusNode());
+                // setState(() => _destination_location = val);
+              },
+            ),
+          ),
+          Text(
+            '例如：元朗西地鐵站, YOHO MALL 附近',
             style: hintTxt,
           ),
           SizedBox(
@@ -310,7 +310,7 @@ class _CreateTripState extends State<CreateTrip>
             .snapshots(),
         builder: (context, usersnapshot) {
           if (usersnapshot.connectionState == ConnectionState.active) {
-            var groupUID = usersnapshot.data['currentGroup']; 
+            var groupUID = usersnapshot.data['currentGroup'];
             return BottomCreateTripBtn(groupUID == null, () {
               SystemChannels.textInput.invokeMethod('Text Input hide');
               _submitData();
@@ -328,7 +328,7 @@ class _CreateTripState extends State<CreateTrip>
     var currentuser = Provider.of<FirebaseUser>(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () {  
+      onTap: () {
         // FocusScope.of(context).unfocus();
       },
       child: Scaffold(
@@ -349,7 +349,7 @@ class _CreateTripState extends State<CreateTrip>
                     ),
                     child: Center(
                       child: Text(
-                        '「一個都半價」慳錢、慳時間。',
+                        '「一個同您搭都半價」慳錢、慳時間',
                         style: TextStyle(
                           fontSize: 14,
                           color: text_color4,

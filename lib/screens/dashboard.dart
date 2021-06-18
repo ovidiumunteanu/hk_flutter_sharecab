@@ -215,7 +215,7 @@ class _DashboardState extends State<Dashboard>
                       ),
                       child: Center(
                         child: Text(
-                          '「一個都半價」慳錢、慳時間。',
+                          '「一個同您搭都半價」慳錢、慳時間',
                           style: TextStyle(
                             fontSize: 14,
                             color: text_color4,

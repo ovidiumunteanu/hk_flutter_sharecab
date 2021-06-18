@@ -84,7 +84,7 @@ class _Splash1State extends State<Splash1> {
                           ),
                           SizedBox(height: 16.0),
                           Text(
-                            '「一個都半價」可慳錢、慳時間。',
+                            '「一個同您搭都半價」慳錢、慳時間。',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,

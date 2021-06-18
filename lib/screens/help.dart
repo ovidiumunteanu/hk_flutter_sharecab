@@ -73,7 +73,7 @@ class _HelpState extends State<Help> {
           //   width: 160,
           //   height: 22,
           // ),
-          Text('幫助', style: TextStyle(color: text_color1, fontSize: 18, fontWeight: FontWeight.w500),),
+          Text('相關資料', style: TextStyle(color: text_color1, fontSize: 18, fontWeight: FontWeight.w500),),
         ]),
       ),
       body: ListView(
@@ -95,7 +95,7 @@ class _HelpState extends State<Help> {
                       textAlign: TextAlign.left,
                       style: TextStyle(
                         color: getVisibleColorOnScaffold(context),
-                        fontSize: 20.0,
+                        fontSize: 16.0,
                         fontWeight: FontWeight.w400,
                       ),
                     ));

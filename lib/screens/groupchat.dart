@@ -290,6 +290,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     return Container(
         width: double.infinity,
         margin: EdgeInsets.only(bottom: (Platform.isIOS ? 80 : 55)),
+        height: 70,
         child: FlatButton(
           color: yellow_color1,
           onPressed: () async {
@@ -316,7 +317,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         ),
         child: Center(
           child: Text(
-            '「一個都半價」慳錢、慳時間。',
+            '「一個同您搭都半價」慳錢、慳時間',
             style: TextStyle(
               fontSize: 14,
               color: text_color4,

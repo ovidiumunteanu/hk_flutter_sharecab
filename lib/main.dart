@@ -245,7 +245,7 @@ class MyApp extends StatelessWidget {
           ChatScreen.routeName: (context) => ChatScreen(' '),
 //          GroupDetails.routeName : (context) => GroupDetails(' '),
         },
-        title: 'Share A Cab',
+        title: 'AA車',
         builder: (context, child) {
           return MediaQuery(
             child: child,
