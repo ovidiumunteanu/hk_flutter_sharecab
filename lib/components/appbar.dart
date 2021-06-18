@@ -29,7 +29,6 @@ AppBar CustomAppBar(BuildContext context, AuthService _auth) {
     actions: <Widget>[
       Container(
         width: 28, height: 28,
-        padding: EdgeInsets.only(top: 2),
         child: IconButton(
         padding: EdgeInsets.zero, 
         focusColor: Colors.amber,
@@ -45,7 +44,7 @@ AppBar CustomAppBar(BuildContext context, AuthService _auth) {
       ),
       ), 
       IconButton(
-        padding: EdgeInsets.zero,
+        padding: EdgeInsets.only(bottom: 1),
           icon: Icon(
             FontAwesomeIcons.solidUserCircle,
             color: text_color1,

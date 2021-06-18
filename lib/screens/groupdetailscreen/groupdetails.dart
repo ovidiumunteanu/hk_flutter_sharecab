@@ -510,7 +510,7 @@ class _GroupDetailsState extends State<GroupDetails>
     } else if (GroupDetails.hasGroup == false && genderOK == true) {
       // if require_permission == false
       return Container(
-        height: 100,
+        height: 115,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
