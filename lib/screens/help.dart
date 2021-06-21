@@ -102,13 +102,14 @@ class _HelpState extends State<Help> {
                   },
                   isExpanded: helper.isExpanded,
                   body: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
                       Padding(
                         padding: const EdgeInsets.only(
                             left: 10.0, right: 10.0, bottom: 20.0),
                         child: Text(
                           helper.description,
-                          textAlign: TextAlign.justify,
+                          textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 16),
                         ),
                       ),

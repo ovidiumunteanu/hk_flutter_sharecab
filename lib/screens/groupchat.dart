@@ -501,31 +501,19 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                     ),
                                     child: Column(
                                       children: [
-                                        wait_all_member ?
-                                        Text('此群組有權「準時出發」及不會等待個別團友。',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black),
-                                        ):
-                                        Text('此群組有權「等待任何團友到達」才出發。',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black),
-                                        ),
-                                        wait_all_member ?
-                                        Text('*如果有團友遲到的情況下，此群組有權「準時出發」。',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black),
-                                        ):
-                                        Text('*如果有團友遲到的情況下，此群組有權「等待團友到達」才出發。',
-                                          style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black),
-                                        ),
-                                        SizedBox(
-                                          height: 40,
-                                        ),
+                                        wait_all_member
+                                            ? Text(
+                                                '此群組有權「準時出發」及不會等待個別團友。',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black),
+                                              )
+                                            : Text(
+                                                '此群組有權「等待任何團友到達」才出發。',
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    color: Colors.black),
+                                              ),
                                       ],
                                     ),
                                   ),
