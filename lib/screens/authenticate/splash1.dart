@@ -9,6 +9,7 @@ import 'package:shareacab/shared/loading.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:shareacab/components/inputs.dart';
 import 'package:shareacab/components/buttons.dart';
+import 'package:shareacab/utils/global.dart';
 
 class Splash1 extends StatefulWidget {
   final Function toggleView;
@@ -42,11 +43,27 @@ class _Splash1State extends State<Splash1> {
                     child: Column(
                       children: [
                         SizedBox(height: 40.0),
-                        Image.asset(
-                          'assets/images/logo_car.png',
-                          height: 65,
+                        Row(
+                          children: [
+                            Expanded(child: Container()),
+                            TextButton(
+                                onPressed: () {
+                                  Global().isLoggedIn = false;
+                                  Navigator.pushNamed(context, '/rootscreen');
+                                },
+                                child: Text(
+                                  '略過',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: text_color1,
+                                  ),
+                                )),
+                            SizedBox(
+                              width: 20,
+                            )
+                          ],
                         ),
-                        SizedBox(height: 12.0),
                         Expanded(
                           child: Container(
                             padding: EdgeInsets.symmetric(
@@ -62,12 +79,6 @@ class _Splash1State extends State<Splash1> {
                       ],
                     ),
                   ),
-                  Image.asset(
-                    'assets/images/splash2.png',
-                    width: double.infinity,
-                    height: 100,
-                    fit: BoxFit.fill,
-                  ),
                   Container(
                       color: Colors.white,
                       padding: EdgeInsets.symmetric(
@@ -75,6 +86,7 @@ class _Splash1State extends State<Splash1> {
                       ),
                       child: Column(
                         children: [
+                          SizedBox(height: 20.0),
                           Text(
                             'AA制車資',
                             style: TextStyle(
@@ -84,42 +96,27 @@ class _Splash1State extends State<Splash1> {
                           ),
                           SizedBox(height: 16.0),
                           Text(
-                            '「一個同您搭都半價」慳錢、慳時間。',
+                            '組團  -  集合  -  出發',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w400,
                                 color: text_color4),
                           ),
                           SizedBox(height: 24.0),
-                          Container(
-                              width: 80,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                  color: grey_color7,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8))),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    width: 40,
-                                    height: 4,
-                                    decoration: BoxDecoration(
-                                        color: red_color3,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(8))),
-                                  ),
-                                  Container(
-                                    width: 40,
-                                  )
-                                ],
-                              )),
-                          SizedBox(height: 24.0),
                           MainBtn(
-                            label: '下一步',
+                            label: '立即開始',
                             height: 64,
                             onPress: () {
                               widget.toggleView(1);
                             },
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            '毋須任何費用',
+                            style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: text_color4),
                           ),
                           SizedBox(height: 90.0),
                         ],

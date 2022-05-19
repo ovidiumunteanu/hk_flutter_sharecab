@@ -23,9 +23,6 @@ class _AuthenticateState extends State<Authenticate> {
       return Splash1(toggleView: toggleView);
     } 
     else if (page == 1) {
-      return Splash2(toggleView: toggleView);
-    } 
-    else if (page == 2) {
       return SignIn(toggleView: toggleView);
     } 
     else  {

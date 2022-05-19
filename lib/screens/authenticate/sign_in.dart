@@ -205,7 +205,7 @@ class _SignInState extends State<SignIn> {
                               ),
                               TextButton(
                                   onPressed: () {
-                                    widget.toggleView(3);
+                                    widget.toggleView(2);
                                   },
                                   child: Text(
                                     '立即註冊',

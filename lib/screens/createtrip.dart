@@ -306,7 +306,7 @@ class _CreateTripState extends State<CreateTrip>
     return StreamBuilder(
         stream: Firestore.instance
             .collection('userdetails')
-            .document(currentuser.uid)
+            .document(currentuser == null ? '' : currentuser.uid)
             .snapshots(),
         builder: (context, usersnapshot) {
           if (usersnapshot.connectionState == ConnectionState.active) {
@@ -334,7 +334,7 @@ class _CreateTripState extends State<CreateTrip>
       child: Scaffold(
         key: _scaffoldKey,
         resizeToAvoidBottomInset: false,
-        appBar: CustomAppBar(context, _auth),
+        appBar: CustomAppBar(context, _auth, currentuser),
         body: Builder(builder: (BuildContext context) {
           return Container(
             color: Colors.white,

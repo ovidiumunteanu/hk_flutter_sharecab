@@ -30,6 +30,8 @@ class _TripsListState extends State<TripsList>
   bool flag;
   var requestsArray = [];
 
+  var currentGroup ;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -70,15 +72,17 @@ class _TripsListState extends State<TripsList>
       body: StreamBuilder(
           stream: Firestore.instance
               .collection('userdetails')
-              .document(currentuser.uid)
+              .document(currentuser == null ? '' : currentuser.uid)
               .snapshots(),
           builder: (_, usersnapshot) {
             if (usersnapshot.connectionState == ConnectionState.waiting) {
               Center(child: CircularProgressIndicator());
             }
-            if (usersnapshot.connectionState == ConnectionState.active) {
+            if (usersnapshot.connectionState == ConnectionState.active && usersnapshot.data != null) {
               requestsArray = usersnapshot.data['currentGroupJoinRequests'];
               requestsArray ??= [];
+
+              currentGroup = usersnapshot.data['currentGroup'];
             }
 
             _controller.addListener(() {
@@ -130,7 +134,7 @@ class _TripsListState extends State<TripsList>
                               docData.data['users'][i]['num'];
                         }
 
-                        if (docId == usersnapshot.data['currentGroup']) {
+                        if (docId == currentGroup) {
                           flag = true;
                         } else {
                           flag = false;

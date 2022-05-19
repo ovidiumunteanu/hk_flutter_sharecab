@@ -1,11 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shareacab/screens/help.dart';
 import 'package:shareacab/screens/profile/userprofile.dart';
 import 'package:shareacab/services/auth.dart';
+import 'package:shareacab/shared/guest.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-AppBar CustomAppBar(BuildContext context, AuthService _auth) {
+AppBar CustomAppBar(BuildContext context, AuthService _auth, FirebaseUser currentuser) {
   return AppBar(
     backgroundColor: yellow_color2,
     titleSpacing: 6,
@@ -51,10 +53,15 @@ AppBar CustomAppBar(BuildContext context, AuthService _auth) {
             size: 24,
           ), 
           onPressed: () {
-            return Navigator.push(context,
-                MaterialPageRoute(builder: (context) {
-              return MyProfile(_auth);
-            }));
+            if (currentuser == null) {
+              GUEST_SERVICE.showGuestModal(context);
+            }
+            else {
+              return Navigator.push(context,
+                  MaterialPageRoute(builder: (context) {
+                return MyProfile(_auth);
+              }));
+            }
           }),
     ],
   );

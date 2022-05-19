@@ -14,10 +14,12 @@ import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shareacab/screens/chatscreen/chat_screen.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:shareacab/shared/guest.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:shareacab/components/TripItem.dart';
 import 'package:shareacab/screens/notifications/services/notifservices.dart';
 import 'package:shareacab/components/inputs.dart';
+import 'package:shareacab/utils/global.dart';
 
 class AddNewJoinNum extends StatefulWidget {
   final Function onJoin;
@@ -207,6 +209,11 @@ class _GroupDetailsState extends State<GroupDetails>
 
   void onJoinGroup() async {
     try {
+      if (Global().isLoggedIn != true) {
+        GUEST_SERVICE.showGuestModal(context);
+        return;
+      }
+
       await showDialog(
           context: context,
           builder: (BuildContext ctx) {
@@ -424,7 +431,7 @@ class _GroupDetailsState extends State<GroupDetails>
                       fontWeight: FontWeight.w500,
                       color: Colors.black),
                 ))
-            : userItem['uid'] == curUser.uid
+            : userItem['uid'] == curUser?.uid
                 ? Padding(
                     padding: const EdgeInsets.all(2.0),
                     child: FlatButton(
@@ -554,7 +561,7 @@ class _GroupDetailsState extends State<GroupDetails>
     return StreamBuilder(
         stream: Firestore.instance
             .collection('userdetails')
-            .document(currentuser.uid)
+            .document(currentuser == null ? '' : currentuser.uid)
             .snapshots(),
         builder: (context, usersnapshot) {
           requestedToJoin = usersnapshot.hasData
@@ -562,8 +569,13 @@ class _GroupDetailsState extends State<GroupDetails>
                   usersnapshot.data['currentGroupJoinRequests']
                       .contains(widget.docId)
               : false;
-          if (usersnapshot.connectionState == ConnectionState.active) {
-            var groupUID = usersnapshot.data['currentGroup'];
+          if (currentuser == null || usersnapshot.connectionState == ConnectionState.active) {
+            var groupUID ;
+            var myName = '';
+            if ( usersnapshot.data != null) {
+              groupUID = usersnapshot.data['currentGroup'];
+              myName = usersnapshot.data['name'];
+            }
             if (groupUID != null) {
               GroupDetails.hasGroup = true;
             } else {
@@ -574,7 +586,7 @@ class _GroupDetailsState extends State<GroupDetails>
             } else {
               GroupDetails.inGroup = false;
             }
-            GroupDetails.myName = usersnapshot.data['name'];
+            GroupDetails.myName = myName;
 
             return StreamBuilder(
                 stream: Firestore.instance

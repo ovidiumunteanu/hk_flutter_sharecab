@@ -4,6 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:shareacab/screens/createtrip.dart';
 import 'package:shareacab/screens/dashboard.dart';
 import 'package:shareacab/screens/groupchat.dart';
+import 'package:shareacab/shared/guest.dart';
+import 'package:shareacab/utils/global.dart';
 import 'messages.dart';
 import 'profile/userprofile.dart';
 import 'notifications/notifications.dart';
@@ -66,7 +68,7 @@ class _RootScreenState extends State<RootScreen> {
   Widget buildPageView() {
     return PageView(
       controller: pageController,
-      onPageChanged: (index) {
+      onPageChanged: (index) { 
         pageChanged(index);
       },
       children: pagelist,
@@ -84,12 +86,21 @@ class _RootScreenState extends State<RootScreen> {
   }
 
   void pageChanged(int index) {
+    if (Global().isLoggedIn != true && index > 0 ) {
+      pageController.jumpToPage(0);
+      GUEST_SERVICE.showGuestModal(context);
+      return; 
+    }
     setState(() {
       _selectedPage = index;
     });
   }
 
   void bottomTapped(int index) {
+    if (Global().isLoggedIn != true && index > 0 ) {
+      GUEST_SERVICE.showGuestModal(context);
+      return; 
+    }
     setState(() {
       _selectedPage = index;
       pageController.animateToPage(index,

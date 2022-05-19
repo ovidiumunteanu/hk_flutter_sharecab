@@ -181,16 +181,17 @@ class _DashboardState extends State<Dashboard>
     final currentuser = Provider.of<FirebaseUser>(context);
     return Scaffold(
       key: scaffoldKey,
-      appBar: CustomAppBar(context, _auth),
+      appBar: CustomAppBar(context, _auth, currentuser),
       resizeToAvoidBottomInset: false,
       body: StreamBuilder(
         stream: Firestore.instance
             .collection('userdetails')
-            .document(currentuser.uid)
+            .document(currentuser != null ? currentuser.uid : '')
             .snapshots(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
+             print(snapshot.data);
+          if (snapshot.connectionState == ConnectionState.active && snapshot.data != null) {
             var temp = snapshot.data['currentGroup'];
             if (temp != null) {
               inGroup = true;
@@ -203,8 +204,7 @@ class _DashboardState extends State<Dashboard>
           }
 
           try {
-            if (snapshot.connectionState == ConnectionState.active &&
-                fetched == true) {
+            if (currentuser == null || (snapshot.connectionState == ConnectionState.active && fetched == true) ) {
               return Scaffold(
                 body: Column(children: <Widget>[
                   Container(

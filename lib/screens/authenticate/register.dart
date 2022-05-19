@@ -312,7 +312,7 @@ class _RegisterState extends State<Register> {
                                     ),
                                     TextButton(
                                         onPressed: () {
-                                          widget.toggleView(2);
+                                          widget.toggleView(1);
                                         },
                                         child: Text(
                                           '請登入',

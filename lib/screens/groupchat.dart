@@ -334,7 +334,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
     return StreamBuilder(
         stream: Firestore.instance
             .collection('userdetails')
-            .document(currentuser.uid)
+            .document(currentuser == null ? '' : currentuser.uid)
             .snapshots(),
         builder: (context, usersnapshot) {
           if (usersnapshot.connectionState == ConnectionState.active) {
@@ -351,7 +351,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                 ? Scaffold(
                     key: _scaffoldKey,
                     backgroundColor: Colors.white,
-                    appBar: CustomAppBar(context, _auth),
+                    appBar: CustomAppBar(context, _auth, currentuser),
                     body: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
@@ -416,7 +416,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                         return Scaffold(
                             key: _scaffoldKey,
                             backgroundColor: Colors.white,
-                            appBar: CustomAppBar(context, _auth),
+                            appBar: CustomAppBar(context, _auth, currentuser),
                             body: SingleChildScrollView(
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,

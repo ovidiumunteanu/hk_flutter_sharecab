@@ -67,28 +67,10 @@ class _Splash2State extends State<Splash2> {
                             ],
                           ),
                         ),
-                        SizedBox(height: 12.0),
-                        Expanded(
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 30, vertical: 12),
-                            child: Image.asset(
-                              'assets/images/splash3.png',
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
+                        SizedBox(height: 12.0), 
                       ],
                     ),
-                  ),
-                  Image.asset(
-                    'assets/images/splash4.png',
-                    width: double.infinity,
-                    height: 100,
-                    fit: BoxFit.fill,
-                  ),
+                  ), 
                   Container(
                       color: Colors.white,
                       padding: EdgeInsets.symmetric(
