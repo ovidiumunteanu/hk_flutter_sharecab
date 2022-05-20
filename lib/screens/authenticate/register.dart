@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shareacab/main.dart';
+import 'package:shareacab/screens/term_policy/term_policy.dart';
 import 'package:shareacab/services/auth.dart';
 import 'package:shareacab/services/database.dart';
 import 'package:shareacab/shared/loading.dart';
@@ -34,9 +35,14 @@ class _RegisterState extends State<Register> {
   String email = '';
   String name = '';
   String sex = '男性';
+  String covid;
   String verify = '';
 
-  final List<String> _sex = [ '男性', '女性',];
+  final List<String> _sex = [
+    '男性',
+    '女性',
+  ];
+  final List<String> _covid = ['已注射第一針', '已注射第二針', '已注射第三針'];
 
   bool isPolicyChecked = false;
 
@@ -247,6 +253,28 @@ class _RegisterState extends State<Register> {
                                   height: 20,
                                 ),
                                 Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    SizedBox(
+                                      width: 110,
+                                      child: DropdownInput(
+                                        label: '已注射新冠疫苗',
+                                        hint: '請選擇',
+                                        curItem: covid,
+                                        items: _covid,
+                                        onChange: (newValue) {
+                                          setState(() {
+                                            covid = newValue;
+                                          });
+                                        },
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       InkWell(
@@ -282,7 +310,7 @@ class _RegisterState extends State<Register> {
                                                 width: 8,
                                               ),
                                               Text(
-                                                '註冊”AA車”應用程式即表示您同意免責條款',
+                                                '同意免責聲明及私隱條例',
                                                 style: TextStyle(
                                                     fontSize: 14,
                                                     color: Colors.black),
@@ -290,7 +318,7 @@ class _RegisterState extends State<Register> {
                                             ],
                                           )),
                                     ]),
-                                SizedBox(height: 60.0),
+                                SizedBox(height: 40.0),
                                 MainBtn(
                                   label: '註冊',
                                   height: 64,
@@ -298,7 +326,7 @@ class _RegisterState extends State<Register> {
                                     onRegister();
                                   },
                                 ),
-                                SizedBox(height: 60.0),
+                                SizedBox(height: 10.0),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -316,6 +344,47 @@ class _RegisterState extends State<Register> {
                                         },
                                         child: Text(
                                           '請登入',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: text_color1,
+                                          ),
+                                        ))
+                                  ],
+                                ),
+                                SizedBox(height: 20.0),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    TextButton(
+                                        onPressed: () {
+                                         Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TermPolicy(
+                                                          isTerm: true)));
+                                        },
+                                        child: Text(
+                                          '免責聲明',
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                            color: text_color1,
+                                          ),
+                                        )),
+                                    SizedBox(width: 50.0),
+                                    TextButton(
+                                        onPressed: () {
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TermPolicy(
+                                                          isTerm: false)));
+                                        },
+                                        child: Text(
+                                          '私隱條例',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,

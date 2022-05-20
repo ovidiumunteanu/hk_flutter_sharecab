@@ -17,6 +17,7 @@ class PhoneVerify extends StatefulWidget {
   String userName;
   String email;
   String sex;
+  String covid;
   int forceCodeResend = -1;
   PhoneVerify(
       {this.PhoneNumber,
@@ -24,6 +25,7 @@ class PhoneVerify extends StatefulWidget {
       this.userName,
       this.email,
       this.sex,
+      this.covid,
       this.forceCodeResend});
   @override
   _PhoneVerifyState createState() => _PhoneVerifyState();
@@ -139,7 +141,9 @@ class _PhoneVerifyState extends State<PhoneVerify> {
                 email: widget.email,
                 phone: widget.PhoneNumber,
                 name: widget.userName,
-                sex: widget.sex);
+                sex: widget.sex,
+                covid: widget.covid
+                );
             Navigator.pop(context);
           }
         }

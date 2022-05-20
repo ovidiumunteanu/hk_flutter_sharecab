@@ -4,6 +4,7 @@ import 'package:shareacab/utils/constant.dart';
 
 class TripItem extends StatelessWidget {
   final Function onPress;
+  String transportation;
   String departure;
   String destination;
   String departure_loc;
@@ -12,7 +13,8 @@ class TripItem extends StatelessWidget {
   int joinedMember = 0;
   DateTime departure_time;
   TripItem(
-      {this.departure,
+      {this.transportation,
+      this.departure,
       this.destination,
       this.departure_loc,
       this.destination_loc,
@@ -67,10 +69,86 @@ class TripItem extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              Expanded(
+                  child: Container(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.only(right: 10),
+                      padding: EdgeInsets.only(
+                          left: 10, right: 10, top: 2, bottom: 2),
+                      decoration: BoxDecoration(
+                          color: Colors.black,
+                          border: Border.all(
+                            color: Colors.black,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(8))),
+                      child: Text(
+                        transportation,
+                        style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white),
+                      ),
+                    ),
+                    Text(
+                      '${DateFormat('kk:mm a').format(departure_time)} - ',
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 4),
+                      child: Text(
+                        '${DateFormat('yyyy.MM.dd').format(departure_time) == today_str ? '今天' : DateFormat('MM月dd日').format(departure_time)}',
+                        style: TextStyle(fontSize: 16, color: Colors.black),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+              Text(
+                '$joinedMember/$MAX_GROUP_MEMBERS',
+                style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Image.asset(
+                'assets/images/covid.png',
+                width: 24,
+                height: 24,
+                fit: BoxFit.contain,
+              ),
+              SizedBox(
+                width: 8,
+              ),
+              Text(
+                destination,
+                style: TextStyle(fontSize: 16, color: Color(0xFF344655)),
+              ),
+            ],
+          ),
+          SizedBox(
+            height: 4,
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
               Text(
                 departure,
                 style: TextStyle(
-                    fontSize:  22,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: red_color2),
               ),
@@ -84,35 +162,9 @@ class TripItem extends StatelessWidget {
               Text(
                 destination,
                 style: TextStyle(
-                    fontSize:  22,
+                    fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: grey_color4),
-              ),
-              Expanded(child: Container()),
-              Padding(
-                padding: EdgeInsets.only(bottom: 5, left: 10, right: 10),
-                child: Text(
-                  '出發於',
-                  style: TextStyle(color: text_color3, fontSize: 12),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(bottom: 5),
-                child: Column(
-                  children: [
-                    Text(
-                      '${DateFormat('kk:mm a').format(departure_time)}',
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.black),
-                    ),
-                    Text(
-                      '${DateFormat('yyyy.MM.dd').format(departure_time) == today_str ? '今天' : DateFormat('yyyy.MM.dd').format(departure_time)}',
-                      style: TextStyle(fontSize: 12, color: Colors.black),
-                    ),
-                  ],
-                ),
               ),
             ],
           ),
@@ -122,17 +174,23 @@ class TripItem extends StatelessWidget {
               Expanded(
                 child: Column(
                   children: <Widget>[
-                    buildRowInfo('集合點  ', departure_loc),
-                    buildRowInfo('出發到  ', destination_loc),
+                    buildRowInfo('集合  ', departure_loc),
+                    buildRowInfo('前往  ', destination_loc),
                   ],
                 ),
               ),
+            ],
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Expanded(child: Container()),
               Text(
                 '$joinedMember/$MAX_GROUP_MEMBERS',
                 style: TextStyle(
-                    fontSize: 28,
+                    fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: Colors.black),
+                    color: Color(0xFFBBBBBB)),
               )
             ],
           ),

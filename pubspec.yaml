@@ -67,6 +67,7 @@ flutter:
     - assets/images/marker_icon.png
     - assets/images/logo_car.png
     - assets/images/logo_qq.png
+    - assets/images/covid.png
     - assets/images/splash1.png
     - assets/images/logo_full_qq.png
     - assets/svgs/logo.svg

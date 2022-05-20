@@ -36,9 +36,9 @@ class AuthService {
     await result.user.sendEmailVerification();
   }
 
-  Future<void> registerUser({String userid, String email, String phone, String name, String sex}) async {
+  Future<void> registerUser({String userid, String email, String phone, String name, String sex, String covid}) async {
     // creating a new document for user
-    await DatabaseService(uid: userid).enterUserData(name: name, mobileNumber: phone, email: email, sex: sex);
+    await DatabaseService(uid: userid).enterUserData(name: name, mobileNumber: phone, email: email, sex: sex, covid: covid);
   }
 
   Future<void> updateUser({String userid, String email, String phone, String name, String sex}) async {

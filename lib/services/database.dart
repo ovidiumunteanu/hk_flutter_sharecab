@@ -22,12 +22,13 @@ class DatabaseService {
 
   // Enter user data (W=1, R=0)
   Future enterUserData(
-      {String name, String mobileNumber, String email, String sex}) async {
+      {String name, String mobileNumber, String email, String sex, String covid}) async {
     return await userDetails.document(uid).setData({
       'name': name,
       'mobileNumber': mobileNumber,
       'email': email,
       'sex': sex,
+      'covid' : covid
     });
   }
 

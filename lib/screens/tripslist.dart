@@ -118,6 +118,7 @@ class _TripsListState extends State<TripsList>
                         final docData = snapshot.data.documents[index];
                         final docId = docData.documentID;
 
+                        final transportation = docData.data['transportation'];
                         final departure = docData.data['departure'];
                         final destination = docData.data['destination'];
                         final departure_location =
@@ -157,6 +158,7 @@ class _TripsListState extends State<TripsList>
                                 margin: EdgeInsets.symmetric(
                                     vertical: 2, horizontal: 0),
                                 child: TripItem(
+                                  transportation: transportation,
                                   departure:
                                       departure, // snapshot.data.documents[index].data['departure'],
                                   destination:
