@@ -23,9 +23,15 @@ class RequestDetails {
   @required
   final int maxMembers;
   @required
+  final int curMembers;
+  @required
   final String sex;
   @required
   final String tunnel;
+  @required
+  final String covid;
+  @required
+  final String reference_number;
   @required
   final int waiting_time;
   @required
@@ -42,8 +48,11 @@ class RequestDetails {
     this.departureDate, 
     this.departureTime,
     this.maxMembers,
+    this.curMembers,
     this.sex,
     this.tunnel, 
+    this.covid,
+    this.reference_number,
     this.waiting_time,
     this.wait_all_member, 
   });

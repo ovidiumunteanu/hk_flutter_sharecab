@@ -66,12 +66,16 @@ class DropdownInput extends StatelessWidget {
   String hint;
   String curItem;
   List<String> items;
+  bool hasBorder = true;
+  bool hasLabel = true;
   DropdownInput(
       {this.label,
       this.labelStyle,
       this.hint,
       this.curItem,
       this.items,
+      this.hasLabel = true,
+      this.hasBorder = true,
       this.onChange});
   @override
   Widget build(BuildContext context) {
@@ -80,15 +84,17 @@ class DropdownInput extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: labelStyle != null
-                ? labelStyle
-                : TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w400,
-                    color: text_color2),
-          ),
+          hasLabel
+              ? Text(
+                  label,
+                  style: labelStyle != null
+                      ? labelStyle
+                      : TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: text_color2),
+                )
+              : Container(),
           SizedBox(
             height: 50,
             child: DropdownButtonFormField(
@@ -97,6 +103,7 @@ class DropdownInput extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                   color: text_color1),
               decoration: InputDecoration(
+                border: hasBorder ? null : InputBorder.none,
                 hintText: hint ?? 'Choose',
                 hintStyle: TextStyle(fontSize: 14, color: grey_color1),
               ),
@@ -247,7 +254,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
     showDatePicker(
             context: context,
             initialDate: DateTime.now().add(Duration(days: 0)),
-            firstDate: DateTime.now().add(Duration(days: 0)) ,
+            firstDate: DateTime.now().add(Duration(days: 0)),
             lastDate: DateTime.now().add(Duration(days: 30)))
         .then((pickedDate) {
       if (pickedDate == null) {
@@ -359,12 +366,21 @@ class _DateTimeInputState extends State<DateTimeInput> {
                         onPressed: () => _startTimePicker(),
                         child: Row(
                           children: [
-                            Text(
-                              _selectedDepartureTime == null
-                                  ? ''
-                                  : '${_selectedDepartureTime.toString().substring(10, 15)}',
-                              style: optionTxt,
+                            Icon(
+                              Icons.timer,
+                              color: text_color1,
                             ),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Expanded(
+                              child: Text(
+                                _selectedDepartureTime == null
+                                    ? ''
+                                    : '${_selectedDepartureTime.toString().substring(10, 15)}',
+                                style: optionTxt,
+                              ),
+                            )
                           ],
                         ),
                       )),

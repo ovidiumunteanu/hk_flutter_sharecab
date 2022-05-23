@@ -8,6 +8,7 @@ class Global {
 
   Global._internal();
 
+  var isAdmin = false;
   var isLoggedIn = false;
   var appData = new Map<String, dynamic>();
  

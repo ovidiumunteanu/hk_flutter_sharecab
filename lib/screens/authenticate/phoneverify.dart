@@ -1,14 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:shareacab/main.dart';
+import 'package:shareacab/models/user.dart';
 import 'package:shareacab/screens/settings.dart';
 import 'package:shareacab/services/auth.dart';
+import 'package:shareacab/services/database.dart';
 import 'package:shareacab/shared/loading.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'package:shareacab/components/inputs.dart';
 import 'package:shareacab/components/buttons.dart';
+import 'package:shareacab/utils/global.dart';
 
 class PhoneVerify extends StatefulWidget {
   // final Function toggleView;
@@ -133,6 +137,14 @@ class _PhoneVerifyState extends State<PhoneVerify> {
           if (widget.userName == null) {
             //signin
             // get profile
+            var userProfile = await DatabaseService(uid: user.user.uid).userProfile(); 
+            print(userProfile);
+            if (userProfile.isAdmin) {
+              Global().isAdmin = true;
+            }
+            else {
+              Global().isAdmin = false;
+            }
             Navigator.pop(context);
           } else {
             // register

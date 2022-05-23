@@ -43,6 +43,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   DateTime departure_time;
   int maxMembers = 0;
   int joinedMember = 0;
+  String reference_number;
+  String covid;
   int waiting_time = 0;
   String sex = '';
   String tunnel = '';
@@ -142,7 +144,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   }
 
   Widget buildTransInfo(
-    String transport,
+    bool wait_member,
     String useTunnel,
     String passenger_type,
   ) {
@@ -152,7 +154,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.only(bottom: 8),
               child: DottedLine(
                 direction: Axis.horizontal,
                 lineLength: double.infinity,
@@ -170,7 +172,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(transport,
+                  child: Text(wait_member ? '   有權等待\n(上限10分鐘)' : '準時出發',
                       style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
@@ -207,7 +209,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(top: 12),
+              padding: EdgeInsets.only(top: 8),
               child: DottedLine(
                 direction: Axis.horizontal,
                 lineLength: double.infinity,
@@ -391,6 +393,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                           departure_time =
                               groupsnapshot.data['departure_time'].toDate();
                           maxMembers = groupsnapshot.data['maxMembers'];
+                          reference_number = groupsnapshot.data['reference_number']; 
+                          covid = groupsnapshot.data['covid']; 
 
                           joinedMember = 0;
                           for (var i = 0;
@@ -406,7 +410,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                           wait_all_member =
                               groupsnapshot.data['wait_all_member'];
 
-                          if (joinedMember >= MAX_GROUP_MEMBERS) {
+                          if (joinedMember >= maxMembers) {
                             full = true;
                           } else {
                             full = false;
@@ -430,6 +434,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                           CrossAxisAlignment.stretch,
                                       children: [
                                         TripItem(
+                                          transportation: transportation,
                                           departure: departure,
                                           destination: destination,
                                           departure_loc: departure_location,
@@ -437,9 +442,11 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                           departure_time: departure_time,
                                           maxMember: maxMembers,
                                           joinedMember: joinedMember,
+                                          reference_number: reference_number,
+                                          covid: covid,
                                         ),
                                         buildTransInfo(
-                                            transportation, tunnel, sex),
+                                            wait_all_member, tunnel, sex),
                                       ],
                                     ),
                                   ),
@@ -494,32 +501,9 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                     ),
                                   ),
                                   Container(
-                                    margin: EdgeInsets.only(top: 40),
-                                    width: double.infinity,
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 50,
-                                    ),
-                                    child: Column(
-                                      children: [
-                                        wait_all_member
-                                            ? Text(
-                                                '此群組有權「準時出發」及不會等待個別團友。',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black),
-                                              )
-                                            : Text(
-                                                '此群組有權「等待任何團友到達」才出發。',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    color: Colors.black),
-                                              ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
                                       width: 200,
                                       height: 40,
+                                      margin: EdgeInsets.only(top: 25),
                                       child: InkWell(
                                         onTap: () {
                                           onLeaveGroup();

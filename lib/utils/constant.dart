@@ -24,6 +24,10 @@ Color blue_color1 = const Color(0xFF2F80ED);
 
 int MAX_GROUP_MEMBERS = 4;
 
+List <String> covid_list= [
+  '必須已注射第一針', '必須已注射第二針', '必須已注射第三針'
+];
+
 List<String> location_list = [
   '柴灣',
   '杏花邨',

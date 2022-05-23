@@ -22,13 +22,17 @@ class DatabaseService {
 
   // Enter user data (W=1, R=0)
   Future enterUserData(
-      {String name, String mobileNumber, String email, String sex, String covid}) async {
+      {String name,
+      String mobileNumber,
+      String email,
+      String sex,
+      String covid}) async {
     return await userDetails.document(uid).setData({
       'name': name,
       'mobileNumber': mobileNumber,
       'email': email,
       'sex': sex,
-      'covid' : covid
+      'covid': covid
     });
   }
 
@@ -92,8 +96,28 @@ class DatabaseService {
     return userDetails.document(uid).snapshots();
   }
 
+  Future<Userdetails> userProfile() async {
+    var doc = await userDetails.document(uid).get();
+    if (doc.exists) {
+      return Userdetails(
+        uid: doc.documentID,
+        name: doc.data['name'] ?? '',
+        email: doc.data['email'] ?? '',
+        mobilenum: doc.data['mobileNumber'] ?? '',
+        sex: doc.data['sex'] ?? '',
+        currentGroup: doc.data['currentGroup'] ?? '',
+        device_token: doc.data['device_token'] ?? '',
+        isAdmin: doc.data['isAdmin'] ?? false,
+        isBlocked: doc.data['isAdmin'] ?? false,
+      );
+    }
+    return null;
+  }
+
   Future<QuerySnapshot> getUserbyPhone(String phonenumber) {
-    return userDetails.where('mobileNumber', isEqualTo: phonenumber).getDocuments();
+    return userDetails
+        .where('mobileNumber', isEqualTo: phonenumber)
+        .getDocuments();
   }
 
   // add group details (W = 4, R = 0)
@@ -111,7 +135,9 @@ class DatabaseService {
 
     final docRef = await groupdetails.add({
       'owner': user.uid.toString(),
-      'users': FieldValue.arrayUnion([{ 'uid' : user.uid, 'num' : requestDetails.maxMembers}]),
+      'users': FieldValue.arrayUnion([
+        {'uid': user.uid, 'num': requestDetails.curMembers}
+      ]),
       'transportation': requestDetails.transportation,
       'departure': requestDetails.departure,
       'destination': requestDetails.destination,
@@ -119,12 +145,15 @@ class DatabaseService {
       'destination_location': requestDetails.destination_location,
       'departure_time': departure_time,
       'maxMembers': requestDetails.maxMembers,
+      'curMembers': requestDetails.curMembers,
+      'covid': requestDetails.covid,
       'sex': requestDetails.sex,
       'tunnel': requestDetails.tunnel,
+      'reference_number': requestDetails.reference_number,
       'waiting_time': requestDetails.waiting_time,
-      'wait_all_member': requestDetails.wait_all_member, 
+      'wait_all_member': requestDetails.wait_all_member,
       'end': false,
-      'created': Timestamp.now(), 
+      'created': Timestamp.now(),
     });
 
     //adding user to group chat
@@ -167,7 +196,7 @@ class DatabaseService {
         temp.hour,
         temp.minute);
 
-    await groupdetails.document(requestDetails.id).setData({ 
+    await groupdetails.document(requestDetails.id).setData({
       'transportation': requestDetails.transportation,
       'departure': requestDetails.departure,
       'destination': requestDetails.destination,
@@ -178,7 +207,7 @@ class DatabaseService {
       'sex': requestDetails.sex,
       'tunnel': requestDetails.tunnel,
       'waiting_time': requestDetails.waiting_time,
-      'wait_all_member': requestDetails.wait_all_member, 
+      'wait_all_member': requestDetails.wait_all_member,
     }, merge: true);
   }
 
@@ -205,12 +234,11 @@ class DatabaseService {
       presentNum = value.data['users'].length;
       owner = value.data['owner'];
 
-      for(var i = 0; i < value.data['users'].length; i ++) {
-          if(value.data['users'][i]['uid'] == user.uid) {
-            userInGroup = value.data['users'][i];
-          }
+      for (var i = 0; i < value.data['users'].length; i++) {
+        if (value.data['users'][i]['uid'] == user.uid) {
+          userInGroup = value.data['users'][i];
+        }
       }
-      
     });
 
     await userDetails.document(user.uid).updateData({
@@ -257,7 +285,9 @@ class DatabaseService {
       'currentGroup': listuid,
     });
     await groupdetails.document(listuid).updateData({
-      'users': FieldValue.arrayUnion([{ 'uid' : user.uid, 'num' : numUsers}]),
+      'users': FieldValue.arrayUnion([
+        {'uid': user.uid, 'num': numUsers}
+      ]),
     });
 
     var request = groupdetails.document(listuid).collection('users');

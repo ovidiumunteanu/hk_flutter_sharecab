@@ -12,6 +12,8 @@ class TripItem extends StatelessWidget {
   int maxMember = 0;
   int joinedMember = 0;
   DateTime departure_time;
+  String covid;
+  String reference_number;
   TripItem(
       {this.transportation,
       this.departure,
@@ -21,6 +23,8 @@ class TripItem extends StatelessWidget {
       this.maxMember,
       this.joinedMember,
       this.departure_time,
+      this.covid,
+      this.reference_number,
       this.onPress});
   String today_str = DateFormat('yyyy.MM.dd').format(DateTime.now());
 
@@ -110,7 +114,7 @@ class TripItem extends StatelessWidget {
                 ),
               )),
               Text(
-                '$joinedMember/$MAX_GROUP_MEMBERS',
+                '$joinedMember/$maxMember',
                 style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w700,
@@ -134,7 +138,7 @@ class TripItem extends StatelessWidget {
                 width: 8,
               ),
               Text(
-                destination,
+                covid,
                 style: TextStyle(fontSize: 16, color: Color(0xFF344655)),
               ),
             ],
@@ -186,7 +190,7 @@ class TripItem extends StatelessWidget {
             children: [
               Expanded(child: Container()),
               Text(
-                '$joinedMember/$MAX_GROUP_MEMBERS',
+                reference_number,
                 style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,

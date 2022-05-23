@@ -42,8 +42,10 @@ class _CreateTripState extends State<CreateTrip>
   final destination_loc_ctr = TextEditingController();
 
   bool hasGroup = false;
-  List<String> members = ['1', '2', '3'];
+  List<String> max_members = ['2位', '3位', '4位', '5位'];
+  List<String> cur_members = ['1位', '2位', '3位'];
 
+  String _covid;
   String _transportation = '的士';
   String _departure;
   String _destination;
@@ -51,11 +53,12 @@ class _CreateTripState extends State<CreateTrip>
   String _destination_location;
   DateTime _selectedDepartureDate;
   TimeOfDay _selectedDepartureTime;
-  int _maxMembers = 1;
+  int _maxMembers = 2;
+  int _curMembers = 1;
   String _sex = '男女也可';
-  String _tunnel = '行隧道';
+  String _tunnel = '可以經隧道';
   int _waiting_time = 0;
-  bool _wait_all_member = true;
+  bool _wait_all_member = false;
 
   void _addNewRequest() async {
     // _departure_location = departure_loc_ctr.text;
@@ -72,8 +75,11 @@ class _CreateTripState extends State<CreateTrip>
       departureDate: _selectedDepartureDate,
       departureTime: _selectedDepartureTime,
       maxMembers: _maxMembers,
+      curMembers: _curMembers,
+      covid: _covid,
       sex: _sex,
       tunnel: _tunnel,
+      reference_number:  '#AA${(DateTime.now().millisecondsSinceEpoch / 1000).toInt()}',
       waiting_time: _waiting_time,
       wait_all_member: _wait_all_member,
     );
@@ -148,6 +154,220 @@ class _CreateTripState extends State<CreateTrip>
     super.initState();
   }
 
+  Widget buildTotalMembersInput() {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(
+        horizontal: 20,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '這團組多少人？ ',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: text_color1),
+                ),
+                Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(
+                      color: grey_color5,
+                    ))),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10, right: 6),
+                          child: Icon(
+                            Icons.person,
+                            color: text_color1,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Expanded(
+                          child: DropdownInput(
+                            hasLabel: false,
+                            hasBorder: false,
+                            labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: text_color1,
+                                fontWeight: FontWeight.bold),
+                            hint: '請選擇',
+                            curItem: '$_maxMembers位',
+                            items: max_members,
+                            onChange: (newValue) {
+                              _maxMembers = int.parse(newValue[0]);
+                              FocusScope.of(context).requestFocus(FocusNode());
+                            },
+                          ),
+                        ),
+                      ],
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildCurrentMembersInput() {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '已有多少位乘客(包括自己)？  ',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: text_color1),
+                ),
+                Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(
+                      color: grey_color5,
+                    ))),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10, right: 6),
+                          child: Icon(
+                            Icons.person,
+                            color: text_color1,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Expanded(
+                          child: DropdownInput(
+                            hasLabel: false,
+                            hasBorder: false,
+                            labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: text_color1,
+                                fontWeight: FontWeight.bold),
+                            hint: '請選擇',
+                            curItem: '$_curMembers位',
+                            items: cur_members,
+                            onChange: (newValue) {
+                              _curMembers = int.parse(newValue[0]);
+                              FocusScope.of(context).requestFocus(FocusNode());
+                            },
+                          ),
+                        ),
+                      ],
+                    )),
+                Text(
+                  '* 三歲或以上為一位乘客。',
+                  style: TextStyle(
+                    height: 2,
+                      fontSize: 14,
+                      color: Color(0xFF808C95)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildCovidInput() {
+    return Container(
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(
+        horizontal: 20,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: double.infinity,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '團友必須已注射新冠疫苗',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: text_color1),
+                ),
+                Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                        border: Border(
+                            bottom: BorderSide(
+                      color: grey_color5,
+                    ))),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 10, right: 6),
+                          child: Image.asset(
+                            'assets/images/covid.png',
+                            width: 24,
+                            height: 24,
+                            fit: BoxFit.contain,
+                          ),
+                        ),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Expanded(
+                          child: DropdownInput(
+                            hasLabel: false,
+                            hasBorder: false,
+                            labelStyle: TextStyle(
+                                fontSize: 14,
+                                color: text_color1,
+                                fontWeight: FontWeight.bold),
+                            hint: '請選擇',
+                            curItem: _covid,
+                            items: covid_list,
+                            onChange: (newValue) {
+                              // setState(() {
+                              //   _departure = newValue;
+                              // });
+                              _covid = newValue;
+                              FocusScope.of(context).requestFocus(FocusNode());
+                            },
+                          ),
+                        ),
+                      ],
+                    )),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget buildFromTo() {
     return Container(
       width: double.infinity,
@@ -212,7 +432,7 @@ class _CreateTripState extends State<CreateTrip>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '在那𥚃集合？(請說明集合地點)',
+            '哪裡集合？（需要明確說明） ',
             style: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
@@ -232,14 +452,14 @@ class _CreateTripState extends State<CreateTrip>
             ),
           ),
           Text(
-            '例如：觀塘APM, 滙豐銀行 ',
+            '例如：屋苑 / 街道 / 大廈 / 商場 / 地鐵站 ',
             style: hintTxt,
           ),
           SizedBox(
             height: 20,
           ),
           Text(
-            '您去那裡？(請說明目的地)',
+            '去哪裡？',
             style: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
@@ -259,7 +479,7 @@ class _CreateTripState extends State<CreateTrip>
             ),
           ),
           Text(
-            '例如：元朗西地鐵站, YOHO MALL 附近',
+            '例如：屋苑 / 街道 / 大廈 / 商場 / 地鐵站 ',
             style: hintTxt,
           ),
           SizedBox(
@@ -270,33 +490,6 @@ class _CreateTripState extends State<CreateTrip>
           }, (val) {
             _selectedDepartureTime = val;
           }),
-          SizedBox(
-            height: 20,
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 4),
-            child: DropdownInput(
-              label: '您現在有多少人？(包括您自己本人)',
-              labelStyle: TextStyle(
-                  fontSize: 14,
-                  color: text_color1,
-                  fontWeight: FontWeight.bold),
-              curItem: _maxMembers.toString(),
-              items: members,
-              onChange: (newValue) {
-                // setState(() => _maxMembers = int.parse(newValue));
-                _maxMembers = int.parse(newValue);
-                // FocusScope.of(context).requestFocus(FocusNode());
-              },
-            ),
-          ),
-          Text(
-            '* 四歲或以上為一位乘客。',
-            style: hintTxt,
-          ),
-          SizedBox(
-            height: 10,
-          ),
         ],
       ),
     );
@@ -363,7 +556,13 @@ class _CreateTripState extends State<CreateTrip>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          RadioInput('您會選擇坐？', ['的士', 'Uber'], _transportation,
+                          SizedBox(
+                            height: 20,
+                          ),
+                          buildTotalMembersInput(),
+                          buildCurrentMembersInput(),
+                          buildCovidInput(),
+                          RadioInput('選擇坐？', ['的士', 'Uber'], _transportation,
                               (val) {
                             _transportation = val;
                           }),
@@ -376,19 +575,19 @@ class _CreateTripState extends State<CreateTrip>
                               (val) {
                             _sex = val;
                           }),
-                          RadioInput('會行隧道嗎？（如果有）', ['會', '不會'], '會', (val) {
-                            if (val == '會') {
-                              _tunnel = '行隧道';
+                          RadioInput('經隧道？（如果有）', ['可以', '不可以'], '可以', (val) {
+                            if (val == '可以') {
+                              _tunnel = '可以經隧道';
                             } else {
-                              _tunnel = '不會行隧道';
+                              _tunnel = '不會經隧道';
                             }
                           }),
-                          RadioInput('會準時出發及不會等待任何遲到的團友？',
-                              ['是 (會準時出發)', '不是 (有權等待)'], '是 (會準時出發)', (val) {
-                            if (val == '是 (會準時出發)') {
-                              _wait_all_member = true;
-                            } else {
+                          RadioInput('會準時出發？', ['是 (不會等待)', '不是 (有權等待上限10分鐘)'],
+                              '是 (不會等待)', (val) {
+                            if (val == '是 (不會等待)') {
                               _wait_all_member = false;
+                            } else {
+                              _wait_all_member = true;
                             }
                           }),
                           SizedBox(

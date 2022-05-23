@@ -10,5 +10,24 @@ class Userdetails {
   final int actualrating;
   final int numberofratings;
 
-  Userdetails({this.uid, this.name, this.email, this.mobilenum, this.hostel, this.sex, this.totalrides, this.cancelledrides, this.actualrating, this.numberofratings});
+  final String currentGroup;
+  final String device_token;
+  final bool isAdmin;
+  final bool isBlocked;
+
+  Userdetails(
+      {this.uid,
+      this.name,
+      this.email,
+      this.mobilenum,
+      this.currentGroup,
+      this.device_token,
+      this.isAdmin,
+      this.isBlocked,
+      this.hostel,
+      this.sex,
+      this.totalrides,
+      this.cancelledrides,
+      this.actualrating,
+      this.numberofratings});
 }

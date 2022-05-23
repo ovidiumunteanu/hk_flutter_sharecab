@@ -127,6 +127,8 @@ class _TripsListState extends State<TripsList>
                             docData.data['destination_location'];
                         final departure_time = docData.data['departure_time'];
                         final maxMembers = docData.data['maxMembers']; 
+                        final reference_number = docData.data['reference_number']; 
+                        final covid = docData.data['covid']; 
                         var joinedMember = 0;
                         for (var i = 0;
                             i < docData.data['users'].length;
@@ -168,6 +170,8 @@ class _TripsListState extends State<TripsList>
                                   departure_time: departure_time.toDate(),
                                   maxMember: maxMembers,
                                   joinedMember: joinedMember,
+                                  reference_number: reference_number,
+                                  covid: covid,
                                 ),
                               ),
                             ),

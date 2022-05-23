@@ -100,6 +100,8 @@ class _GroupDetailsState extends State<GroupDetails>
   String destination_location = '';
   DateTime departure_time;
   int maxMembers = 0;
+  String reference_number;
+  String covid;
   int joinedMember = 0;
   int waiting_time = 0;
   String sex = '';
@@ -130,7 +132,7 @@ class _GroupDetailsState extends State<GroupDetails>
 
   List<String> getAvailableNewMembers() {
     var ret = <String>[];
-    for (var i = 1; i <= (MAX_GROUP_MEMBERS - joinedMember); i++) {
+    for (var i = 1; i <= (maxMembers - joinedMember); i++) {
       ret.add(i.toString());
     }
     return ret;
@@ -538,7 +540,7 @@ class _GroupDetailsState extends State<GroupDetails>
               onPressed: () {
                 onJoinGroup();
               },
-              child: Text('加入此群組',
+              child: Text('按此加入此團',
                   style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
@@ -609,7 +611,8 @@ class _GroupDetailsState extends State<GroupDetails>
                       departure_time =
                           groupsnapshot.data['departure_time'].toDate();
                       maxMembers = groupsnapshot.data['maxMembers'];
-
+                      reference_number = groupsnapshot.data['reference_number']; 
+                      covid = groupsnapshot.data['covid']; 
                       curUsers = groupsnapshot.data['users'].length;
                       joinedMember = 0;
                       for (var i = 0;
@@ -624,7 +627,7 @@ class _GroupDetailsState extends State<GroupDetails>
                       tunnel = groupsnapshot.data['tunnel'];
                       wait_all_member = groupsnapshot.data['wait_all_member'];
 
-                      if (joinedMember >= MAX_GROUP_MEMBERS) {
+                      if (joinedMember >= maxMembers) {
                         full = true;
                       } else {
                         full = false;
@@ -696,12 +699,13 @@ class _GroupDetailsState extends State<GroupDetails>
                                   children: <Widget>[
                                     Container(
                                       width: double.infinity,
-                                      color: Color(0xFFFAFAFA),
+                                      color: Color(0xFFFFFFFF),
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.stretch,
                                         children: [
                                           TripItem(
+                                            transportation: transportation,
                                             departure: departure,
                                             destination: destination,
                                             departure_loc: departure_location,
@@ -710,9 +714,15 @@ class _GroupDetailsState extends State<GroupDetails>
                                             departure_time: departure_time,
                                             maxMember: maxMembers,
                                             joinedMember: joinedMember,
+                                            reference_number: reference_number,
+                                            covid: covid,
                                           ),
-                                          buildTransInfo(
-                                              transportation, tunnel, sex),
+                                          // buildTransInfo(
+                                          //     transportation, tunnel, sex),
+                                          Container(child: Padding(padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+                                            child: 
+                                            Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: grey_color6))),),
+                                          ),)
                                         ],
                                       ),
                                     ),
