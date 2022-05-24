@@ -59,6 +59,36 @@ class AuthInput extends StatelessWidget {
   }
 }
 
+class SearchInput extends StatelessWidget {
+  final Function onChange;
+  String type;
+  String hint;
+  SearchInput({this.hint, this.type, this.onChange});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      height: 45,
+      color: Color(0xFFf7f7f7),
+      child: TextFormField(
+          keyboardType:
+              type == 'phone' ? TextInputType.phone : TextInputType.text,
+          style: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w500, color: text_color1),
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xFFBBBBBB)),
+            border: InputBorder.none
+          ),
+          onChanged: (val) {
+            onChange(val);
+          }),
+    );
+  }
+}
+
 class DropdownInput extends StatelessWidget {
   final Function onChange;
   String label;

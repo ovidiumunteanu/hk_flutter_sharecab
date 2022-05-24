@@ -242,8 +242,7 @@ class MyApp extends StatelessWidget {
           '/rootscreen': (context) => RootScreen(),
           '/edituserdetails': (context) => EditForm(),
           '/dashboard': (context) => Dashboard(),
-          ChatScreen.routeName: (context) => ChatScreen(' '),
-//          GroupDetails.routeName : (context) => GroupDetails(' '),
+          ChatScreen.routeName: (context) => ChatScreen(' '), 
         },
         title: 'AA車',
         builder: (context, child) {

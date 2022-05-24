@@ -6,10 +6,9 @@ import 'package:shareacab/models/user.dart';
 import 'package:shareacab/screens/chatscreen/chat_database/chatservices.dart';
 
 class DatabaseService {
-  final String uid;
+  String uid;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  DatabaseService({this.uid});
-
+  DatabaseService({this.uid}); 
   //collection reference
   final CollectionReference userDetails =
       Firestore.instance.collection('userdetails');
@@ -32,7 +31,10 @@ class DatabaseService {
       'mobileNumber': mobileNumber,
       'email': email,
       'sex': sex,
-      'covid': covid
+      'covid': covid,
+      'isAdmin': false,
+      'isBlocked': false,
+      'created': Timestamp.now(),
     });
   }
 
@@ -68,6 +70,11 @@ class DatabaseService {
     }
   }
 
+// Update user data (W=1/2,R=1)
+  Future blockUser({String userid, bool flag}) async {
+    await userDetails.document(userid).updateData({'isBlocked': flag});
+  }
+
   // user list from snapshot
   List<Userdetails> _UserListFromSnapshot(QuerySnapshot snapshot) {
     return snapshot.documents.map((doc) {
@@ -82,13 +89,18 @@ class DatabaseService {
         cancelledrides: doc.data['cancelledRides'] ?? 0,
         actualrating: doc.data['actualRating'] ?? 0,
         numberofratings: doc.data['numberOfRatings'] ?? 0,
+        isAdmin: doc.data['isAdmin'] ?? false,
+        isBlocked: doc.data['isBlocked'] ?? false,
       );
     }).toList();
   }
 
   // get users stream
   Stream<List<Userdetails>> get users {
-    return userDetails.snapshots().map(_UserListFromSnapshot);
+    return userDetails
+        .where('isAdmin', isEqualTo: false)
+        .snapshots()
+        .map(_UserListFromSnapshot);
   }
 
   // get user doc
@@ -108,7 +120,7 @@ class DatabaseService {
         currentGroup: doc.data['currentGroup'] ?? '',
         device_token: doc.data['device_token'] ?? '',
         isAdmin: doc.data['isAdmin'] ?? false,
-        isBlocked: doc.data['isAdmin'] ?? false,
+        isBlocked: doc.data['isBlocked'] ?? false,
       );
     }
     return null;

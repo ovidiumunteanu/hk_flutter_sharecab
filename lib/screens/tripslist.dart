@@ -154,7 +154,7 @@ class _TripsListState extends State<TripsList>
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            GroupDetails(docId, docData)));
+                                            GroupDetails(docId, isHistory: false,)));
                               },
                               child: Card(
                                 margin: EdgeInsets.symmetric(

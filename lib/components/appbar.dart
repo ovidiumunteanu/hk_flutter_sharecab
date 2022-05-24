@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shareacab/screens/admin/admindashboard.dart';
 import 'package:shareacab/screens/help.dart';
 import 'package:shareacab/screens/profile/userprofile.dart';
 import 'package:shareacab/services/auth.dart';
@@ -93,7 +94,7 @@ AppBar CustomAppBar(
                     } else {
                       return Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return MyProfile(_auth);
+                        return AdminDashboard();
                       }));
                     }
                   }));

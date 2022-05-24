@@ -76,11 +76,11 @@ class _AddNewJoinNumState extends State<AddNewJoinNum> {
 
 class GroupDetails extends StatefulWidget {
   final docId;
-  final data;
+  bool isHistory = false;
   static bool inGroup = false;
   static bool hasGroup = false;
   static String myName = '';
-  GroupDetails(this.docId, this.data);
+  GroupDetails(this.docId, {this.isHistory = false});
 
   @override
   _GroupDetailsState createState() => _GroupDetailsState();
@@ -253,71 +253,8 @@ class _GroupDetailsState extends State<GroupDetails>
     Navigator.of(context).pop();
   }
 
-  void onLeaveGroup() async {
-    try {
-      await showDialog(
-          context: context,
-          builder: (BuildContext ctx) {
-            return AlertDialog(
-              title: Text('離開群組'),
-              content: Text('您確定要離開這群組嗎？'),
-              actions: <Widget>[
-                FlatButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: Text('取消',
-                      style: TextStyle(color: Theme.of(context).accentColor)),
-                ),
-                FlatButton(
-                  onPressed: () async {
-                    ProgressDialog pr;
-                    pr = ProgressDialog(context,
-                        type: ProgressDialogType.Normal,
-                        isDismissible: false,
-                        showLogs: false);
-                    pr.style(
-                      message: '離開群組中..',
-                      backgroundColor: Theme.of(context).backgroundColor,
-                      messageTextStyle: TextStyle(
-                        color: text_color1,
-                      ),
-                    );
-                    await pr.show();
-                    await Future.delayed(Duration(seconds: 1));
-                    try {
-                      await _notifServices.leftGroup(
-                          GroupDetails.myName, widget.docId);
-                      await _request.exitGroup();
-                      Navigator.pop(context);
-                      await pr.hide();
-                      if (curUsers <= 1) {
-                        Navigator.pop(context);
-                      }
-                    } catch (e) {
-                      await pr.hide();
-                      print(e.toString());
-                      var errStr = e.toString();
-                      final snackBar = SnackBar(
-                          content: Text(errStr),
-                          duration: Duration(seconds: 3));
-                      _scaffoldKey.currentState.showSnackBar(snackBar);
-                    }
-                    // Navigator.pop(context);
-                  },
-                  child: Text('確定',
-                      style: TextStyle(color: Theme.of(context).accentColor)),
-                ),
-              ],
-            );
-          });
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   Widget buildTransInfo(
-    String transport,
+    bool wait_member,
     String useTunnel,
     String passenger_type,
   ) {
@@ -327,7 +264,7 @@ class _GroupDetailsState extends State<GroupDetails>
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Padding(
-              padding: EdgeInsets.only(bottom: 12),
+              padding: EdgeInsets.only(bottom: 8),
               child: DottedLine(
                 direction: Axis.horizontal,
                 lineLength: double.infinity,
@@ -345,7 +282,7 @@ class _GroupDetailsState extends State<GroupDetails>
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Text(transport,
+                  child: Text(wait_member ? '   有權等待\n(上限10分鐘)' : '準時出發',
                       style: TextStyle(
                           fontWeight: FontWeight.w700,
                           fontSize: 14,
@@ -382,7 +319,7 @@ class _GroupDetailsState extends State<GroupDetails>
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(top: 12),
+              padding: EdgeInsets.only(top: 8),
               child: DottedLine(
                 direction: Axis.horizontal,
                 lineLength: double.infinity,
@@ -408,6 +345,62 @@ class _GroupDetailsState extends State<GroupDetails>
       }
     }
 
+    if (widget.isHistory) {
+      return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: <Widget>[
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                userItem['name'] + (numUsers > 1 ? ' x $numUsers' : ''),
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black),
+              ),
+            ),
+          ),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                userItem['mobilenum'],
+                style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Colors.black),
+              ),
+            ),
+          ),
+          Expanded(
+            child:
+          userItem['isArrived'] == true
+              ? Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'IN',
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  ))
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'OUT',
+                    textAlign: TextAlign.end,
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.red),
+                  ))
+          )
+        ],
+      );
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: <Widget>[
@@ -415,7 +408,7 @@ class _GroupDetailsState extends State<GroupDetails>
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              userItem['name'] + (numUsers > 1 ? ' x $numUsers 乘客' : ''),
+              userItem['name'] + (numUsers > 1 ? ' x $numUsers' : ''),
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -462,6 +455,10 @@ class _GroupDetailsState extends State<GroupDetails>
   }
 
   Widget buildBottomBtn() {
+    if (widget.isHistory) {
+      return null;
+    }
+
     if (GroupDetails.inGroup) {
       return FlatButton(
         color: yellow_color1,
@@ -571,10 +568,11 @@ class _GroupDetailsState extends State<GroupDetails>
                   usersnapshot.data['currentGroupJoinRequests']
                       .contains(widget.docId)
               : false;
-          if (currentuser == null || usersnapshot.connectionState == ConnectionState.active) {
-            var groupUID ;
+          if (currentuser == null ||
+              usersnapshot.connectionState == ConnectionState.active) {
+            var groupUID;
             var myName = '';
-            if ( usersnapshot.data != null) {
+            if (usersnapshot.data != null) {
               groupUID = usersnapshot.data['currentGroup'];
               myName = usersnapshot.data['name'];
             }
@@ -611,8 +609,8 @@ class _GroupDetailsState extends State<GroupDetails>
                       departure_time =
                           groupsnapshot.data['departure_time'].toDate();
                       maxMembers = groupsnapshot.data['maxMembers'];
-                      reference_number = groupsnapshot.data['reference_number']; 
-                      covid = groupsnapshot.data['covid']; 
+                      reference_number = groupsnapshot.data['reference_number'];
+                      covid = groupsnapshot.data['covid'];
                       curUsers = groupsnapshot.data['users'].length;
                       joinedMember = 0;
                       for (var i = 0;
@@ -717,12 +715,8 @@ class _GroupDetailsState extends State<GroupDetails>
                                             reference_number: reference_number,
                                             covid: covid,
                                           ),
-                                          // buildTransInfo(
-                                          //     transportation, tunnel, sex),
-                                          Container(child: Padding(padding: EdgeInsets.only(left: 20, right: 20, top: 20),
-                                            child: 
-                                            Container(decoration: BoxDecoration(border: Border(bottom: BorderSide(color: grey_color6))),),
-                                          ),)
+                                          buildTransInfo(
+                                              wait_all_member, tunnel, sex),
                                         ],
                                       ),
                                     ),
@@ -776,49 +770,6 @@ class _GroupDetailsState extends State<GroupDetails>
                                         },
                                       ),
                                     ),
-                                    Container(
-                                      margin:
-                                          EdgeInsets.only(top: 40, bottom: 20),
-                                      width: double.infinity,
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal: 50,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          wait_all_member
-                                              ? Text(
-                                                  '此群組有權「準時出發」及不會等待個別團友。',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.black),
-                                                )
-                                              : Text(
-                                                  '此群組有權「等待任何團友到達」才出發。',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.black),
-                                                ),
-                                        ],
-                                      ),
-                                    ),
-                                    GroupDetails.inGroup
-                                        ? Container(
-                                            width: 200,
-                                            height: 40,
-                                            child: InkWell(
-                                              onTap: () {
-                                                onLeaveGroup();
-                                              },
-                                              child: Center(
-                                                child: Text(
-                                                  '按此離開群組',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.red),
-                                                ),
-                                              ),
-                                            ))
-                                        : Container(),
                                     SizedBox(
                                       height: 100,
                                     ),
