@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shareacab/screens/admin/admindashboard.dart';
 import 'package:shareacab/screens/help.dart';
 import 'package:shareacab/screens/profile/userprofile.dart';
+import 'package:shareacab/screens/term_policy/term_policy.dart';
 import 'package:shareacab/services/auth.dart';
 import 'package:shareacab/services/database.dart';
 import 'package:shareacab/shared/guest.dart';
@@ -47,7 +48,7 @@ AppBar CustomAppBar(
           ),
           onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => Help()));
+                context, MaterialPageRoute(builder: (context) => TermsPolicy('faq')));
           },
         ),
       ),

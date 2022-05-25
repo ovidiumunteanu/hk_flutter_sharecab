@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shareacab/components/TopMessage.dart';
 import 'package:shareacab/screens/chatscreen/chat_widgets/chat_users_list.dart';
 import 'package:shareacab/screens/rootscreen.dart';
 import 'package:shareacab/screens/help.dart';
@@ -142,21 +143,7 @@ class _MessagesState extends State<Messages> {
         body: Container(
           child: Column(
             children: <Widget>[
-              Container(
-                  width: double.infinity,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: yellow_color1,
-                  ),
-                  child: Center(
-                    child: Text(
-                      '「一個同您搭都半價」慳錢、慳時間',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: text_color4,
-                      ),
-                    ),
-                  )),
+              TopMessage(),
               Expanded(
                 child: ChatUsersList(),
               ),

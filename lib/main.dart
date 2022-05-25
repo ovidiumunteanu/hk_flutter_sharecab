@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shareacab/screens/authenticate/forgotpass.dart';
-import 'package:shareacab/screens/dashboard.dart';
+import 'package:shareacab/screens/dashboard/dashboard.dart';
 import 'package:shareacab/screens/edituserdetails.dart';
 import 'package:shareacab/screens/rootscreen.dart';
 import 'package:shareacab/screens/createtrip.dart';

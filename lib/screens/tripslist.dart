@@ -14,10 +14,12 @@ class TripsList extends StatefulWidget {
   final bool inGroup;
   final filterDeparture;
   final filterDestination;
+  final filterDepartureSub;
+  final filterDestinationSub;
   final filterGender;
   final sortTime;
   final Function startCreatingTrip;
-  TripsList(this.filterDeparture, this.filterDestination, this.filterGender, this.sortTime,
+  TripsList(this.filterDeparture, this.filterDepartureSub, this.filterDestination, this.filterDestinationSub, this.filterGender, this.sortTime,
       {this.inGroupFetch, this.inGroup, this.startCreatingTrip});
   @override
   _TripsListState createState() => _TripsListState();
@@ -51,6 +53,12 @@ class _TripsListState extends State<TripsList>
     }
     if (widget.filterDestination != '任何') {
       query = query.where('destination', isEqualTo: widget.filterDestination);
+    }
+    if (widget.filterDepartureSub != '任何') {
+      query = query.where('departure_sub', isEqualTo: widget.filterDepartureSub);
+    }
+    if (widget.filterDestinationSub != '任何') {
+      query = query.where('destination_sub', isEqualTo: widget.filterDestinationSub);
     }
     if (widget.filterGender != '任何') {
       query = query.where('sex', isEqualTo: widget.filterGender);

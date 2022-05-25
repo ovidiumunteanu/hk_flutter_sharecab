@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:shareacab/components/TopMessage.dart';
 import 'package:shareacab/models/requestdetails.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -47,8 +48,10 @@ class _CreateTripState extends State<CreateTrip>
 
   String _covid;
   String _transportation = '的士';
-  String _departure;
-  String _destination;
+  String _departure = '香港島';
+  String _departure_sub;
+  String _destination = '香港島';
+  String _destination_sub;
   String _departure_location;
   String _destination_location;
   DateTime _selectedDepartureDate;
@@ -69,7 +72,9 @@ class _CreateTripState extends State<CreateTrip>
       name: 'Name',
       transportation: _transportation,
       departure: _departure,
+      departure_sub: _departure_sub,
       destination: _destination,
+      destination_sub: _destination_sub,
       departure_location: _departure_location,
       destination_location: _destination_location,
       departureDate: _selectedDepartureDate,
@@ -79,7 +84,8 @@ class _CreateTripState extends State<CreateTrip>
       covid: _covid,
       sex: _sex,
       tunnel: _tunnel,
-      reference_number:  '#AA${(DateTime.now().millisecondsSinceEpoch / 1000).toInt()}',
+      reference_number:
+          '#AA${(DateTime.now().millisecondsSinceEpoch / 1000).toInt()}',
       waiting_time: _waiting_time,
       wait_all_member: _wait_all_member,
     );
@@ -103,12 +109,12 @@ class _CreateTripState extends State<CreateTrip>
   void _submitData() {
     _formKey.currentState.validate();
 
-    // _departure_location = departure_loc_ctr.text;
-    // _destination_location = destination_loc_ctr.text;
-
-    if (_destination == null ||
-        _destination_location == null ||
-        _departure_location == null) {
+    if (_departure == '' ||
+        _departure_sub == '' ||
+        _destination == '' ||
+        _destination_sub == '' ||
+        _destination_location == '' ||
+        _departure_location == '') {
       _scaffoldKey.currentState.hideCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
@@ -125,25 +131,22 @@ class _CreateTripState extends State<CreateTrip>
         content: Text('請輸入相關資料。', style: TextStyle(color: text_color1)),
       ));
       return;
-    } else {
+    } else if (_maxMembers < _curMembers) {
+       _scaffoldKey.currentState.hideCurrentSnackBar();
+      _scaffoldKey.currentState.showSnackBar(SnackBar(
+        duration: Duration(seconds: 1),
+        backgroundColor: yellow_color2,
+        content: Text('最大成員數應大於當前成員數', style: TextStyle(color: text_color1)),
+      ));
+      return;
+    }
+    else {
       // _formKey.currentState.save();
       FocusScope.of(context).unfocus();
       _addNewRequest();
 
       departure_loc_ctr.text = '';
       destination_loc_ctr.text = '';
-      // setState(() {
-      //   _transportation = '的士';
-      //   _departure = location_list[0];
-      //   _destination = location_list[1];
-      //   _departure_location = null;
-      //   _destination_location = null;
-      //   _maxMembers = 1;
-      //   _sex = '男女也可';
-      //   _tunnel = '行隧道';
-      //   _waiting_time = 0;
-      //   _wait_all_member = true;
-      // });
 
       widget.setTabChange(0);
     }
@@ -283,9 +286,7 @@ class _CreateTripState extends State<CreateTrip>
                 Text(
                   '* 三歲或以上為一位乘客。',
                   style: TextStyle(
-                    height: 2,
-                      fontSize: 14,
-                      color: Color(0xFF808C95)),
+                      height: 2, fontSize: 14, color: Color(0xFF808C95)),
                 ),
               ],
             ),
@@ -350,9 +351,6 @@ class _CreateTripState extends State<CreateTrip>
                             curItem: _covid,
                             items: covid_list,
                             onChange: (newValue) {
-                              // setState(() {
-                              //   _departure = newValue;
-                              // });
                               _covid = newValue;
                               FocusScope.of(context).requestFocus(FocusNode());
                             },
@@ -368,7 +366,7 @@ class _CreateTripState extends State<CreateTrip>
     );
   }
 
-  Widget buildFromTo() {
+  Widget buildFrom() {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(20),
@@ -379,42 +377,89 @@ class _CreateTripState extends State<CreateTrip>
         border: Border.all(color: grey_color2),
         borderRadius: BorderRadius.all(Radius.circular(16)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          DropdownInput(
-            label: '所在地',
+          Expanded(
+              child: DropdownInput(
+            label: '出發點 1',
             labelStyle: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
             hint: '請選擇',
             curItem: _departure,
-            items: location_list,
+            items: location_list1,
             onChange: (newValue) {
-              // setState(() {
-              //   _departure = newValue;
-              // });
+              _departure_sub = location_list2[newValue][0];
               _departure = newValue;
               FocusScope.of(context).requestFocus(FocusNode());
             },
-          ),
+          )),
           SizedBox(
-            height: 12,
+            width: 12,
           ),
-          DropdownInput(
-            label: '目的地',
+          Expanded(
+              child: DropdownInput(
+            label: '出發點 2',
+            labelStyle: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            hint: '請選擇',
+            curItem: _departure_sub,
+            items: location_list2[_departure],
+            onChange: (newValue) {
+              _departure_sub = newValue;
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+          )),
+        ],
+      ),
+    );
+  }
+
+  Widget buildTo() {
+    print('_destination ' + _destination);
+    print(location_list2[_destination]);
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20),
+      margin: EdgeInsets.symmetric(
+        vertical: 8,
+        horizontal: 20,
+      ),
+      decoration: BoxDecoration(
+        border: Border.all(color: grey_color2),
+        borderRadius: BorderRadius.all(Radius.circular(16)),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+              child: DropdownInput(
+            label: '目的地 1',
             labelStyle: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
             hint: '請選擇',
             curItem: _destination,
-            items: location_list,
+            items: location_list1,
             onChange: (newValue) {
-              // setState(() {
-              //   _destination = newValue;
-              // });
+              _destination_sub = location_list2[newValue][0];
               _destination = newValue;
               FocusScope.of(context).requestFocus(FocusNode());
             },
+          )),
+          SizedBox(
+            width: 12,
           ),
+          Expanded(
+              child: DropdownInput(
+            label: '目的地 2',
+            labelStyle: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+            hint: '請選擇',
+            curItem: _destination_sub,
+            items: location_list2[_destination],
+            onChange: (newValue) {
+              _destination_sub = newValue;
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+          )),
         ],
       ),
     );
@@ -534,21 +579,7 @@ class _CreateTripState extends State<CreateTrip>
             //padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
             child: Column(
               children: [
-                Container(
-                    width: double.infinity,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: yellow_color1,
-                    ),
-                    child: Center(
-                      child: Text(
-                        '「一個同您搭都半價」慳錢、慳時間',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: text_color4,
-                        ),
-                      ),
-                    )),
+                TopMessage(),
                 Expanded(
                   child: SingleChildScrollView(
                     child: Form(
@@ -569,7 +600,8 @@ class _CreateTripState extends State<CreateTrip>
                           SizedBox(
                             height: 8,
                           ),
-                          buildFromTo(),
+                          buildFrom(),
+                          buildTo(),
                           buildDetailInfo(),
                           RadioInput('團友性別', ['男女也可', '只限男性', '只限女性'], _sex,
                               (val) {

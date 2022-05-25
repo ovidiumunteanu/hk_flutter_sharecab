@@ -11,7 +11,11 @@ class RequestDetails {
   @required
   final String departure;
   @required
+  final String departure_sub;
+  @required
   final String destination;
+  @required
+  final String destination_sub;
   @required
   final String departure_location;
   @required
@@ -42,7 +46,9 @@ class RequestDetails {
     this.name, 
     this.transportation,
     this.departure,
+    this.departure_sub,
     this.destination, 
+    this.destination_sub,
     this.departure_location,
     this.destination_location, 
     this.departureDate, 

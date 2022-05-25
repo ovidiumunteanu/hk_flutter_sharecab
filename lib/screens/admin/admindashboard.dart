@@ -31,10 +31,21 @@ class _AdminDashboardState extends State<AdminDashboard> {
       }));
     } else if (index == 2) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return TextSetting();
+        return TextSetting('news');
       }));
     } else if (index == 3) {
-    } else if (index == 4) {}
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return TextSetting('terms');
+      }));
+    } else if (index == 4) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return TextSetting('policy');
+      }));
+    } else if (index == 5) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return TextSetting('faq');
+      }));
+    }
   }
 
   @override
@@ -78,10 +89,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
           itemCount: entries.length,
           itemBuilder: (BuildContext context, int index) {
             return Card(
-                color:  Colors.white,
+                color: Colors.white,
                 elevation: 0.0,
                 margin: EdgeInsets.zero,
-                child: InkWell( 
+                child: InkWell(
                     onTap: () {
                       onPressItem(index);
                     },
@@ -93,8 +104,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                        Text(entries[index], style: TextStyle(fontSize: 16, color: text_color1),)
-                      ],),
+                          Text(
+                            entries[index],
+                            style: TextStyle(fontSize: 16, color: text_color1),
+                          )
+                        ],
+                      ),
                     )));
           },
           separatorBuilder: (BuildContext context, int index) => const Divider(

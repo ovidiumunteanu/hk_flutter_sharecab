@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:shareacab/components/TopMessage.dart';
 import 'package:shareacab/screens/groupdetailscreen/mapview.dart';
 import 'package:shareacab/services/database.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -675,21 +676,7 @@ class _GroupDetailsState extends State<GroupDetails>
                         ),
                         body: Column(
                           children: [
-                            Container(
-                                width: double.infinity,
-                                height: 30,
-                                decoration: BoxDecoration(
-                                  color: yellow_color1,
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '「一個同您搭都半價」慳錢、慳時間',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: text_color4,
-                                    ),
-                                  ),
-                                )),
+                            TopMessage(),
                             Expanded(
                               child: SingleChildScrollView(
                                 child: Column(

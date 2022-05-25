@@ -1,18 +1,43 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:shareacab/main.dart';
 import 'package:shareacab/utils/constant.dart';
 
-class TermPolicy extends StatefulWidget {
-  bool isTerm;
-  TermPolicy({this.isTerm});
+class TermsPolicy extends StatefulWidget {
+  final String type;
+  TermsPolicy(this.type);
   @override
-  _TermPolicyState createState() => _TermPolicyState();
+  _TermsPolicyState createState() => _TermsPolicyState();
 }
 
-class _TermPolicyState extends State<TermPolicy> {
+class _TermsPolicyState extends State<TermsPolicy> {
+  var isLoading = false;
+  final _textEditController = TextEditingController();
+  String text = '';
+
+  @override
+  void initState() {
+    super.initState();
+  }
+ 
+
+  String getTitle() {
+    if (widget.type == 'news') {
+      return '最新消息';
+    } else if (widget.type == 'terms') {
+      return '免責聲明';
+    } else if (widget.type == 'policy') {
+      return '私隱條例';
+    } else if (widget.type == 'faq') {
+      return 'F&Q問答';
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
+    double screen_width = MediaQuery.of(context).size.width;
     return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: yellow_color2,
           leadingWidth: 32,
@@ -37,7 +62,7 @@ class _TermPolicyState extends State<TermPolicy> {
             //   height: 22,
             // ),
             Text(
-              widget.isTerm ? '免責聲明' : '私隱條例',
+              getTitle(),
               style: TextStyle(
                   color: text_color1,
                   fontSize: 18,
@@ -45,28 +70,42 @@ class _TermPolicyState extends State<TermPolicy> {
             ),
           ]),
         ),
-        body: Container(
-            color: Colors.white,
-            padding: EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Text(
-                  "Hybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP version Hybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP versionHybrid AMP Pages: The Hybrid AMP pages allow the users to have coexisted AMP version",
-                  style: TextStyle(
-                      color: text_color1,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500),
+        body: StreamBuilder(
+            stream: Firestore.instance.collection('settings').snapshots(),
+            builder: (_, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                Center(child: CircularProgressIndicator());
+              }
+
+              var textdata = '';
+              if (snapshot.data != null) {
+                for (var i = 0; i < snapshot.data.documents.length; i++) {
+                  final doc = snapshot.data.documents[i];
+                  if (widget.type == 'news' && doc.documentID == 'news') {
+                    textdata = doc.data['text'] ?? '';
+                  } else if (widget.type == 'terms' &&
+                      doc.documentID == 'terms') {
+                    textdata = doc.data['text'] ?? '';
+                  } else if (widget.type == 'policy' &&
+                      doc.documentID == 'policy') {
+                    textdata = doc.data['text'] ?? '';
+                  } else if (widget.type == 'faq' && doc.documentID == 'faq') {
+                    textdata = doc.data['text'] ?? '';
+                  }
+                }
+              }
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Container(
+                        padding: EdgeInsets.all(20),
+                        child: Text(
+                          textdata,
+                          style: TextStyle(fontSize: 15, color: text_color1),
+                        )),
+                  ],
                 ),
-              ],
-            )));
+              );
+            }));
   }
-}
-
-class Helper {
-  bool isExpanded;
-  Image thumbnail;
-  String heading;
-  String description;
-
-  Helper({this.heading, this.thumbnail, this.description, this.isExpanded});
 }

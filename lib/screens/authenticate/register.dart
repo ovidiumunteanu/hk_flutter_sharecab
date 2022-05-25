@@ -362,8 +362,7 @@ class _RegisterState extends State<Register> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      TermPolicy(
-                                                          isTerm: true)));
+                                                      TermsPolicy('terms')));
                                         },
                                         child: Text(
                                           '免責聲明',
@@ -380,8 +379,7 @@ class _RegisterState extends State<Register> {
                                               context,
                                               MaterialPageRoute(
                                                   builder: (context) =>
-                                                      TermPolicy(
-                                                          isTerm: false)));
+                                                      TermsPolicy('policy')));
                                         },
                                         child: Text(
                                           '私隱條例',

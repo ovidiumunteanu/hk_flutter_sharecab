@@ -8,53 +8,41 @@ import 'package:shareacab/services/database.dart';
 import 'package:shareacab/utils/constant.dart';
 
 class TextSetting extends StatefulWidget {
+  final String type;
+  TextSetting(this.type);
   @override
   _TextSettingState createState() => _TextSettingState();
 }
 
 class _TextSettingState extends State<TextSetting> {
   var isLoading = false;
-  var page = 1;
-  var scrollcontroller = ScrollController();
-  String search = '';
-  bool isSwitched = false;
+  final _textEditController = TextEditingController();
+  String text = '';
 
   @override
   void initState() {
-    //added the pagination function with listener
-    scrollcontroller.addListener(pagination);
     super.initState();
   }
 
-  void pagination() {
-    // if ((scrollcontroller.position.pixels ==
-    //     scrollcontroller.position.maxScrollExtent) && (_subCategoryModel.products.length < total)) {
-    //   setState(() {
-    //     isLoading = true;
-    //     page += 1;
-    //     //add api for load the more data according to new page
-    //   });
-    // }
+  void onSave() {
+    Firestore.instance
+        .collection('settings')
+        .document(widget.type)
+        .setData({'text': _textEditController.text}, merge: true);
+    Navigator.pop(context);
   }
 
-  void toggleSwitch(String userId, bool value) {
-    DatabaseService().blockUser(userid: userId, flag: !value);
-  }
-
-  void onPressItem(int index) {
-    print('press $index');
-    if (index == 0) {
-      // Navigator.push(context, MaterialPageRoute(builder: (context) {
-      //   return TextSetting();
-      // }));
-    } else if (index == 1) {
-    } else if (index == 2) {
-    } else if (index == 3) {
-    } else if (index == 4) {}
-  }
-
-  void onSave() async { 
-
+  String getTitle() {
+    if (widget.type == 'news') {
+      return '最新消息';
+    } else if (widget.type == 'terms') {
+      return '免責聲明';
+    } else if (widget.type == 'policy') {
+      return '私隱條例';
+    } else if (widget.type == 'faq') {
+      return 'F&Q問答';
+    }
+    return '';
   }
 
   @override
@@ -86,7 +74,7 @@ class _TextSettingState extends State<TextSetting> {
             //   height: 22,
             // ),
             Text(
-              '註冊用戶',
+              getTitle(),
               style: TextStyle(
                   color: text_color1,
                   fontSize: 18,
@@ -95,31 +83,29 @@ class _TextSettingState extends State<TextSetting> {
           ]),
         ),
         body: StreamBuilder(
-            stream: Firestore.instance
-                .collection('settings')
-                .snapshots(),
+            stream: Firestore.instance.collection('settings').snapshots(),
             builder: (_, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 Center(child: CircularProgressIndicator());
               }
-              List<Userdetails> TextSetting = [];
-              final count = snapshot.data == null
-                  ? 0
-                  : snapshot.data.documents.length;
+
+              var textdata = '';
               if (snapshot.data != null) {
                 for (var i = 0; i < snapshot.data.documents.length; i++) {
                   final doc = snapshot.data.documents[i];
-                  var userDetails = Userdetails(
-                    uid: doc.documentID,
-                    name: doc.data['name'] ?? '',
-                    email: doc.data['email'] ?? '',
-                    mobilenum: doc.data['mobileNumber'] ?? '',
-                    isBlocked: doc.data['isBlocked'] ?? false,
-                  );
-                  if (userDetails.mobilenum.contains(search)) {
-                    TextSetting.add(userDetails);
+                  if (widget.type == 'news' && doc.documentID == 'news') {
+                    textdata = doc.data['text'] ?? '';
+                  } else if (widget.type == 'terms' &&
+                      doc.documentID == 'terms') {
+                    textdata = doc.data['text'] ?? '';
+                  } else if (widget.type == 'policy' &&
+                      doc.documentID == 'policy') {
+                    textdata = doc.data['text'] ?? '';
+                  } else if (widget.type == 'faq' && doc.documentID == 'faq') {
+                    textdata = doc.data['text'] ?? '';
                   }
                 }
+                _textEditController.text = textdata;
               }
               return Container(
                 width: double.infinity,
@@ -135,6 +121,7 @@ class _TextSettingState extends State<TextSetting> {
                             child: TextFormField(
                                 minLines: 15,
                                 maxLines: 40,
+                                controller: _textEditController,
                                 style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
@@ -146,7 +133,8 @@ class _TextSettingState extends State<TextSetting> {
                                         fontWeight: FontWeight.w500,
                                         color: Color(0xFFBBBBBB)),
                                     border: InputBorder.none),
-                                onChanged: (val) {}),
+                                 ),
+                                 
                           )),
                     ),
                     Container(

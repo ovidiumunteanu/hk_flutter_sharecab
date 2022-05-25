@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:progress_dialog/progress_dialog.dart';
+import 'package:shareacab/components/TopMessage.dart';
 import 'package:shareacab/services/auth.dart';
 import 'package:shareacab/services/database.dart';
 import 'package:dotted_line/dotted_line.dart';
@@ -310,24 +311,6 @@ class _GroupChatScreenState extends State<GroupChatScreen>
         ));
   }
 
-  Widget renderNoti() {
-    return Container(
-        width: double.infinity,
-        height: 30,
-        decoration: BoxDecoration(
-          color: yellow_color1,
-        ),
-        child: Center(
-          child: Text(
-            '「一個同您搭都半價」慳錢、慳時間',
-            style: TextStyle(
-              fontSize: 14,
-              color: text_color4,
-            ),
-          ),
-        ));
-  }
-
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -357,7 +340,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                     body: Column(
                       mainAxisSize: MainAxisSize.max,
                       children: <Widget>[
-                        renderNoti(),
+                        TopMessage(),
                         Expanded(
                             child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -425,7 +408,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                               child: Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: <Widget>[
-                                  renderNoti(),
+                                  TopMessage(),
                                   Container(
                                     width: double.infinity,
                                     color: Color(0xFFFAFAFA),
