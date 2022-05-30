@@ -470,7 +470,7 @@ class _BottomCreateTripBtnState extends State<BottomCreateTripBtn> {
             margin: EdgeInsets.only(
                 bottom: keyboardOpened ? 0 : (Platform.isIOS ? 80 : 55)),
             child: FlatButton(
-              height: 85,
+              height: 70,
               color: yellow_color1,
               onPressed: () {
                 FocusScope.of(context).unfocus();

@@ -97,6 +97,8 @@ class _GroupDetailsState extends State<GroupDetails>
   String transportation = '';
   String departure = '';
   String destination = '';
+  String departure_sub = '';
+  String destination_sub = '';
   String departure_location = '';
   String destination_location = '';
   DateTime departure_time;
@@ -110,6 +112,7 @@ class _GroupDetailsState extends State<GroupDetails>
   bool wait_all_member = false;
 
   int curUsers = 0;
+  int exitedUsers = 0;
 
   String ownerUser = '';
 
@@ -338,7 +341,7 @@ class _GroupDetailsState extends State<GroupDetails>
   }
 
   Widget buildUserListItem(FirebaseUser curUser, Map<String, dynamic> userItem,
-      dynamic usersInGroup) {
+      dynamic usersInGroup, bool isOut) {
     var numUsers = 1;
     for (var i = 0; i < usersInGroup.length; i++) {
       if (usersInGroup[i]['uid'] == userItem['uid']) {
@@ -366,7 +369,9 @@ class _GroupDetailsState extends State<GroupDetails>
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                userItem['mobilenum'],
+                (userItem['mobilenum'] != null
+                    ? userItem['mobilenum'].substring(4)
+                    : ''),
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -375,29 +380,27 @@ class _GroupDetailsState extends State<GroupDetails>
             ),
           ),
           Expanded(
-            child:
-          userItem['isArrived'] == true
-              ? Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'IN',
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black),
-                  ))
-              : Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(
-                    'OUT',
-                    textAlign: TextAlign.end,
-                    style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red),
-                  ))
-          )
+              child: isOut != true
+                  ? Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'IN',
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black),
+                      ))
+                  : Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(
+                        'OUT',
+                        textAlign: TextAlign.end,
+                        style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.red),
+                      )))
         ],
       );
     }
@@ -517,21 +520,10 @@ class _GroupDetailsState extends State<GroupDetails>
     } else if (GroupDetails.hasGroup == false && genderOK == true) {
       // if require_permission == false
       return Container(
-        height: 115,
+        height: 85,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              width: double.infinity,
-              height: 30,
-              color: text_color1,
-              child: Center(
-                child: Text(
-                  '下一位可節省 50% 車資',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
             FlatButton(
               height: 85,
               color: yellow_color1,
@@ -603,6 +595,8 @@ class _GroupDetailsState extends State<GroupDetails>
                       transportation = groupsnapshot.data['transportation'];
                       departure = groupsnapshot.data['departure'];
                       destination = groupsnapshot.data['destination'];
+                      departure_sub = groupsnapshot.data['departure_sub'];
+                      destination_sub = groupsnapshot.data['destination_sub'];
                       departure_location =
                           groupsnapshot.data['departure_location'];
                       destination_location =
@@ -613,6 +607,8 @@ class _GroupDetailsState extends State<GroupDetails>
                       reference_number = groupsnapshot.data['reference_number'];
                       covid = groupsnapshot.data['covid'];
                       curUsers = groupsnapshot.data['users'].length;
+                      exitedUsers = groupsnapshot.data['users-out'].length;
+
                       joinedMember = 0;
                       for (var i = 0;
                           i < groupsnapshot.data['users'].length;
@@ -691,8 +687,8 @@ class _GroupDetailsState extends State<GroupDetails>
                                         children: [
                                           TripItem(
                                             transportation: transportation,
-                                            departure: departure,
-                                            destination: destination,
+                                            departureSub: departure_sub,
+                                            destinationSub: destination_sub,
                                             departure_loc: departure_location,
                                             destination_loc:
                                                 destination_location,
@@ -751,12 +747,64 @@ class _GroupDetailsState extends State<GroupDetails>
                                                           .documents[index]
                                                           .data,
                                                       groupsnapshot
-                                                          .data['users']),
+                                                          .data['users'],
+                                                      false),
                                                 );
                                               });
                                         },
                                       ),
                                     ),
+                                    widget.isHistory == true
+                                        ? Container(
+                                            width: double.infinity,
+                                            height: exitedUsers.toDouble() * 60,
+                                            child: StreamBuilder(
+                                              stream: Firestore.instance
+                                                  .collection('group')
+                                                  .document(widget.docId)
+                                                  .collection('users-out')
+                                                  .snapshots(),
+                                              builder: (ctx, futureSnapshot) {
+                                                if (futureSnapshot
+                                                        .connectionState ==
+                                                    ConnectionState.waiting) {
+                                                  return Container();
+                                                }
+                                                return ListView.builder(
+                                                    physics:
+                                                        NeverScrollableScrollPhysics(),
+                                                    itemCount: futureSnapshot
+                                                        .data.documents.length,
+                                                    padding: EdgeInsets.zero,
+                                                    itemBuilder: (ctx, index) {
+                                                      return Container(
+                                                        margin: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 0,
+                                                                horizontal: 20),
+                                                        decoration: BoxDecoration(
+                                                            border: Border(
+                                                                bottom: BorderSide(
+                                                                    // width:
+                                                                    //     double.infinity,
+                                                                    color: grey_color6))),
+                                                        width: double.infinity,
+                                                        child: buildUserListItem(
+                                                            currentuser,
+                                                            futureSnapshot
+                                                                .data
+                                                                .documents[
+                                                                    index]
+                                                                .data,
+                                                            groupsnapshot.data[
+                                                                'users-out'],
+                                                            true),
+                                                      );
+                                                    });
+                                              },
+                                            ),
+                                          )
+                                        : Container(),
                                     SizedBox(
                                       height: 100,
                                     ),

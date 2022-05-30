@@ -159,7 +159,7 @@ class _MyProfileState extends State<MyProfile>
                             builder: (BuildContext ctx) {
                               return AlertDialog(
                                 title: Text('登出'),
-                                content: Text('您確定要退出嗎？'),
+                                content: Text('您確定要登出嗎？'),
                                 shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.0)),
                                 actions: <Widget>[

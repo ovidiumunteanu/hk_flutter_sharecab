@@ -129,6 +129,8 @@ class _TripsListState extends State<TripsList>
                         final transportation = docData.data['transportation'];
                         final departure = docData.data['departure'];
                         final destination = docData.data['destination'];
+                        final departure_sub = docData.data['departure_sub'];
+                        final destination_sub = docData.data['destination_sub'];
                         final departure_location =
                             docData.data['departure_location'];
                         final destination_location =
@@ -169,10 +171,10 @@ class _TripsListState extends State<TripsList>
                                     vertical: 2, horizontal: 0),
                                 child: TripItem(
                                   transportation: transportation,
-                                  departure:
-                                      departure, // snapshot.data.documents[index].data['departure'],
-                                  destination:
-                                      destination, //snapshot.data.documents[index].data['destination'],
+                                  departureSub:
+                                      departure_sub, // snapshot.data.documents[index].data['departure'],
+                                  destinationSub:
+                                      destination_sub, //snapshot.data.documents[index].data['destination'],
                                   departure_loc: departure_location,
                                   destination_loc: destination_location,
                                   departure_time: departure_time.toDate(),

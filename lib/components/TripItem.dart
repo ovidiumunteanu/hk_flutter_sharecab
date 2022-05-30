@@ -5,8 +5,8 @@ import 'package:shareacab/utils/constant.dart';
 class TripItem extends StatelessWidget {
   final Function onPress;
   String transportation;
-  String departure;
-  String destination;
+  String departureSub;
+  String destinationSub;
   String departure_loc;
   String destination_loc;
   int maxMember = 0;
@@ -16,8 +16,8 @@ class TripItem extends StatelessWidget {
   String reference_number;
   TripItem(
       {this.transportation,
-      this.departure,
-      this.destination,
+      this.departureSub,
+      this.destinationSub,
       this.departure_loc,
       this.destination_loc,
       this.maxMember,
@@ -150,7 +150,7 @@ class TripItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                departure,
+                departureSub,
                 style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
@@ -164,7 +164,7 @@ class TripItem extends StatelessWidget {
                 ),
               ),
               Text(
-                destination,
+                destinationSub,
                 style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,

@@ -92,7 +92,7 @@ class _FilterViewState extends State<FilterView>
                     height: 20,
                   ),
                   DropdownInput(
-                    label: (isDestination ? '目的地 1' : '出發點 1'),
+                    label: '區域',
                     labelStyle: TextStyle(
                         fontSize: 14,
                         color: text_color1,
@@ -119,7 +119,7 @@ class _FilterViewState extends State<FilterView>
                     height: 15,
                   ),
                   DropdownInput(
-                    label: (isDestination ? '目的地 2' : '出發點 2'),
+                    label: '地點',
                     labelStyle: TextStyle(
                         fontSize: 14,
                         color: text_color1,
@@ -239,15 +239,34 @@ class _FilterViewState extends State<FilterView>
                 ),
                 Text('出發點'),
                 SizedBox(
-                  height: 13,
+                  height: (curDeparture == '任何' && curDepartureSub == '任何')
+                      ? 13
+                      : 2,
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6),
-                  child: Text('$curDeparture - $curDepartureSub',
-                      style: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: text_color2)),
+                  child: (curDeparture == '任何' && curDepartureSub == '任何')
+                      ? Text('$curDeparture - $curDepartureSub',
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: text_color2))
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text('$curDeparture',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: text_color2)),
+                            Text('$curDepartureSub',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: text_color2))
+                          ],
+                        ),
                 ),
                 SizedBox(
                   height: 12,
@@ -273,15 +292,35 @@ class _FilterViewState extends State<FilterView>
                       ),
                       Text('目的地'),
                       SizedBox(
-                        height: 13,
+                        height: (curDestination == '任何' &&
+                                curDestinationSub == '任何')
+                            ? 13
+                            : 2,
                       ),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 6),
-                        child: Text('$curDestination - $curDestinationSub',
-                            style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: text_color2)),
+                        child: (curDestination == '任何' && curDestinationSub == '任何')
+                            ? Text('$curDestination - $curDestinationSub',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: text_color2))
+                            : Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text('$curDestination',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: text_color2)),
+                                  Text('$curDestinationSub',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: text_color2))
+                                ],
+                              ),
                       ),
                       SizedBox(
                         height: 12,

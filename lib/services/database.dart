@@ -8,7 +8,7 @@ import 'package:shareacab/screens/chatscreen/chat_database/chatservices.dart';
 class DatabaseService {
   String uid;
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  DatabaseService({this.uid}); 
+  DatabaseService({this.uid});
   //collection reference
   final CollectionReference userDetails =
       Firestore.instance.collection('userdetails');
@@ -150,6 +150,7 @@ class DatabaseService {
       'users': FieldValue.arrayUnion([
         {'uid': user.uid, 'num': requestDetails.curMembers}
       ]),
+      'users-out': [],
       'transportation': requestDetails.transportation,
       'departure': requestDetails.departure,
       'departure_sub': requestDetails.departure_sub,
@@ -230,6 +231,7 @@ class DatabaseService {
     var user = await _auth.currentUser();
     var currentGrp;
     int presentNum = 0;
+    int exitedUsersNum = 0;
     var totalRides;
     var cancelledRides;
     var owner;
@@ -246,13 +248,16 @@ class DatabaseService {
 
     await groupdetails.document(currentGrp).get().then((value) {
       presentNum = value.data['users'].length;
-      owner = value.data['owner'];
 
       for (var i = 0; i < value.data['users'].length; i++) {
         if (value.data['users'][i]['uid'] == user.uid) {
           userInGroup = value.data['users'][i];
         }
       }
+
+      exitedUsersNum = value.data['users-out'].length;
+
+      owner = value.data['owner'];
     });
 
     await userDetails.document(user.uid).updateData({
@@ -281,14 +286,51 @@ class DatabaseService {
       await ChatService().exitChatRoom(currentGrp);
     } else {
       await chat_collection.document(currentGrp).delete();
-
+      await groupdetails.document(currentGrp).updateData({
+        'users': FieldValue.arrayRemove([userInGroup]),
+      });
       await groupdetails
           .document(currentGrp)
           .collection('users')
           .document(user.uid)
           .delete();
-      await groupdetails.document(currentGrp).delete();
+      // await groupdetails.document(currentGrp).delete();
     }
+
+    // save leaved users
+    if (exitedUsersNum == 0) {
+      await groupdetails.document(currentGrp).updateData({
+        'users-out': [userInGroup],
+      });
+    } else {
+      await groupdetails.document(currentGrp).updateData({
+        'users-out': FieldValue.arrayUnion([userInGroup]),
+      });
+    }
+
+    await Firestore.instance
+        .collection('userdetails')
+        .document(user.uid)
+        .get()
+        .then((value) async {
+      if (value.exists) {
+        await groupdetails
+            .document(currentGrp)
+            .collection('users-out')
+            .document(user.uid)
+            .setData({
+          'uid': user.uid,
+          'name': value.data['name'],
+          'hostel': value.data['hostel'],
+          'sex': value.data['sex'],
+          'mobilenum': value.data['mobileNumber'],
+          'totalrides': value.data['totalRides'],
+          'cancelledrides': value.data['cancelledRides'],
+          'actualrating': value.data['actualRating'],
+          'numberofratings': value.data['numberOfRatings']
+        });
+      }
+    });
   }
 
   // join a group from dashboard (W=4,R=2)

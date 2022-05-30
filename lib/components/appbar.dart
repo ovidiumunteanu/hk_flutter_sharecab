@@ -77,7 +77,7 @@ AppBar CustomAppBar(
       StreamBuilder<DocumentSnapshot>(
         stream: DatabaseService(uid: currentuser == null ? '' : currentuser.uid).userData,
         builder: (context, snapshot) {
-          if (snapshot.hasData) { 
+          if (snapshot.hasData && snapshot.data != null && snapshot.data['isAdmin'] == true) { 
             return Container(
               width: 28,
               height: 28,

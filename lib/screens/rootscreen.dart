@@ -36,21 +36,21 @@ class _RootScreenState extends State<RootScreen> {
   List<BottomNavigationBarItem> buildBottomNavBarItems() {
     return [
       BottomNavigationBarItem(
-        title: Container(),
+        title: Text('路線', style: TextStyle(color: _selectedPage == 0 ? Colors.white : grey_color5),),
         icon: SvgPicture.asset(
           'assets/svgs/way.svg',
           color: _selectedPage == 0 ? Colors.white : grey_color5,
         ),
       ),
       BottomNavigationBarItem(
-        title: Container(),
+        title: Text('開團', style: TextStyle(color: _selectedPage == 1 ? Colors.white : grey_color5),),
         icon: SvgPicture.asset(
           'assets/svgs/plus.svg',
           color: _selectedPage == 1 ? Colors.white : grey_color5,
         ),
       ),
       BottomNavigationBarItem(
-        title: Container(),
+        title: Text('已加入', style: TextStyle(color: _selectedPage == 2 ? Colors.white : grey_color5),),
         icon: SvgPicture.asset(
           'assets/svgs/message.svg',
           color: _selectedPage == 2 ? Colors.white : grey_color5,

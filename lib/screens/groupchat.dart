@@ -39,6 +39,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   String transportation = '';
   String departure = '';
   String destination = '';
+  String departure_sub = '';
+  String destination_sub = '';
   String departure_location = '';
   String destination_location = '';
   DateTime departure_time;
@@ -369,6 +371,10 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                           transportation = groupsnapshot.data['transportation'];
                           departure = groupsnapshot.data['departure'];
                           destination = groupsnapshot.data['destination'];
+
+                          departure_sub = groupsnapshot.data['departure_sub'];
+                          destination_sub = groupsnapshot.data['destination_sub'];
+
                           departure_location =
                               groupsnapshot.data['departure_location'];
                           destination_location =
@@ -418,8 +424,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                       children: [
                                         TripItem(
                                           transportation: transportation,
-                                          departure: departure,
-                                          destination: destination,
+                                          departureSub: departure_sub,
+                                          destinationSub: destination_sub,
                                           departure_loc: departure_location,
                                           destination_loc: destination_location,
                                           departure_time: departure_time,

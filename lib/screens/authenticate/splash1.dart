@@ -118,7 +118,7 @@ class _Splash1State extends State<Splash1> {
                                 fontWeight: FontWeight.w400,
                                 color: text_color4),
                           ),
-                          SizedBox(height: 90.0),
+                          SizedBox(height: 30.0),
                         ],
                       )),
                 ],

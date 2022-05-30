@@ -381,7 +381,7 @@ class _CreateTripState extends State<CreateTrip>
         children: [
           Expanded(
               child: DropdownInput(
-            label: '出發點 1',
+            label: '出發點',
             labelStyle: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
             hint: '請選擇',
@@ -398,7 +398,7 @@ class _CreateTripState extends State<CreateTrip>
           ),
           Expanded(
               child: DropdownInput(
-            label: '出發點 2',
+            label: '',
             labelStyle: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
             hint: '請選擇',
@@ -432,7 +432,7 @@ class _CreateTripState extends State<CreateTrip>
         children: [
           Expanded(
               child: DropdownInput(
-            label: '目的地 1',
+            label: '目的地',
             labelStyle: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
             hint: '請選擇',
@@ -449,7 +449,7 @@ class _CreateTripState extends State<CreateTrip>
           ),
           Expanded(
               child: DropdownInput(
-            label: '目的地 2',
+            label: '',
             labelStyle: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
             hint: '請選擇',
