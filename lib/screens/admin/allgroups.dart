@@ -12,6 +12,8 @@ import 'package:shareacab/utils/common.dart';
 import 'package:shareacab/utils/constant.dart';
 
 class GroupList extends StatefulWidget {
+  final userId;
+  GroupList(this.userId);
   @override
   _GroupListState createState() => _GroupListState();
 }
@@ -74,7 +76,7 @@ class _GroupListState extends State<GroupList> {
             //   height: 22,
             // ),
             Text(
-              '刊登團體',
+              (widget.userId != null ? '過去加入群組' : '刊登團體'),
               style: TextStyle(
                   color: text_color1,
                   fontSize: 18,
@@ -103,8 +105,25 @@ class _GroupListState extends State<GroupList> {
                     reference_number: doc.data['reference_number'] ?? '',
                     created: createdAt != null ? format.format(createdAt) : '',
                   );
-                  if (group.reference_number.contains(search)) {
-                    GroupList.add(group);
+
+                  if (widget.userId != null) {
+                    var find_user = doc.data['users'].firstWhere(
+                        (element) => element['uid'] == widget.userId, orElse: () {
+                      return null;
+                    });
+                    var find_user_out = doc.data['users-out'].firstWhere(
+                        (element) => element['uid'] == widget.userId, orElse: () {
+                      return null;
+                    });
+
+                    if ((find_user != null || find_user_out != null) &&
+                        group.reference_number.contains(search)) {
+                      GroupList.add(group);
+                    }
+                  } else {
+                    if (group.reference_number.contains(search)) {
+                      GroupList.add(group);
+                    }
                   }
                 }
               }
@@ -153,7 +172,7 @@ class _GroupListState extends State<GroupList> {
                                 },
                                 child: Container(
                                   width: double.infinity,
-                                  height: 50, 
+                                  height: 50,
                                   decoration: BoxDecoration(
                                       border: Border(
                                           bottom: BorderSide(
@@ -183,7 +202,7 @@ class _GroupListState extends State<GroupList> {
                       },
                       separatorBuilder: (BuildContext context, int index) =>
                           const Divider(
-                        height: 0, 
+                        height: 0,
                       ),
                     ))
                   ],

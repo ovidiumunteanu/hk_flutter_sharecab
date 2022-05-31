@@ -148,12 +148,12 @@ class _FilterViewState extends State<FilterView>
                         height: 50,
                         color: yellow_color1,
                         onPressed: () {
-                          // setState(() {
-                          //   curDeparture = _departure;
-                          //   curDestination = _destination;
-                          //   curDepartureSub = _departure_sub;
-                          //   curDestinationSub = _destination_sub;
-                          // });
+                          setState(() {
+                            curDeparture = _departure;
+                            curDestination = _destination;
+                            curDepartureSub = _departure_sub;
+                            curDestinationSub = _destination_sub;
+                          });
 
                           widget.onChange(
                               _departure,

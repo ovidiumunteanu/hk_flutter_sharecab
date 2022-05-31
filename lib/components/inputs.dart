@@ -77,11 +77,48 @@ class SearchInput extends StatelessWidget {
           style: TextStyle(
               fontSize: 15, fontWeight: FontWeight.w500, color: text_color1),
           decoration: InputDecoration(
-            hintText: hint,
-            hintStyle: TextStyle(
-              fontSize: 15, fontWeight: FontWeight.w500, color: Color(0xFFBBBBBB)),
-            border: InputBorder.none
-          ),
+              hintText: hint,
+              hintStyle: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFFBBBBBB)),
+              border: InputBorder.none),
+          onChanged: (val) {
+            onChange(val);
+          }),
+    );
+  }
+}
+
+class HomeSearchInput extends StatelessWidget {
+  final Function onChange;
+  String type;
+  String hint;
+  String value;
+  HomeSearchInput({this.value, this.hint, this.type, this.onChange});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 12),
+      height: 42,
+      decoration: BoxDecoration(
+          color: Color(0xFFf7f7f7),
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: TextFormField(
+          initialValue: value,
+          keyboardType: TextInputType.text,
+          style: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.w500, color: text_color1),
+          decoration: InputDecoration(
+              icon: Icon(Icons.search),
+              hintText: hint,
+              hintStyle: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF808080)),
+              border: InputBorder.none),
+          onEditingComplete: () {},
           onChanged: (val) {
             onChange(val);
           }),

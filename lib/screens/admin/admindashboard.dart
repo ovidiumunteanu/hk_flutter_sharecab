@@ -27,7 +27,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
       }));
     } else if (index == 1) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return GroupList();
+        return GroupList(null);
       }));
     } else if (index == 2) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {

@@ -77,6 +77,7 @@ class _RegisterState extends State<Register> {
                     email: email,
                     userName: name,
                     sex: sex,
+                    covid: covid,
                   )));
     };
     final PhoneVerificationCompleted verifySuccess = (AuthCredential user) {

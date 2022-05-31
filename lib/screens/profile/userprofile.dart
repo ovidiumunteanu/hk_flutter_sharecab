@@ -5,7 +5,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shareacab/screens/admin/allgroups.dart';
 import 'package:shareacab/screens/rootscreen.dart';
+import 'package:shareacab/screens/term_policy/term_policy.dart';
 import 'package:shareacab/shared/loading.dart';
 import 'package:shareacab/utils/constant.dart';
 import '../../main.dart';
@@ -30,12 +32,13 @@ class _MyProfileState extends State<MyProfile>
     with AutomaticKeepAliveClientMixin<MyProfile> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
-
+  final List<String> _covid = ['已注射第一針', '已注射第二針', '已注射第三針'];
   FirebaseUser currentUser;
   String phone = '';
   String email = '';
   String name = '';
   String sex = '男性';
+  String covid;
 
   bool genderChanged = false;
 
@@ -43,8 +46,11 @@ class _MyProfileState extends State<MyProfile>
   void initState() {
     super.initState();
   }
- 
-  final List<String> _sex = [ '男性', '女性',];
+
+  final List<String> _sex = [
+    '男性',
+    '女性',
+  ];
 
   void onUpdate(DocumentSnapshot curData) async {
     if (_formKey.currentState.validate()) {
@@ -66,13 +72,17 @@ class _MyProfileState extends State<MyProfile>
       try {
         final UID = await widget._auth.getCurrentUID();
 
-        var newGender = (curData.data['sex'] == null || curData.data['sex'] == '') ? sex : curData.data['sex'];
+        var newGender =
+            (curData.data['sex'] == null || curData.data['sex'] == '')
+                ? sex
+                : curData.data['sex'];
         await widget._auth.updateUser(
             userid: UID,
-            email: email == '' ? curData.data['email'] : email, 
+            email: email == '' ? curData.data['email'] : email,
             phone: curData.data['mobileNumber'],
             name: name == '' ? curData.data['name'] : name,
-            sex: genderChanged ? sex : newGender );
+            sex: genderChanged ? sex : newGender,
+            covid: covid);
         Navigator.pop(context);
         await pr.hide();
       } catch (e) {
@@ -122,7 +132,7 @@ class _MyProfileState extends State<MyProfile>
     return StreamBuilder<DocumentSnapshot>(
         stream: DatabaseService(uid: user == null ? '' : user.uid).userData,
         builder: (context, snapshot) {
-          if (snapshot.hasData) { 
+          if (snapshot.hasData) {
             return GestureDetector(
               onTap: () {
                 FocusScope.of(context).unfocus();
@@ -218,7 +228,9 @@ class _MyProfileState extends State<MyProfile>
                               label: '電話號碼',
                               type: 'phone',
                               enabled: false,
-                              initVal: snapshot.data['mobileNumber'],
+                              initVal: (snapshot.data['mobileNumber'] != null
+                                  ? snapshot.data['mobileNumber'].substring(4)
+                                  : ''),
                               onChange: (val) {
                                 setState(() => phone = val);
                               }),
@@ -231,7 +243,10 @@ class _MyProfileState extends State<MyProfile>
                                 child: DropdownInput(
                                   label: '性別',
                                   hint: '請選擇',
-                                  curItem: (snapshot.data['sex'] == null || snapshot.data['sex'] == '') ? sex : snapshot.data['sex'],
+                                  curItem: (snapshot.data['sex'] == null ||
+                                          snapshot.data['sex'] == '')
+                                      ? sex
+                                      : snapshot.data['sex'],
                                   items: _sex,
                                   onChange: (newValue) {
                                     setState(() {
@@ -243,6 +258,58 @@ class _MyProfileState extends State<MyProfile>
                               )
                             ],
                           ),
+                          SizedBox(height: 20.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 110,
+                                child: DropdownInput(
+                                  label: '已注射新冠疫苗',
+                                  hint: '請選擇',
+                                  curItem: (snapshot.data['covid'] == null ||
+                                          snapshot.data['covid'] == '')
+                                      ? covid
+                                      : snapshot.data['covid'],
+                                  items: _covid,
+                                  onChange: (newValue) {
+                                    setState(() {
+                                      covid = newValue;
+                                    });
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                          SizedBox(height: 30.0),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                TextButton(
+                                    style: TextButton.styleFrom(
+                                      minimumSize: Size.zero,
+                                      padding: EdgeInsets.zero,
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  GroupList(snapshot.data.documentID)));
+                                    },
+                                    child: Text(
+                                      '過去加入群組',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: text_color1,
+                                      ),
+                                    )),
+                                Icon(Icons.chevron_right),
+                              ]),
                           SizedBox(height: 60.0),
                           MainBtn(
                             label: '更新',
@@ -250,6 +317,45 @@ class _MyProfileState extends State<MyProfile>
                             onPress: () {
                               onUpdate(snapshot.data);
                             },
+                          ),
+                          SizedBox(height: 40.0),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                TermsPolicy('terms')));
+                                  },
+                                  child: Text(
+                                    '免責聲明',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: text_color1,
+                                    ),
+                                  )),
+                              SizedBox(width: 50.0),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                TermsPolicy('policy')));
+                                  },
+                                  child: Text(
+                                    '私隱條例',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                      color: text_color1,
+                                    ),
+                                  ))
+                            ],
                           ),
                           SizedBox(height: 20.0),
                         ],

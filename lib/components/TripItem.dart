@@ -40,7 +40,7 @@ class TripItem extends StatelessWidget {
           child: Text(
             key,
             style: TextStyle(
-                fontSize: 14, fontWeight: FontWeight.w400, color: text_color3),
+                fontSize: 15, fontWeight: FontWeight.w400, color: text_color3),
             textAlign: TextAlign.start,
           ),
         ),
@@ -52,7 +52,7 @@ class TripItem extends StatelessWidget {
             child: Text(
               value,
               style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 15,
                   fontWeight: FontWeight.w600,
                   color: text_color1),
               textAlign: TextAlign.start,
@@ -91,7 +91,7 @@ class TripItem extends StatelessWidget {
                       child: Text(
                         transportation,
                         style: TextStyle(
-                            fontSize: 16,
+                            fontSize: 15,
                             fontWeight: FontWeight.bold,
                             color: Colors.white),
                       ),
@@ -99,15 +99,15 @@ class TripItem extends StatelessWidget {
                     Text(
                       '${DateFormat('kk:mm a').format(departure_time)} - ',
                       style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 15,
                           fontWeight: FontWeight.bold,
                           color: Colors.black),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(bottom: 4),
+                      padding: EdgeInsets.only(bottom: 0),
                       child: Text(
                         '${DateFormat('yyyy.MM.dd').format(departure_time) == today_str ? '今天' : DateFormat('MM月dd日').format(departure_time)}',
-                        style: TextStyle(fontSize: 16, color: Colors.black),
+                        style: TextStyle(fontSize: 15, color: Colors.black),
                       ),
                     ),
                   ],
@@ -130,8 +130,8 @@ class TripItem extends StatelessWidget {
             children: [
               Image.asset(
                 'assets/images/covid.png',
-                width: 24,
-                height: 24,
+                width: 22,
+                height: 22,
                 fit: BoxFit.contain,
               ),
               SizedBox(
@@ -139,7 +139,7 @@ class TripItem extends StatelessWidget {
               ),
               Text(
                 covid,
-                style: TextStyle(fontSize: 16, color: Color(0xFF344655)),
+                style: TextStyle(fontSize: 15, color: Color(0xFF344655)),
               ),
             ],
           ),

@@ -109,7 +109,8 @@ class _CreateTripState extends State<CreateTrip>
   void _submitData() {
     _formKey.currentState.validate();
 
-    if (_departure == '' ||
+    if (_covid == null ||
+        _departure == '' ||
         _departure_sub == '' ||
         _destination == '' ||
         _destination_sub == '' ||
@@ -132,15 +133,14 @@ class _CreateTripState extends State<CreateTrip>
       ));
       return;
     } else if (_maxMembers < _curMembers) {
-       _scaffoldKey.currentState.hideCurrentSnackBar();
+      _scaffoldKey.currentState.hideCurrentSnackBar();
       _scaffoldKey.currentState.showSnackBar(SnackBar(
         duration: Duration(seconds: 1),
         backgroundColor: yellow_color2,
         content: Text('最大成員數應大於當前成員數', style: TextStyle(color: text_color1)),
       ));
       return;
-    }
-    else {
+    } else {
       // _formKey.currentState.save();
       FocusScope.of(context).unfocus();
       _addNewRequest();
@@ -172,7 +172,7 @@ class _CreateTripState extends State<CreateTrip>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '這團組多少人？ ',
+                  '建立多少人的群組? ',
                   style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
@@ -477,34 +477,7 @@ class _CreateTripState extends State<CreateTrip>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '哪裡集合？（需要明確說明） ',
-            style: TextStyle(
-                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 4),
-            child: TextFormField(
-              // controller: departure_loc_ctr,
-              // decoration: InputDecoration(
-              //     // hintText: 'Departure Location',
-              //     ),
-              validator: (val) => val.length == 0 ? '輸入出發地點。' : null,
-              onChanged: (val) {
-                _departure_location = val;
-                // FocusScope.of(context).requestFocus(FocusNode());
-                // setState(() => _departure_location = val);
-              },
-            ),
-          ),
-          Text(
-            '例如：屋苑 / 街道 / 大廈 / 商場 / 地鐵站 ',
-            style: hintTxt,
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
-            '去哪裡？',
+            '哪裡是目的地？',
             style: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
           ),
@@ -524,7 +497,34 @@ class _CreateTripState extends State<CreateTrip>
             ),
           ),
           Text(
-            '例如：屋苑 / 街道 / 大廈 / 商場 / 地鐵站 ',
+            '例如：屋苑名稱 / 街道 / 大廈 / 商場 / 地鐵站',
+            style: hintTxt,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            '哪裡集合？（請清晰說明） ',
+            style: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: 4),
+            child: TextFormField(
+              // controller: departure_loc_ctr,
+              // decoration: InputDecoration(
+              //     // hintText: 'Departure Location',
+              //     ),
+              validator: (val) => val.length == 0 ? '輸入出發地點。' : null,
+              onChanged: (val) {
+                _departure_location = val;
+                // FocusScope.of(context).requestFocus(FocusNode());
+                // setState(() => _departure_location = val);
+              },
+            ),
+          ),
+          Text(
+            '例如：屋苑名稱 / 街道 / 大廈 / 商場 / 地鐵站',
             style: hintTxt,
           ),
           SizedBox(

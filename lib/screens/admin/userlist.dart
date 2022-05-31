@@ -170,7 +170,7 @@ class _UserListState extends State<UserList> {
                                         CrossAxisAlignment.center,
                                     children: [
                                       Expanded(
-                                          flex: 3,
+                                          flex: 5,
                                           child: Text(
                                             userList[index].name,
                                             style: TextStyle(
@@ -180,7 +180,11 @@ class _UserListState extends State<UserList> {
                                       Expanded(
                                           flex: 5,
                                           child: Text(
-                                            userList[index].mobilenum,
+                                            (userList[index].mobilenum != null
+                                                ? userList[index]
+                                                    .mobilenum
+                                                    .substring(4)
+                                                : ''),
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 color: text_color1),

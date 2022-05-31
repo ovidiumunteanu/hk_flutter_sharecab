@@ -40,7 +40,7 @@ class DatabaseService {
 
   // Update user data (W=1/2,R=1)
   Future updateUserData(
-      {String name, String mobileNumber, String email, String sex}) async {
+      {String name, String mobileNumber, String email, String sex, String covid}) async {
     var currentGrp;
     var user = await _auth.currentUser();
     await Firestore.instance
@@ -55,6 +55,7 @@ class DatabaseService {
       'mobileNumber': mobileNumber,
       'email': email,
       'sex': sex,
+      'covid': covid,
     });
     if (currentGrp != null) {
       await groupdetails
@@ -66,6 +67,7 @@ class DatabaseService {
         'mobilenum': mobileNumber,
         'email': email,
         'sex': sex,
+        'covid': covid,
       }, merge: true);
     }
   }

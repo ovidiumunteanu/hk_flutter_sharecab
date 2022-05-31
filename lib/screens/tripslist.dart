@@ -18,9 +18,10 @@ class TripsList extends StatefulWidget {
   final filterDestinationSub;
   final filterGender;
   final sortTime;
+  final search;
   final Function startCreatingTrip;
   TripsList(this.filterDeparture, this.filterDepartureSub, this.filterDestination, this.filterDestinationSub, this.filterGender, this.sortTime,
-      {this.inGroupFetch, this.inGroup, this.startCreatingTrip});
+      {this.inGroupFetch, this.inGroup, this.startCreatingTrip, this.search});
   @override
   _TripsListState createState() => _TripsListState();
 }
@@ -151,6 +152,9 @@ class _TripsListState extends State<TripsList>
                           flag = true;
                         } else {
                           flag = false;
+                        }
+                        if (widget.search != null && widget.search != '' && !destination_location.contains(widget.search)) {
+                          return Container();
                         }
                         return Hero(
                           tag: docId,

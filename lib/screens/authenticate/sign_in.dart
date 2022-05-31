@@ -41,6 +41,17 @@ class _SignInState extends State<SignIn> {
     return data.documents.length > 0;
   }
 
+  Future<bool> isBlocked() async {
+    var data = await _db.getUserbyPhone('+852' + phone);
+    if (data == null) {
+      return false;
+    }
+    if (data.documents.length > 0) {
+      return data.documents[0].data['isBlocked'] == true ;
+    }
+    return false;
+  }
+
   Future<String> verifyPhone() async {
     String verificationId;
     final PhoneCodeAutoRetrievalTimeout autoRetrieve = (String verId) {
@@ -109,6 +120,20 @@ class _SignInState extends State<SignIn> {
             duration: Duration(seconds: 2),
             content: Text(
               '此電話號碼尚未註冊。',
+              style: TextStyle(color: text_color1),
+            ),
+          ));
+          return;
+        }
+        res = await isBlocked();
+        if (res == true) {
+          await pr.hide();
+          _scaffoldKey.currentState.hideCurrentSnackBar();
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+            backgroundColor: yellow_color2,
+            duration: Duration(seconds: 2),
+            content: Text(
+              '此電話號碼已被屏蔽。',
               style: TextStyle(color: text_color1),
             ),
           ));

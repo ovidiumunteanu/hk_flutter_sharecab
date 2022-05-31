@@ -28,6 +28,7 @@ class _DashboardState extends State<Dashboard>
   bool inGroup = false;
   Location location = Location();
 
+  TextEditingController _controller = TextEditingController();
   void _startCreatingTrip(BuildContext ctx) async {
     await Navigator.of(ctx).pushNamed(
       CreateTrip.routeName,
@@ -50,7 +51,8 @@ class _DashboardState extends State<Dashboard>
   String curDestinationSub = '任何';
   String curGender = '任何';
   String sortbyTime = '任何';
- 
+  String search = '';
+
   @override
   Widget build(BuildContext context) {
     var fetched = false;
@@ -67,7 +69,6 @@ class _DashboardState extends State<Dashboard>
             .snapshots(),
         builder:
             (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          print(snapshot.data);
           if (snapshot.connectionState == ConnectionState.active &&
               snapshot.data != null) {
             var temp = snapshot.data['currentGroup'];
@@ -80,7 +81,6 @@ class _DashboardState extends State<Dashboard>
             }
             fetched = true;
           }
-
           try {
             if (currentuser == null ||
                 (snapshot.connectionState == ConnectionState.active &&
@@ -88,8 +88,46 @@ class _DashboardState extends State<Dashboard>
               return Scaffold(
                 body: Column(children: <Widget>[
                   TopMessage(),
-                  FilterView((_departure, _departure_sub, _destination, _destination_sub, _curGender, _sortbyTime){
-                    print('$_departure, $_departure_sub, $_destination, $_destination_sub, $_curGender, $_sortbyTime');
+                  Container(
+                      width: double.infinity,
+                      color: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      child: Container(
+                        width: double.infinity,
+                        padding: EdgeInsets.symmetric(horizontal: 12),
+                        height: 42,
+                        decoration: BoxDecoration(
+                            color: Color(0xFFf7f7f7),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(10))),
+                        child: TextFormField(
+                          controller: _controller,
+                          keyboardType: TextInputType.text,
+                          style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              color: text_color1),
+                          decoration: InputDecoration(
+                              icon: Icon(Icons.search),
+                              hintText: '請輸入搜尋[前往]關鍵字',
+                              hintStyle: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color(0xFF808080)),
+                              border: InputBorder.none),
+                          onEditingComplete: () {
+                            FocusScope.of(context).unfocus();
+                            setState(() {
+                              search = _controller.text;
+                            });
+                          },
+                        ),
+                      )),
+                  FilterView((_departure, _departure_sub, _destination,
+                          _destination_sub, _curGender, _sortbyTime) {
+                    print(
+                        '$_departure, $_departure_sub, $_destination, $_destination_sub, $_curGender, $_sortbyTime');
                     setState(() {
                       curDeparture = _departure;
                       curDepartureSub = _departure_sub;
@@ -98,7 +136,8 @@ class _DashboardState extends State<Dashboard>
                       curGender = _curGender;
                       sortbyTime = _sortbyTime;
                     });
-                  }, curDeparture, curDepartureSub, curDestination, curDestinationSub, curGender, sortbyTime),
+                  }, curDeparture, curDepartureSub, curDestination,
+                      curDestinationSub, curGender, sortbyTime),
                   Expanded(
                     child: SingleChildScrollView(
                       child: Column(
@@ -117,6 +156,7 @@ class _DashboardState extends State<Dashboard>
                               inGroup: inGroup,
                               inGroupFetch: inGroupFetch,
                               startCreatingTrip: _startCreatingTrip,
+                              search: search,
                             ),
                           ),
                         ],
