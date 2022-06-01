@@ -23,11 +23,12 @@ db.settings({ ignoreUndefinedProperties: true })
 
 exports.manual_remove = functions.https.onRequest(async (req, res) => {
     try {
+        let time_offset = 0; //mins
         let group_ref = await db.collection('group').get();
         for (var p = 0; p < group_ref.docs.length; p++) {
             let departure_time = group_ref.docs[p].data().departure_time;
            
-            if (departure_time._seconds * 1000  < (new Date().getTime() - 90 * 60 * 1000)) // 90 mins   
+            if (departure_time._seconds * 1000  < (new Date().getTime() - time_offset * 60 * 1000)) // 90 mins   
             {
                 let group_id = group_ref.docs[p].id
 
@@ -52,11 +53,13 @@ exports.manual_remove = functions.https.onRequest(async (req, res) => {
 
                 // delete group
                 try {
-                    let group_users_ref = await db.collection('group').doc(group_id).collection('users').get();
-                    for (var u = 0; u < group_users_ref.docs.length; u++) {
-                        await db.collection('group').doc(group_id).collection('users').doc(group_users_ref.docs[u].id).delete();
-                    }
-                    await db.collection('group').doc(group_id).delete();
+                    // let group_users_ref = await db.collection('group').doc(group_id).collection('users').get();
+                    // for (var u = 0; u < group_users_ref.docs.length; u++) {
+                    //     await db.collection('group').doc(group_id).collection('users').doc(group_users_ref.docs[u].id).delete();
+                    // }
+                    await db.collection('group').doc(group_id).update({
+                        end: true
+                    });
                 } 
                 catch (error) {
                     console.log(error);
@@ -72,11 +75,12 @@ exports.manual_remove = functions.https.onRequest(async (req, res) => {
 
 exports.scheduler = functions.pubsub.schedule('every 5 minutes').onRun(async (context) => {
     try {
+        let time_offset = 0; //mins
         let group_ref = await db.collection('group').get();
         for (var p = 0; p < group_ref.docs.length; p++) {
             let departure_time = group_ref.docs[p].data().departure_time;
            
-            if (departure_time._seconds * 1000  < (new Date().getTime() - 90 * 60 * 1000)) // 90 mins   
+            if (departure_time._seconds * 1000  < (new Date().getTime() - time_offset * 60 * 1000)) // 90 mins   
             {
                 let group_id = group_ref.docs[p].id
 
@@ -101,11 +105,13 @@ exports.scheduler = functions.pubsub.schedule('every 5 minutes').onRun(async (co
 
                 // delete group
                 try {
-                    let group_users_ref = await db.collection('group').doc(group_id).collection('users').get();
-                    for (var u = 0; u < group_users_ref.docs.length; u++) {
-                        await db.collection('group').doc(group_id).collection('users').doc(group_users_ref.docs[u].id).delete();
-                    }
-                    await db.collection('group').doc(group_id).delete();
+                    // let group_users_ref = await db.collection('group').doc(group_id).collection('users').get();
+                    // for (var u = 0; u < group_users_ref.docs.length; u++) {
+                    //     await db.collection('group').doc(group_id).collection('users').doc(group_users_ref.docs[u].id).delete();
+                    // }
+                    await db.collection('group').doc(group_id).update({
+                        end: true
+                    });
                 } 
                 catch (error) {
                     console.log(error);
