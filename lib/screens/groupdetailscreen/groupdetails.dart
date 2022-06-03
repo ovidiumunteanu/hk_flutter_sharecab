@@ -368,7 +368,7 @@ class _GroupDetailsState extends State<GroupDetails>
           Expanded(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text(
+              child: Center(child: Text(
                 (userItem['mobilenum'] != null
                     ? userItem['mobilenum'].substring(4)
                     : ''),
@@ -376,7 +376,7 @@ class _GroupDetailsState extends State<GroupDetails>
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                     color: Colors.black),
-              ),
+              ),)
             ),
           ),
           Expanded(
@@ -413,20 +413,6 @@ class _GroupDetailsState extends State<GroupDetails>
             padding: const EdgeInsets.all(8.0),
             child: Text(
               userItem['name'] + (numUsers > 1 ? ' x $numUsers' : ''),
-              style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black),
-            ),
-          ),
-        ),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              (userItem['mobilenum'] != null
-                  ? userItem['mobilenum'].substring(4)
-                  : ''),
               style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
