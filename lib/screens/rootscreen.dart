@@ -36,21 +36,39 @@ class _RootScreenState extends State<RootScreen> {
   List<BottomNavigationBarItem> buildBottomNavBarItems() {
     return [
       BottomNavigationBarItem(
-        title: Text('路線', style: TextStyle(color: _selectedPage == 0 ? Colors.white : grey_color5),),
-        icon: SvgPicture.asset(
-          'assets/svgs/way.svg',
-          color: _selectedPage == 0 ? Colors.white : grey_color5,
+        title: Text(
+          '路線',
+          style: TextStyle(
+              fontSize: 14,
+              color: _selectedPage == 0 ? Colors.white : grey_color5),
+        ),
+        icon: Padding(
+          padding: EdgeInsets.only(top: 4, bottom: 3),
+          child: SvgPicture.asset(
+            'assets/svgs/way.svg',
+            color: _selectedPage == 0 ? Colors.white : grey_color5,
+          ),
         ),
       ),
       BottomNavigationBarItem(
-        title: Text('開團', style: TextStyle(color: _selectedPage == 1 ? Colors.white : grey_color5),),
+        title: Text(
+          '開團',
+          style: TextStyle(
+              fontSize: 14,
+              color: _selectedPage == 1 ? Colors.white : grey_color5),
+        ),
         icon: SvgPicture.asset(
           'assets/svgs/plus.svg',
           color: _selectedPage == 1 ? Colors.white : grey_color5,
         ),
       ),
       BottomNavigationBarItem(
-        title: Text('已加入', style: TextStyle(color: _selectedPage == 2 ? Colors.white : grey_color5),),
+        title: Text(
+          '已加入',
+          style: TextStyle(
+              fontSize: 14,
+              color: _selectedPage == 2 ? Colors.white : grey_color5),
+        ),
         icon: SvgPicture.asset(
           'assets/svgs/message.svg',
           color: _selectedPage == 2 ? Colors.white : grey_color5,
@@ -68,7 +86,7 @@ class _RootScreenState extends State<RootScreen> {
   Widget buildPageView() {
     return PageView(
       controller: pageController,
-      onPageChanged: (index) { 
+      onPageChanged: (index) {
         pageChanged(index);
       },
       children: pagelist,
@@ -86,10 +104,10 @@ class _RootScreenState extends State<RootScreen> {
   }
 
   void pageChanged(int index) {
-    if (Global().isLoggedIn != true && index > 0 ) {
+    if (Global().isLoggedIn != true && index > 0) {
       pageController.jumpToPage(0);
       GUEST_SERVICE.showGuestModal(context);
-      return; 
+      return;
     }
     setState(() {
       _selectedPage = index;
@@ -97,9 +115,9 @@ class _RootScreenState extends State<RootScreen> {
   }
 
   void bottomTapped(int index) {
-    if (Global().isLoggedIn != true && index > 0 ) {
+    if (Global().isLoggedIn != true && index > 0) {
       GUEST_SERVICE.showGuestModal(context);
-      return; 
+      return;
     }
     setState(() {
       _selectedPage = index;
@@ -117,6 +135,8 @@ class _RootScreenState extends State<RootScreen> {
             extendBody: true,
             body: buildPageView(),
             bottomNavigationBar: BottomNavigationBar(
+              selectedFontSize: 14,
+              unselectedFontSize: 14,
               onTap: (index) {
                 bottomTapped(index);
               },

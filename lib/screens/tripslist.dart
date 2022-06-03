@@ -20,8 +20,17 @@ class TripsList extends StatefulWidget {
   final sortTime;
   final search;
   final Function startCreatingTrip;
-  TripsList(this.filterDeparture, this.filterDepartureSub, this.filterDestination, this.filterDestinationSub, this.filterGender, this.sortTime,
-      {this.inGroupFetch, this.inGroup, this.startCreatingTrip, this.search});
+  TripsList(
+      this.filterDeparture,
+      this.filterDepartureSub,
+      this.filterDestination,
+      this.filterDestinationSub,
+      this.filterGender,
+      this.sortTime,
+      {this.inGroupFetch,
+      this.inGroup,
+      this.startCreatingTrip,
+      this.search});
   @override
   _TripsListState createState() => _TripsListState();
 }
@@ -33,7 +42,7 @@ class _TripsListState extends State<TripsList>
   bool flag;
   var requestsArray = [];
 
-  var currentGroup ;
+  var currentGroup;
 
   @override
   void initState() {
@@ -56,15 +65,17 @@ class _TripsListState extends State<TripsList>
       query = query.where('destination', isEqualTo: widget.filterDestination);
     }
     if (widget.filterDepartureSub != '任何') {
-      query = query.where('departure_sub', isEqualTo: widget.filterDepartureSub);
+      query =
+          query.where('departure_sub', isEqualTo: widget.filterDepartureSub);
     }
     if (widget.filterDestinationSub != '任何') {
-      query = query.where('destination_sub', isEqualTo: widget.filterDestinationSub);
+      query = query.where('destination_sub',
+          isEqualTo: widget.filterDestinationSub);
     }
     if (widget.filterGender != '任何') {
       query = query.where('sex', isEqualTo: widget.filterGender);
     }
- 
+
     if (widget.sortTime == '最早' || widget.sortTime == '任何') {
       query = query.orderBy('created', descending: true);
     } else if (widget.sortTime == '最遲') {
@@ -87,7 +98,8 @@ class _TripsListState extends State<TripsList>
             if (usersnapshot.connectionState == ConnectionState.waiting) {
               Center(child: CircularProgressIndicator());
             }
-            if (usersnapshot.connectionState == ConnectionState.active && usersnapshot.data != null) {
+            if (usersnapshot.connectionState == ConnectionState.active &&
+                usersnapshot.data != null) {
               requestsArray = usersnapshot.data['currentGroupJoinRequests'];
               requestsArray ??= [];
 
@@ -137,15 +149,14 @@ class _TripsListState extends State<TripsList>
                         final destination_location =
                             docData.data['destination_location'];
                         final departure_time = docData.data['departure_time'];
-                        final maxMembers = docData.data['maxMembers']; 
-                        final reference_number = docData.data['reference_number']; 
-                        final covid = docData.data['covid']; 
+                        final maxMembers = docData.data['maxMembers'];
+                        final reference_number =
+                            docData.data['reference_number'];
+                        final covid = docData.data['covid'];
                         var joinedMember = 0;
-                        for (var i = 0;
-                            i < docData.data['users'].length;
-                            i++) {
-                          joinedMember = joinedMember +
-                              docData.data['users'][i]['num'];
+                        for (var i = 0; i < docData.data['users'].length; i++) {
+                          joinedMember =
+                              joinedMember + docData.data['users'][i]['num'];
                         }
 
                         if (docId == currentGroup) {
@@ -153,7 +164,9 @@ class _TripsListState extends State<TripsList>
                         } else {
                           flag = false;
                         }
-                        if (widget.search != null && widget.search != '' && !destination_location.contains(widget.search)) {
+                        if (widget.search != null &&
+                            widget.search != '' &&
+                            !destination_location.contains(widget.search)) {
                           return Container();
                         }
                         return Hero(
@@ -161,16 +174,25 @@ class _TripsListState extends State<TripsList>
                           child: Card(
                             color: Theme.of(context).scaffoldBackgroundColor,
                             elevation: 0.0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0),
+                            ),
                             margin: EdgeInsets.zero,
                             child: InkWell(
                               onTap: () {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            GroupDetails(docId, isHistory: false,)));
+                                        builder: (context) => GroupDetails(
+                                              docId,
+                                              isHistory: false,
+                                            )));
                               },
                               child: Card(
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(0),
+                                ),
                                 margin: EdgeInsets.symmetric(
                                     vertical: 2, horizontal: 0),
                                 child: TripItem(

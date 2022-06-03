@@ -109,7 +109,10 @@ class _DashboardState extends State<Dashboard>
                               fontWeight: FontWeight.w500,
                               color: text_color1),
                           decoration: InputDecoration(
-                              icon: Icon(Icons.search),
+                              icon: Padding(
+                                padding: EdgeInsets.only(top: 2),
+                                child: Icon(Icons.search),
+                              ),
                               hintText: '請輸入搜尋[前往]關鍵字',
                               hintStyle: TextStyle(
                                   fontSize: 15,

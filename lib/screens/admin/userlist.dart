@@ -78,6 +78,7 @@ class _UserListState extends State<UserList> {
               ),
             ),
           ),
+          elevation: 0,
           titleSpacing: 8,
           title: Row(children: [
             // Image.asset(

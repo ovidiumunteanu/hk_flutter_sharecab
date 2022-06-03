@@ -420,6 +420,20 @@ class _GroupDetailsState extends State<GroupDetails>
             ),
           ),
         ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              (userItem['mobilenum'] != null
+                  ? userItem['mobilenum'].substring(4)
+                  : ''),
+              style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.black),
+            ),
+          ),
+        ),
         userItem['isArrived'] == true
             ? Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -661,6 +675,7 @@ class _GroupDetailsState extends State<GroupDetails>
                               ),
                             ),
                           ),
+                          elevation: 0,
                           titleSpacing: 0,
                           title: Row(children: [
                             Image.asset(

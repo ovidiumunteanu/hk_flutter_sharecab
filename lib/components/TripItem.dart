@@ -126,7 +126,8 @@ class TripItem extends StatelessWidget {
             height: 8,
           ),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset(
                 'assets/images/covid.png',

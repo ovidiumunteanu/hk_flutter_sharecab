@@ -57,6 +57,7 @@ class _MessagesState extends State<Messages> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: yellow_color2,
+          elevation: 0,
           title: Row(
             children: [
               Image.asset(

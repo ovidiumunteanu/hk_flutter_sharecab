@@ -68,6 +68,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
               ),
             ),
           ),
+          elevation: 0,
           titleSpacing: 8,
           title: Row(children: [
             // Image.asset(

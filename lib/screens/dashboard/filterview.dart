@@ -237,10 +237,10 @@ class _FilterViewState extends State<FilterView>
                 SizedBox(
                   height: 8,
                 ),
-                Text('出發點'),
+                Text('出發點', style: TextStyle(fontSize: 14),),
                 SizedBox(
                   height: (curDeparture == '任何' && curDepartureSub == '任何')
-                      ? 13
+                      ? 15
                       : 2,
                 ),
                 Container(
@@ -269,7 +269,7 @@ class _FilterViewState extends State<FilterView>
                         ),
                 ),
                 SizedBox(
-                  height: 12,
+                  height: 15,
                 ),
               ],
             ),
@@ -290,11 +290,11 @@ class _FilterViewState extends State<FilterView>
                       SizedBox(
                         height: 8,
                       ),
-                      Text('目的地'),
+                      Text('目的地', style: TextStyle(fontSize: 14),),
                       SizedBox(
                         height: (curDestination == '任何' &&
                                 curDestinationSub == '任何')
-                            ? 13
+                            ? 15
                             : 2,
                       ),
                       Container(
@@ -323,7 +323,7 @@ class _FilterViewState extends State<FilterView>
                               ),
                       ),
                       SizedBox(
-                        height: 12,
+                        height: 15,
                       ),
                     ],
                   ))),
@@ -338,7 +338,7 @@ class _FilterViewState extends State<FilterView>
               SizedBox(
                 height: 8,
               ),
-              Text('團友性別'),
+              Text('團友性別', style: TextStyle(fontSize: 14),),
               filterBtn(['任何', '男女也可', '只限男性', '只限女性'], 'gender')
             ],
           ),
@@ -353,7 +353,7 @@ class _FilterViewState extends State<FilterView>
               SizedBox(
                 height: 8,
               ),
-              Text('出發時間'),
+              Text('出發時間', style: TextStyle(fontSize: 14),),
               filterBtn(['任何', '最早', '最遲'], 'sortbytime')
             ],
           ),

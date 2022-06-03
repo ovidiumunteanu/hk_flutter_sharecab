@@ -55,6 +55,7 @@ class _TermsPolicyState extends State<TermsPolicy> {
             ),
           ),
           titleSpacing: 8,
+          elevation: 0,
           title: Row(children: [
             // Image.asset(
             //   'assets/images/logo_full_qq.png',

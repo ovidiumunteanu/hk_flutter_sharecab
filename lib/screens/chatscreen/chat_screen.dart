@@ -59,6 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
             size: 36,
           ),
         ),
+        elevation: 0,
         title: Text(
           '聊天室',
           style: TextStyle(color: text_color1, fontSize: 18),

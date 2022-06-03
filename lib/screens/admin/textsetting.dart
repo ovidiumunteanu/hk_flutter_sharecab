@@ -66,6 +66,7 @@ class _TextSettingState extends State<TextSetting> {
               ),
             ),
           ),
+          elevation: 0,
           titleSpacing: 8,
           title: Row(children: [
             // Image.asset(

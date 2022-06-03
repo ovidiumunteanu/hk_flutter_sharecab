@@ -17,6 +17,7 @@ AppBar CustomAppBar(
   return AppBar(
     backgroundColor: yellow_color2,
     titleSpacing: 6,
+    elevation: 0,
     title: Row(
       children: [
         Image.asset(
@@ -55,7 +56,7 @@ AppBar CustomAppBar(
       Container(
         width: 28,
         height: 28,
-        margin: EdgeInsets.only(left: 10, right: 8),
+        margin: EdgeInsets.only(left: 6, right: 6),
         child: IconButton(
             padding: EdgeInsets.only(bottom: 2),
             icon: Icon(

@@ -59,7 +59,7 @@ class _CreateTripState extends State<CreateTrip>
   int _maxMembers = 2;
   int _curMembers = 1;
   String _sex = '男女也可';
-  String _tunnel = '可以經隧道';
+  String _tunnel = '經隧道';
   int _waiting_time = 0;
   bool _wait_all_member = false;
 
@@ -477,33 +477,6 @@ class _CreateTripState extends State<CreateTrip>
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '哪裡是目的地？',
-            style: TextStyle(
-                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 4),
-            child: TextFormField(
-              // controller: destination_loc_ctr,
-              // decoration: InputDecoration(
-              //     // hintText: 'Destination Location',
-              //     ),
-              validator: (val) => val.length == 0 ? '輸入目的地位置。' : null,
-              onChanged: (val) {
-                _destination_location = val;
-                // FocusScope.of(context).requestFocus(FocusNode());
-                // setState(() => _destination_location = val);
-              },
-            ),
-          ),
-          Text(
-            '例如：屋苑名稱 / 街道 / 大廈 / 商場 / 地鐵站',
-            style: hintTxt,
-          ),
-          SizedBox(
-            height: 20,
-          ),
-          Text(
             '哪裡集合？（請清晰說明） ',
             style: TextStyle(
                 fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
@@ -520,6 +493,33 @@ class _CreateTripState extends State<CreateTrip>
                 _departure_location = val;
                 // FocusScope.of(context).requestFocus(FocusNode());
                 // setState(() => _departure_location = val);
+              },
+            ),
+          ),
+          Text(
+            '例如：屋苑名稱 / 街道 / 大廈 / 商場 / 地鐵站',
+            style: hintTxt,
+          ),
+          SizedBox(
+            height: 20,
+          ),
+          Text(
+            '去哪裡？',
+            style: TextStyle(
+                fontSize: 14, color: text_color1, fontWeight: FontWeight.bold),
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: 4),
+            child: TextFormField(
+              // controller: destination_loc_ctr,
+              // decoration: InputDecoration(
+              //     // hintText: 'Destination Location',
+              //     ),
+              validator: (val) => val.length == 0 ? '輸入目的地位置。' : null,
+              onChanged: (val) {
+                _destination_location = val;
+                // FocusScope.of(context).requestFocus(FocusNode());
+                // setState(() => _destination_location = val);
               },
             ),
           ),
@@ -609,9 +609,9 @@ class _CreateTripState extends State<CreateTrip>
                           }),
                           RadioInput('經隧道？（如果有）', ['可以', '不可以'], '可以', (val) {
                             if (val == '可以') {
-                              _tunnel = '可以經隧道';
+                              _tunnel = '經隧道';
                             } else {
-                              _tunnel = '不會經隧道';
+                              _tunnel = '不經隧道';
                             }
                           }),
                           RadioInput('會準時出發？', ['是 (不會等待)', '不是 (有權等待上限10分鐘)'],

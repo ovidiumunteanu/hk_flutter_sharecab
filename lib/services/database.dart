@@ -289,6 +289,7 @@ class DatabaseService {
     } else {
       await chat_collection.document(currentGrp).delete();
       await groupdetails.document(currentGrp).updateData({
+        'end': true,
         'users': FieldValue.arrayRemove([userInGroup]),
       });
       await groupdetails

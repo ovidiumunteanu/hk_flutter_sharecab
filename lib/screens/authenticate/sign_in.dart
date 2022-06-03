@@ -133,7 +133,7 @@ class _SignInState extends State<SignIn> {
             backgroundColor: yellow_color2,
             duration: Duration(seconds: 2),
             content: Text(
-              '此電話號碼已被屏蔽。',
+              '此帳戶暫時被封鎖，請聯絡我們。',
               style: TextStyle(color: text_color1),
             ),
           ));

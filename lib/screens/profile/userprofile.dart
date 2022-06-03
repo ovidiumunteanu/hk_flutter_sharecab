@@ -152,6 +152,7 @@ class _MyProfileState extends State<MyProfile>
                       size: 36,
                     ),
                   ),
+                  titleSpacing: 8,
                   title: Text(
                     '帳戶',
                     style: TextStyle(fontSize: 22, color: text_color1),
