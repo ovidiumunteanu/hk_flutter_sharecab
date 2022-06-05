@@ -11,6 +11,11 @@ class RequestService {
     await DatabaseService().exitGroup();
   }
 
+
+  Future<void> removeGroup(group_id) async {
+    await DatabaseService().removeGroup(group_id);
+  }
+
   Future<void> joinGroup(String listuid, int numUsers) async {
     await DatabaseService().joinGroup(listuid, numUsers);
   }

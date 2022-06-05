@@ -40,7 +40,11 @@ class DatabaseService {
 
   // Update user data (W=1/2,R=1)
   Future updateUserData(
-      {String name, String mobileNumber, String email, String sex, String covid}) async {
+      {String name,
+      String mobileNumber,
+      String email,
+      String sex,
+      String covid}) async {
     var currentGrp;
     var user = await _auth.currentUser();
     await Firestore.instance
@@ -336,6 +340,61 @@ class DatabaseService {
     });
   }
 
+  Future<void> removeGroup(group_id) async {
+    try {
+      var users_ref = await Firestore.instance
+          .collection('userdetails')
+          .where('currentGroup', isEqualTo: group_id)
+          .getDocuments();
+
+      for (var u = 0; u < users_ref.documents.length; u++) {
+        await userDetails
+            .document(users_ref.documents[u].documentID)
+            .updateData({
+          'currentGroup': null,
+        });
+      }
+    } catch (error) {
+      print(error);
+    }
+
+    // delete group
+    try {
+      var group_users_ref = await groupdetails
+          .document(group_id)
+          .collection('users')
+          .getDocuments();
+      for (var u = 0; u < group_users_ref.documents.length; u++) {
+        await groupdetails
+            .document(group_id)
+            .collection('users')
+            .document(group_users_ref.documents[u].documentID)
+            .delete();
+      }
+
+      var group_usersout_ref = await groupdetails
+          .document(group_id)
+          .collection('users-out')
+          .getDocuments();
+      for (var u = 0; u < group_usersout_ref.documents.length; u++) {
+        await groupdetails
+            .document(group_id)
+            .collection('users-out')
+            .document(group_usersout_ref.documents[u].documentID)
+            .delete();
+      }
+    } catch (error) {
+      print(error);
+    }
+
+    try {
+      await chat_collection.document(group_id).delete();
+      await groupdetails.document(group_id).delete();
+    } catch (error) {
+      print(error);
+    }
+  }
+
   // join a group from dashboard (W=4,R=2)
   Future<void> joinGroup(String listuid, int numUsers) async {
     var user = await _auth.currentUser();
@@ -401,5 +460,28 @@ class DatabaseService {
       'users': FieldValue.arrayRemove([uid]),
     });
     await ChatService().kickedChatRoom(currentGrp, uid);
+  }
+
+  Future<void> setFavStatus(String group_id) async {
+    try {
+      var user = await _auth.currentUser();
+      await groupdetails.document(group_id).get().then((value) async {
+        if (value.exists) {
+          var favs = [];
+          if (value.data['favs'] != null) {
+            favs = value.data['favs'];
+          }
+          if (favs.contains(user.uid)) {
+            favs.remove(user.uid);
+          } else {
+            favs.add(user.uid);
+          }
+
+          await groupdetails.document(group_id).updateData({'favs': favs});
+        }
+      });
+    } catch (err) {
+      print(err);
+    }
   }
 }

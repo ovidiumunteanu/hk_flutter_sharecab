@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shareacab/components/TripItem.dart';
+import 'package:shareacab/providers/homesearch.dart';
 import 'package:shareacab/utils/constant.dart';
 import 'groupdetailscreen/groupdetails.dart';
 import 'groupscreen/group.dart';
@@ -88,170 +89,192 @@ class _TripsListState extends State<TripsList>
   @override
   Widget build(BuildContext context) {
     final currentuser = Provider.of<FirebaseUser>(context);
-    return Scaffold(
-      body: StreamBuilder(
-          stream: Firestore.instance
-              .collection('userdetails')
-              .document(currentuser == null ? '' : currentuser.uid)
-              .snapshots(),
-          builder: (_, usersnapshot) {
-            if (usersnapshot.connectionState == ConnectionState.waiting) {
-              Center(child: CircularProgressIndicator());
-            }
-            if (usersnapshot.connectionState == ConnectionState.active &&
-                usersnapshot.data != null) {
-              requestsArray = usersnapshot.data['currentGroupJoinRequests'];
-              requestsArray ??= [];
 
-              currentGroup = usersnapshot.data['currentGroup'];
-            }
+    return Consumer<HomeSearchProvider>(
+      builder: (context, searchProvider, child) {
+        print('searchProvider ' + searchProvider.search);
+        return Scaffold(
+          body: StreamBuilder(
+              stream: Firestore.instance
+                  .collection('userdetails')
+                  .document(currentuser == null ? '' : currentuser.uid)
+                  .snapshots(),
+              builder: (_, usersnapshot) {
+                if (usersnapshot.connectionState == ConnectionState.waiting) {
+                  Center(child: CircularProgressIndicator());
+                }
+                if (usersnapshot.connectionState == ConnectionState.active &&
+                    usersnapshot.data != null) {
+                  requestsArray = usersnapshot.data['currentGroupJoinRequests'];
+                  requestsArray ??= [];
 
-            _controller.addListener(() {
-              switch (_controller.position.userScrollDirection) {
-                // Scrolling up - forward the animation (value goes to 1)
-                case ScrollDirection.forward:
-                  _hideFabController.forward();
-                  break;
-                // Scrolling down - reverse the animation (value goes to 0)
-                case ScrollDirection.reverse:
-                  _hideFabController.reverse();
-                  break;
-                // Idle - keep FAB visibility unchanged
-                case ScrollDirection.idle:
-                  break;
-              }
-            });
-            return Container(
-              child: StreamBuilder(
-                stream: getStream(),
-                builder: (_, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    Center(child: CircularProgressIndicator());
+                  currentGroup = usersnapshot.data['currentGroup'];
+                }
+
+                _controller.addListener(() {
+                  switch (_controller.position.userScrollDirection) {
+                    // Scrolling up - forward the animation (value goes to 1)
+                    case ScrollDirection.forward:
+                      _hideFabController.forward();
+                      break;
+                    // Scrolling down - reverse the animation (value goes to 0)
+                    case ScrollDirection.reverse:
+                      _hideFabController.reverse();
+                      break;
+                    // Idle - keep FAB visibility unchanged
+                    case ScrollDirection.idle:
+                      break;
                   }
+                });
+                return Container(
+                  child: StreamBuilder(
+                    stream: getStream(),
+                    builder: (_, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        Center(child: CircularProgressIndicator());
+                      }
 
-                  return ListView.builder(
-                      controller: _controller,
-                      physics: BouncingScrollPhysics(),
-                      itemCount: snapshot.data == null
-                          ? 0
-                          : snapshot.data.documents.length,
-                      itemBuilder: (ctx, index) {
-                        final docData = snapshot.data.documents[index];
-                        final docId = docData.documentID;
+                      return ListView.builder(
+                          controller: _controller,
+                          physics: BouncingScrollPhysics(),
+                          itemCount: snapshot.data == null
+                              ? 0
+                              : snapshot.data.documents.length,
+                          itemBuilder: (ctx, index) {
+                            final docData = snapshot.data.documents[index];
+                            final docId = docData.documentID;
 
-                        final transportation = docData.data['transportation'];
-                        final departure = docData.data['departure'];
-                        final destination = docData.data['destination'];
-                        final departure_sub = docData.data['departure_sub'];
-                        final destination_sub = docData.data['destination_sub'];
-                        final departure_location =
-                            docData.data['departure_location'];
-                        final destination_location =
-                            docData.data['destination_location'];
-                        final departure_time = docData.data['departure_time'];
-                        final maxMembers = docData.data['maxMembers'];
-                        final reference_number =
-                            docData.data['reference_number'];
-                        final covid = docData.data['covid'];
-                        var joinedMember = 0;
-                        for (var i = 0; i < docData.data['users'].length; i++) {
-                          joinedMember =
-                              joinedMember + docData.data['users'][i]['num'];
-                        }
+                            final transportation =
+                                docData.data['transportation'];
+                            final departure = docData.data['departure'];
+                            final destination = docData.data['destination'];
+                            final departure_sub = docData.data['departure_sub'];
+                            final destination_sub =
+                                docData.data['destination_sub'];
+                            final departure_location =
+                                docData.data['departure_location'];
+                            final destination_location =
+                                docData.data['destination_location'];
+                            final departure_time =
+                                docData.data['departure_time'];
+                            final maxMembers = docData.data['maxMembers'];
+                            final reference_number =
+                                docData.data['reference_number'];
+                            final covid = docData.data['covid'];
+                            var joinedMember = 0;
+                            for (var i = 0;
+                                i < docData.data['users'].length;
+                                i++) {
+                              joinedMember = joinedMember +
+                                  docData.data['users'][i]['num'];
+                            }
+                            var isFav = false;
+                            if (docData.data['favs'] != null) {
+                              if (docData.data['favs']
+                                  .contains(currentuser.uid)) {
+                                isFav = true;
+                              }
+                            }
 
-                        if (docId == currentGroup) {
-                          flag = true;
-                        } else {
-                          flag = false;
-                        }
-                        if (widget.search != null &&
-                            widget.search != '' &&
-                            !destination_location.contains(widget.search)) {
-                          return Container();
-                        }
-                        return Hero(
-                          tag: docId,
-                          child: Card(
-                            color: Theme.of(context).scaffoldBackgroundColor,
-                            elevation: 0.0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(0),
-                            ),
-                            margin: EdgeInsets.zero,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => GroupDetails(
-                                              docId,
-                                              isHistory: false,
-                                            )));
-                              },
+                            if (docId == currentGroup) {
+                              flag = true;
+                            } else {
+                              flag = false;
+                            }
+                            if (searchProvider.search != null &&
+                                searchProvider.search != '' &&
+                                !destination_location
+                                    .contains(searchProvider.search)) {
+                              return Container();
+                            }
+                            return Hero(
+                              tag: docId,
                               child: Card(
-                                elevation: 0,
+                                color:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                elevation: 0.0,
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(0),
                                 ),
-                                margin: EdgeInsets.symmetric(
-                                    vertical: 2, horizontal: 0),
-                                child: TripItem(
-                                  transportation: transportation,
-                                  departureSub:
-                                      departure_sub, // snapshot.data.documents[index].data['departure'],
-                                  destinationSub:
-                                      destination_sub, //snapshot.data.documents[index].data['destination'],
-                                  departure_loc: departure_location,
-                                  destination_loc: destination_location,
-                                  departure_time: departure_time.toDate(),
-                                  maxMember: maxMembers,
-                                  joinedMember: joinedMember,
-                                  reference_number: reference_number,
-                                  covid: covid,
+                                margin: EdgeInsets.zero,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => GroupDetails(
+                                                  docId,
+                                                  isHistory: false,
+                                                )));
+                                  },
+                                  child: Card(
+                                    elevation: 0,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(0),
+                                    ),
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 2, horizontal: 0),
+                                    child: TripItem(
+                                      transportation: transportation,
+                                      departureSub:
+                                          departure_sub, // snapshot.data.documents[index].data['departure'],
+                                      destinationSub:
+                                          destination_sub, //snapshot.data.documents[index].data['destination'],
+                                      departure_loc: departure_location,
+                                      destination_loc: destination_location,
+                                      departure_time: departure_time.toDate(),
+                                      maxMember: maxMembers,
+                                      joinedMember: joinedMember,
+                                      reference_number: reference_number,
+                                      covid: covid,
+                                      isFav: isFav,
+                                      group_id: docId,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
-                        );
-                      });
-                },
-              ),
-            );
-          }),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      // floatingActionButton: FadeTransition(
-      //   opacity: _hideFabController,
-      //   child: ScaleTransition(
-      //     scale: _hideFabController,
-      //     child: widget.inGroupFetch
-      //         ? !widget.inGroup
-      //             ? Padding(
-      //                 padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
-      //                 child: FloatingActionButton(
-      //                   onPressed: () => widget.startCreatingTrip(context),
-      //                   child: Tooltip(
-      //                     message: 'Create Group',
-      //                     verticalOffset: -60,
-      //                     child: Icon(Icons.add),
-      //                   ),
-      //                 ),
-      //               )
-      //             : Padding(
-      //                 padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
-      //                 child: FloatingActionButton.extended(
-      //                   onPressed: () {
-      //                     Navigator.push(
-      //                         context,
-      //                         MaterialPageRoute(
-      //                             builder: (context) => GroupPage()));
-      //                   },
-      //                   icon: Icon(Icons.group),
-      //                   label: Text('Group'),
-      //                 ),
-      //               )
-      //         : null,
-      //   ),
-      // )
+                            );
+                          });
+                    },
+                  ),
+                );
+              }),
+          // floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+          // floatingActionButton: FadeTransition(
+          //   opacity: _hideFabController,
+          //   child: ScaleTransition(
+          //     scale: _hideFabController,
+          //     child: widget.inGroupFetch
+          //         ? !widget.inGroup
+          //             ? Padding(
+          //                 padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
+          //                 child: FloatingActionButton(
+          //                   onPressed: () => widget.startCreatingTrip(context),
+          //                   child: Tooltip(
+          //                     message: 'Create Group',
+          //                     verticalOffset: -60,
+          //                     child: Icon(Icons.add),
+          //                   ),
+          //                 ),
+          //               )
+          //             : Padding(
+          //                 padding: const EdgeInsets.fromLTRB(0, 20, 0, 80),
+          //                 child: FloatingActionButton.extended(
+          //                   onPressed: () {
+          //                     Navigator.push(
+          //                         context,
+          //                         MaterialPageRoute(
+          //                             builder: (context) => GroupPage()));
+          //                   },
+          //                   icon: Icon(Icons.group),
+          //                   label: Text('Group'),
+          //                 ),
+          //               )
+          //         : null,
+          //   ),
+          // )
+        );
+      },
     );
   }
 }

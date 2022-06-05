@@ -46,7 +46,7 @@ class _CreateTripState extends State<CreateTrip>
   List<String> max_members = ['2位', '3位', '4位', '5位'];
   List<String> cur_members = ['1位', '2位', '3位'];
 
-  String _covid;
+  String _covid = '必須已注射第三針';
   String _transportation = '的士';
   String _departure = '香港島';
   String _departure_sub;
@@ -56,7 +56,7 @@ class _CreateTripState extends State<CreateTrip>
   String _destination_location;
   DateTime _selectedDepartureDate;
   TimeOfDay _selectedDepartureTime;
-  int _maxMembers = 2;
+  int _maxMembers = 4;
   int _curMembers = 1;
   String _sex = '男女也可';
   String _tunnel = '經隧道';

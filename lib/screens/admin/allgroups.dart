@@ -101,19 +101,28 @@ class _GroupListState extends State<GroupList> {
                   var format = DateFormat('yyyy.MM.dd    h:mm a');
                   var createdAt = CommonUtils.convertFBTimeStamp2DateTime(
                       doc.data['created']);
+
+                  var favs_count = 0;
+                  if (doc.data['favs'] != null) {
+                    favs_count = doc.data['favs'].length;
+                  }
+
                   var group = GroupData(
-                    id: doc.documentID,
-                    reference_number: doc.data['reference_number'] ?? '',
-                    created: createdAt != null ? format.format(createdAt) : '',
-                  );
+                      id: doc.documentID,
+                      reference_number: doc.data['reference_number'] ?? '',
+                      created:
+                          createdAt != null ? format.format(createdAt) : '',
+                      favs_count: favs_count);
 
                   if (widget.userId != null) {
                     var find_user = doc.data['users'].firstWhere(
-                        (element) => element['uid'] == widget.userId, orElse: () {
+                        (element) => element['uid'] == widget.userId,
+                        orElse: () {
                       return null;
                     });
                     var find_user_out = doc.data['users-out'].firstWhere(
-                        (element) => element['uid'] == widget.userId, orElse: () {
+                        (element) => element['uid'] == widget.userId,
+                        orElse: () {
                       return null;
                     });
 
@@ -163,6 +172,7 @@ class _GroupListState extends State<GroupList> {
                             margin: EdgeInsets.zero,
                             child: InkWell(
                                 onTap: () {
+                                  print(GroupList[index].id);
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -189,13 +199,22 @@ class _GroupListState extends State<GroupList> {
                                           child: Text(
                                             GroupList[index].reference_number,
                                             style: TextStyle(
-                                                fontSize: 16,
+                                                fontSize: 14,
                                                 color: text_color1),
                                           )),
                                       Text(
                                         GroupList[index].created,
                                         style: TextStyle(
-                                            fontSize: 16, color: text_color1),
+                                            fontSize: 14, color: text_color1),
+                                      ),
+                                      Expanded(
+                                        flex: 1,
+                                        child: Text(
+                                          "${GroupList[index].favs_count}",
+                                          textAlign: TextAlign.right,
+                                          style: TextStyle(
+                                              fontSize: 14, color: red_color1),
+                                        ),
                                       )
                                     ],
                                   ),
@@ -217,5 +236,6 @@ class GroupData {
   String id;
   String reference_number;
   String created;
-  GroupData({this.id, this.reference_number, this.created});
+  int favs_count;
+  GroupData({this.id, this.reference_number, this.created, this.favs_count});
 }

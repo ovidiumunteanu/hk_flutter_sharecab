@@ -32,24 +32,24 @@ exports.manual_remove = functions.https.onRequest(async (req, res) => {
             {
                 let group_id = group_ref.docs[p].id
 
-                try {
-                    let users_ref = await db.collection('userdetails').where('currentGroup', '==', group_id).get();
-                    for (var u = 0; u < users_ref.docs.length; u++) {
-                        await db.collection('userdetails').doc(users_ref.docs[u].id).update({
-                            currentGroup: null
-                        });
-                    }
-                }
-                catch (error) {
-                    console.log(error);
-                }
+                // try {
+                //     let users_ref = await db.collection('userdetails').where('currentGroup', '==', group_id).get();
+                //     for (var u = 0; u < users_ref.docs.length; u++) {
+                //         await db.collection('userdetails').doc(users_ref.docs[u].id).update({
+                //             currentGroup: null
+                //         });
+                //     }
+                // }
+                // catch (error) {
+                //     console.log(error);
+                // }
 
-                try {
-                    await db.collection('chatroom').doc(group_id).delete();
-                } 
-                catch (error) {
-                    console.log(error);
-                }
+                // try {
+                //     await db.collection('chatroom').doc(group_id).delete();
+                // } 
+                // catch (error) {
+                //     console.log(error);
+                // }
 
                 // delete group
                 try {
@@ -84,24 +84,24 @@ exports.scheduler = functions.pubsub.schedule('every 5 minutes').onRun(async (co
             {
                 let group_id = group_ref.docs[p].id
 
-                try {
-                    let users_ref = await db.collection('userdetails').where('currentGroup', '==', group_id).get();
-                    for (var u = 0; u < users_ref.docs.length; u++) {
-                        await db.collection('userdetails').doc(users_ref.docs[u].id).update({
-                            currentGroup: null
-                        });
-                    }
-                }
-                catch (error) {
-                    console.log(error);
-                }
+                // try {
+                //     let users_ref = await db.collection('userdetails').where('currentGroup', '==', group_id).get();
+                //     for (var u = 0; u < users_ref.docs.length; u++) {
+                //         await db.collection('userdetails').doc(users_ref.docs[u].id).update({
+                //             currentGroup: null
+                //         });
+                //     }
+                // }
+                // catch (error) {
+                //     console.log(error);
+                // }
 
-                try {
-                    await db.collection('chatroom').doc(group_id).delete();
-                } 
-                catch (error) {
-                    console.log(error);
-                }
+                // try {
+                //     await db.collection('chatroom').doc(group_id).delete();
+                // } 
+                // catch (error) {
+                //     console.log(error);
+                // }
 
                 // delete group
                 try {

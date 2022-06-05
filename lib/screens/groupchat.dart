@@ -53,6 +53,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
   String tunnel = '';
   bool wait_all_member = false;
 
+  var isFav = false;
+
   String ownerUser = '';
 
   bool require_permission;
@@ -103,7 +105,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                   },
                 ),
                 FlatButton(
-                  child: Text('確定',
+                  child: Text('確認',
                       style: TextStyle(color: Theme.of(context).accentColor)),
                   onPressed: () async {
                     ProgressDialog pr;
@@ -373,7 +375,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                           destination = groupsnapshot.data['destination'];
 
                           departure_sub = groupsnapshot.data['departure_sub'];
-                          destination_sub = groupsnapshot.data['destination_sub'];
+                          destination_sub =
+                              groupsnapshot.data['destination_sub'];
 
                           departure_location =
                               groupsnapshot.data['departure_location'];
@@ -382,8 +385,9 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                           departure_time =
                               groupsnapshot.data['departure_time'].toDate();
                           maxMembers = groupsnapshot.data['maxMembers'];
-                          reference_number = groupsnapshot.data['reference_number']; 
-                          covid = groupsnapshot.data['covid']; 
+                          reference_number =
+                              groupsnapshot.data['reference_number'];
+                          covid = groupsnapshot.data['covid'];
 
                           joinedMember = 0;
                           for (var i = 0;
@@ -391,6 +395,14 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                               i++) {
                             joinedMember = joinedMember +
                                 groupsnapshot.data['users'][i]['num'];
+                          }
+
+                          isFav = false;
+                          if (groupsnapshot.data['favs'] != null) {
+                            if (groupsnapshot.data['favs']
+                                .contains(currentuser.uid)) {
+                              isFav = true;
+                            }
                           }
 
                           waiting_time = groupsnapshot.data['waiting_time'];
@@ -433,6 +445,8 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                                           joinedMember: joinedMember,
                                           reference_number: reference_number,
                                           covid: covid,
+                                          isFav: isFav,
+                                          group_id: groupUID,
                                         ),
                                         buildTransInfo(
                                             wait_all_member, tunnel, sex),

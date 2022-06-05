@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shareacab/services/database.dart';
 import 'package:shareacab/utils/constant.dart';
 
 class TripItem extends StatelessWidget {
@@ -14,6 +15,8 @@ class TripItem extends StatelessWidget {
   DateTime departure_time;
   String covid;
   String reference_number;
+  String group_id;
+  bool isFav = false;
   TripItem(
       {this.transportation,
       this.departureSub,
@@ -25,8 +28,17 @@ class TripItem extends StatelessWidget {
       this.departure_time,
       this.covid,
       this.reference_number,
+      this.group_id,
+      this.isFav,
       this.onPress});
   String today_str = DateFormat('yyyy.MM.dd').format(DateTime.now());
+
+  final DatabaseService _databaseService = DatabaseService();
+
+  void toggleFav() {
+    print('toggle fav ' + group_id);
+    _databaseService.setFavStatus(group_id);
+  }
 
   Widget buildRowInfo(String key, String value) {
     return Row(
@@ -182,6 +194,21 @@ class TripItem extends StatelessWidget {
                     buildRowInfo('集合  ', departure_loc),
                     buildRowInfo('前往  ', destination_loc),
                   ],
+                ),
+              ),
+              InkWell(
+                onTap: () {
+                  toggleFav();
+                },
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: 6),
+                  child: Image.asset(
+                    isFav == true
+                        ? 'assets/images/alert_on.png'
+                        : 'assets/images/alert_off.png',
+                    height: 24,
+                    fit: BoxFit.contain,
+                  ),
                 ),
               ),
             ],

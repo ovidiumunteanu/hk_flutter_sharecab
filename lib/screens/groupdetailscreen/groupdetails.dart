@@ -111,6 +111,8 @@ class _GroupDetailsState extends State<GroupDetails>
   String tunnel = '';
   bool wait_all_member = false;
 
+  var isFav = false;
+
   int curUsers = 0;
   int exitedUsers = 0;
 
@@ -140,6 +142,64 @@ class _GroupDetailsState extends State<GroupDetails>
       ret.add(i.toString());
     }
     return ret;
+  }
+
+  void onDeleteGroup() async {
+    try {
+      await showDialog(
+          context: context,
+          builder: (BuildContext ctx) {
+            return AlertDialog(
+              title: Text('刪除群組'),
+              content: Text('確認刪除這群組嗎？'),
+              actions: <Widget>[
+                FlatButton(
+                  child: Text('取消',
+                      style: TextStyle(color: Theme.of(context).accentColor)),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                FlatButton(
+                  child: Text('確認',
+                      style: TextStyle(color: Theme.of(context).accentColor)),
+                  onPressed: () async {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                    ProgressDialog pr;
+                    pr = ProgressDialog(context,
+                        type: ProgressDialogType.Normal,
+                        isDismissible: false,
+                        showLogs: false);
+                    pr.style(
+                      message: '刪除群組中..',
+                      backgroundColor: Theme.of(context).backgroundColor,
+                      messageTextStyle: TextStyle(
+                        color: text_color1,
+                      ),
+                    );
+                    await pr.show();
+                    await Future.delayed(Duration(seconds: 1));
+                    try {
+                      await _request.removeGroup(widget.docId);
+                      await pr.hide();
+                    } catch (e) {
+                      await pr.hide();
+                      print(e.toString());
+                      var errStr = e.message == null ? '' : e.toString();
+                      final snackBar = SnackBar(
+                          content: Text(errStr),
+                          duration: Duration(seconds: 3));
+                      _scaffoldKey.currentState.showSnackBar(snackBar);
+                    }
+                  },
+                ),
+              ],
+            );
+          });
+    } catch (e) {
+      print(e.toString());
+    }
   }
 
   void setArrived() async {
@@ -367,17 +427,18 @@ class _GroupDetailsState extends State<GroupDetails>
           ),
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Center(child: Text(
-                (userItem['mobilenum'] != null
-                    ? userItem['mobilenum'].substring(4)
-                    : ''),
-                style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black),
-              ),)
-            ),
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                  child: Text(
+                    (userItem['mobilenum'] != null
+                        ? userItem['mobilenum'].substring(4)
+                        : ''),
+                    style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black),
+                  ),
+                )),
           ),
           Expanded(
               child: isOut != true
@@ -617,6 +678,14 @@ class _GroupDetailsState extends State<GroupDetails>
                             groupsnapshot.data['users'][i]['num'];
                       }
 
+                      isFav = false;
+                      if (groupsnapshot.data['favs'] != null) {
+                        if (groupsnapshot.data['favs']
+                            .contains(currentuser.uid)) {
+                          isFav = true;
+                        }
+                      }
+
                       waiting_time = groupsnapshot.data['waiting_time'];
                       sex = groupsnapshot.data['sex'];
                       tunnel = groupsnapshot.data['tunnel'];
@@ -698,6 +767,8 @@ class _GroupDetailsState extends State<GroupDetails>
                                             joinedMember: joinedMember,
                                             reference_number: reference_number,
                                             covid: covid,
+                                            isFav: isFav,
+                                            group_id: widget.docId,
                                           ),
                                           buildTransInfo(
                                               wait_all_member, tunnel, sex),
@@ -807,7 +878,29 @@ class _GroupDetailsState extends State<GroupDetails>
                                           )
                                         : Container(),
                                     SizedBox(
-                                      height: 100,
+                                      height: 40,
+                                    ),
+                                    widget.isHistory == true
+                                        ? Container(
+                                            width: 200,
+                                            height: 40,
+                                            margin: EdgeInsets.only(top: 25),
+                                            child: InkWell(
+                                              onTap: () {
+                                                onDeleteGroup();
+                                              },
+                                              child: Center(
+                                                child: Text(
+                                                  '刪除群組',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.red),
+                                                ),
+                                              ),
+                                            ))
+                                        : Container(),
+                                    SizedBox(
+                                      height: 60,
                                     ),
                                   ],
                                 ),
