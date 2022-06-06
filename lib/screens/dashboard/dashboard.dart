@@ -116,15 +116,11 @@ class _DashboardState extends State<Dashboard>
                                       fontWeight: FontWeight.w500,
                                       color: text_color1),
                                   decoration: InputDecoration(
-                                      prefixIcon: Padding(
+                                      icon: Padding(
                                         padding: EdgeInsets.only(
                                           top: 2,
                                         ),
                                         child: Icon(Icons.search),
-                                      ),
-                                      prefixIconConstraints: BoxConstraints(
-                                        minWidth: 30,
-                                        minHeight: 25,
                                       ),
                                       hintText: '搜尋[集合]關鍵字',
                                       hintStyle: TextStyle(
@@ -144,7 +140,7 @@ class _DashboardState extends State<Dashboard>
                               ),
                             ),
                             Container(
-                              width: 20,
+                              width: 15,
                             ),
                             Expanded(
                                 child: Container(
@@ -162,15 +158,11 @@ class _DashboardState extends State<Dashboard>
                                     fontWeight: FontWeight.w500,
                                     color: text_color1),
                                 decoration: InputDecoration(
-                                    prefixIcon: Padding(
+                                    icon: Padding(
                                       padding: EdgeInsets.only(
                                         top: 2,
                                       ),
                                       child: Icon(Icons.search),
-                                    ),
-                                    prefixIconConstraints: BoxConstraints(
-                                      minWidth: 30,
-                                      minHeight: 25,
                                     ),
                                     hintText: '搜尋[前往]關鍵字',
                                     hintStyle: TextStyle(
