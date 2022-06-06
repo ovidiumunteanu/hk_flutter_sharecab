@@ -123,6 +123,8 @@ class _GroupDetailsState extends State<GroupDetails>
   bool full = false;
   bool genderOK = true;
 
+  var isAdmin = false;
+
   Timer _countdownTimer;
   @override
   void dispose() {
@@ -425,6 +427,7 @@ class _GroupDetailsState extends State<GroupDetails>
               ),
             ),
           ),
+          isAdmin ? 
           Expanded(
             child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -439,7 +442,7 @@ class _GroupDetailsState extends State<GroupDetails>
                         color: Colors.black),
                   ),
                 )),
-          ),
+          ) : Container(),
           Expanded(
               child: isOut != true
                   ? Padding(
@@ -629,6 +632,8 @@ class _GroupDetailsState extends State<GroupDetails>
             if (usersnapshot.data != null) {
               groupUID = usersnapshot.data['currentGroup'];
               myName = usersnapshot.data['name'];
+
+              isAdmin = usersnapshot.data['isAdmin'] ?? false;
             }
             if (groupUID != null) {
               GroupDetails.hasGroup = true;
@@ -679,7 +684,7 @@ class _GroupDetailsState extends State<GroupDetails>
                       }
 
                       isFav = false;
-                      if (groupsnapshot.data['favs'] != null) {
+                      if (currentuser != null && groupsnapshot.data['favs'] != null) {
                         if (groupsnapshot.data['favs']
                             .contains(currentuser.uid)) {
                           isFav = true;
@@ -880,7 +885,7 @@ class _GroupDetailsState extends State<GroupDetails>
                                     SizedBox(
                                       height: 40,
                                     ),
-                                    widget.isHistory == true
+                                    (isAdmin == true && widget.isHistory == true)
                                         ? Container(
                                             width: 200,
                                             height: 40,

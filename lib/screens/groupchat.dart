@@ -398,7 +398,7 @@ class _GroupChatScreenState extends State<GroupChatScreen>
                           }
 
                           isFav = false;
-                          if (groupsnapshot.data['favs'] != null) {
+                          if (currentuser != null && groupsnapshot.data['favs'] != null) {
                             if (groupsnapshot.data['favs']
                                 .contains(currentuser.uid)) {
                               isFav = true;

@@ -43,10 +43,6 @@ class _GroupListState extends State<GroupList> {
     // }
   }
 
-  void toggleSwitch(String userId, bool value) {
-    DatabaseService().blockUser(userid: userId, flag: !value);
-  }
-
   @override
   Widget build(BuildContext context) {
     double screen_width = MediaQuery.of(context).size.width;
@@ -207,6 +203,7 @@ class _GroupListState extends State<GroupList> {
                                         style: TextStyle(
                                             fontSize: 14, color: text_color1),
                                       ),
+                                      widget.userId == null ?
                                       Expanded(
                                         flex: 1,
                                         child: Text(
@@ -216,6 +213,7 @@ class _GroupListState extends State<GroupList> {
                                               fontSize: 14, color: red_color1),
                                         ),
                                       )
+                                      : Container()
                                     ],
                                   ),
                                 )));

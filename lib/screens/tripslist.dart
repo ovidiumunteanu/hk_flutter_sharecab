@@ -169,7 +169,7 @@ class _TripsListState extends State<TripsList>
                                   docData.data['users'][i]['num'];
                             }
                             var isFav = false;
-                            if (docData.data['favs'] != null) {
+                            if (currentuser != null && docData.data['favs'] != null) {
                               if (docData.data['favs']
                                   .contains(currentuser.uid)) {
                                 isFav = true;
