@@ -92,7 +92,6 @@ class _TripsListState extends State<TripsList>
 
     return Consumer<HomeSearchProvider>(
       builder: (context, searchProvider, child) {
-        print('searchProvider ' + searchProvider.search);
         return Scaffold(
           body: StreamBuilder(
               stream: Firestore.instance
@@ -181,10 +180,16 @@ class _TripsListState extends State<TripsList>
                             } else {
                               flag = false;
                             }
-                            if (searchProvider.search != null &&
-                                searchProvider.search != '' &&
+                            if (searchProvider.search_to != null &&
+                                searchProvider.search_to != '' &&
                                 !destination_location
-                                    .contains(searchProvider.search)) {
+                                    .contains(searchProvider.search_to)) {
+                              return Container();
+                            }
+                            if (searchProvider.search_from != null &&
+                                searchProvider.search_from != '' &&
+                                !departure_location
+                                    .contains(searchProvider.search_from)) {
                               return Container();
                             }
                             return Hero(

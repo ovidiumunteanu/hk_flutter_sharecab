@@ -29,7 +29,9 @@ class _DashboardState extends State<Dashboard>
   bool inGroup = false;
   Location location = Location();
 
-  TextEditingController _controller = TextEditingController();
+  TextEditingController searchfrom_controller = TextEditingController();
+  TextEditingController searchto_controller = TextEditingController();
+
   void _startCreatingTrip(BuildContext ctx) async {
     await Navigator.of(ctx).pushNamed(
       CreateTrip.routeName,
@@ -96,41 +98,97 @@ class _DashboardState extends State<Dashboard>
                         color: Colors.white,
                         padding:
                             EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                        child: Container(
-                          width: double.infinity,
-                          padding: EdgeInsets.symmetric(horizontal: 12),
-                          height: 42,
-                          decoration: BoxDecoration(
-                              color: Color(0xFFf7f7f7),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          child: TextFormField(
-                            controller: _controller,
-                            keyboardType: TextInputType.text,
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w500,
-                                color: text_color1),
-                            decoration: InputDecoration(
-                                icon: Padding(
-                                  padding: EdgeInsets.only(top: 2),
-                                  child: Icon(Icons.search),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Container(
+                                padding: EdgeInsets.symmetric(horizontal: 12),
+                                height: 42,
+                                decoration: BoxDecoration(
+                                    color: Color(0xFFf7f7f7),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(10))),
+                                child: TextFormField(
+                                  controller: searchfrom_controller,
+                                  keyboardType: TextInputType.text,
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: text_color1),
+                                  decoration: InputDecoration(
+                                      prefixIcon: Padding(
+                                        padding: EdgeInsets.only(
+                                          top: 2,
+                                        ),
+                                        child: Icon(Icons.search),
+                                      ),
+                                      prefixIconConstraints: BoxConstraints(
+                                        minWidth: 30,
+                                        minHeight: 25,
+                                      ),
+                                      hintText: '搜尋[集合]關鍵字',
+                                      hintStyle: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w500,
+                                          color: Color(0xFF808080)),
+                                      border: InputBorder.none),
+                                  onChanged: (value) {
+                                    Provider.of<HomeSearchProvider>(context,
+                                            listen: false)
+                                        .setFromSearch(searchfrom_controller.text);
+                                  },
+                                  onEditingComplete: () {
+                                    FocusScope.of(context).unfocus();
+                                  },
                                 ),
-                                hintText: '請輸入搜尋[前往]關鍵字',
-                                hintStyle: TextStyle(
+                              ),
+                            ),
+                            Container(
+                              width: 20,
+                            ),
+                            Expanded(
+                                child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 12),
+                              height: 42,
+                              decoration: BoxDecoration(
+                                  color: Color(0xFFf7f7f7),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(10))),
+                              child: TextFormField(
+                                controller: searchto_controller,
+                                keyboardType: TextInputType.text,
+                                style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w500,
-                                    color: Color(0xFF808080)),
-                                border: InputBorder.none),
-                            onChanged: (value) {
-                              Provider.of<HomeSearchProvider>(context,
-                                      listen: false)
-                                  .setSearch(_controller.text);
-                            },
-                            onEditingComplete: () {
-                              FocusScope.of(context).unfocus();
-                            },
-                          ),
+                                    color: text_color1),
+                                decoration: InputDecoration(
+                                    prefixIcon: Padding(
+                                      padding: EdgeInsets.only(
+                                        top: 2,
+                                      ),
+                                      child: Icon(Icons.search),
+                                    ),
+                                    prefixIconConstraints: BoxConstraints(
+                                      minWidth: 30,
+                                      minHeight: 25,
+                                    ),
+                                    hintText: '搜尋[前往]關鍵字',
+                                    hintStyle: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: Color(0xFF808080)),
+                                    border: InputBorder.none),
+                                onChanged: (value) {
+                                  Provider.of<HomeSearchProvider>(context,
+                                          listen: false)
+                                      .setToSearch(searchto_controller.text);
+                                },
+                                onEditingComplete: () {
+                                  FocusScope.of(context).unfocus();
+                                },
+                              ),
+                            ))
+                          ],
                         )),
                     FilterView((_departure, _departure_sub, _destination,
                             _destination_sub, _curGender, _sortbyTime) {
@@ -164,8 +222,7 @@ class _DashboardState extends State<Dashboard>
                                 sortbyTime,
                                 inGroup: inGroup,
                                 inGroupFetch: inGroupFetch,
-                                startCreatingTrip: _startCreatingTrip,
-                                search: _controller.text,
+                                startCreatingTrip: _startCreatingTrip
                               ),
                             ),
                           ],
